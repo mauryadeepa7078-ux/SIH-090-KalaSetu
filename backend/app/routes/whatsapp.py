@@ -7,7 +7,7 @@ from backend.app.models.schemas import (
     CatalogGenerateRequest
 )
 from backend.app.pipeline.photo_studio import process_artisan_photo
-from backend.app.pipeline.voice_catalog import generate_bilingual_catalog, transcribe_audio_whisper
+from backend.app.pipeline.voice_catalog import generate_bilingual_catalog, transcribe_audio_whisper, get_category_image
 from backend.app.pipeline.pricing_model import pricing_engine
 from backend.app.data.db_store import db_store
 
@@ -199,18 +199,6 @@ async def simulate_whatsapp_conversation(req: WhatsAppSimulationRequest):
         ]
         return {"status": "success", "messages": messages}
 
-    # 3. Process image if provided or craft description
-    enhanced_img_url = "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80"
-    raw_img_url = enhanced_img_url
-    if req.image_base64:
-        try:
-            img_bytes = base64.b64decode(req.image_base64.split(",")[-1])
-            photo_result = process_artisan_photo(img_bytes, remove_bg=True, apply_enhancement=True)
-            enhanced_img_url = photo_result["enhanced_image_url"]
-            raw_img_url = photo_result["original_image_url"]
-        except Exception as e:
-            print(f"WhatsApp image process error: {e}")
-
     # Fallback text if empty
     if not transcribed_text:
         transcribed_text = "हस्तनिर्मित पारंपरिक भारतीय कलाकृति"
@@ -222,6 +210,18 @@ async def simulate_whatsapp_conversation(req: WhatsAppSimulationRequest):
             artisan_name="WhatsApp Artisan"
         )
     )
+
+    # 3. Process image if provided, or resolve category authentic photo
+    enhanced_img_url = get_category_image(catalog.suggested_category)
+    raw_img_url = enhanced_img_url
+    if req.image_base64:
+        try:
+            img_bytes = base64.b64decode(req.image_base64.split(",")[-1])
+            photo_result = process_artisan_photo(img_bytes, remove_bg=True, apply_enhancement=True)
+            enhanced_img_url = photo_result.get("enhanced_image_data") or photo_result.get("enhanced_image_url") or enhanced_img_url
+            raw_img_url = photo_result.get("original_image_data") or photo_result.get("original_image_url") or raw_img_url
+        except Exception as e:
+            print(f"WhatsApp image process error: {e}")
 
     # 5. Calculate Dynamic Pricing
     pricing = pricing_engine.calculate_price(

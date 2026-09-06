@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   ShoppingBag, 
   Trash2, 
@@ -98,7 +99,7 @@ export const BuyerCartPage = () => {
           <div className="lg:col-span-7 space-y-3">
             {cart.map((item) => {
               const displayTitle = lang === 'hi' && item.title_hi ? item.title_hi : item.title_en;
-              const imgSrc = item.enhanced_image_url || item.original_image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=80';
+              const imgSrc = getProductImage(item);
 
               return (
                 <div
@@ -108,6 +109,10 @@ export const BuyerCartPage = () => {
                   <img
                     src={imgSrc}
                     alt={item.title_en}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getCategoryFallbackImage(item.category);
+                    }}
                     className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover bg-stone-100 border border-stone-200 shrink-0"
                   />
 

@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Package, 
   Truck, 
@@ -243,8 +244,12 @@ export const ArtisanOrdersPage = () => {
                       <div className="md:col-span-6 flex items-center space-x-4">
                         <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-stone-100 p-1 border border-stone-200 flex-shrink-0 overflow-hidden flex items-center justify-center">
                           <img
-                            src={order.product_image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80'}
+                            src={getProductImage(order) || order.product_image || getCategoryFallbackImage('Handloom Saree')}
                             alt={order.product_title}
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = getCategoryFallbackImage(order.category || 'Handloom Saree');
+                            }}
                             className="w-full h-full object-cover rounded-xl"
                           />
                         </div>

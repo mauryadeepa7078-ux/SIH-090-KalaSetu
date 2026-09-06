@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Package, 
   Truck, 
@@ -133,8 +134,12 @@ export const BuyerOrdersPage = () => {
                   >
                     <div className="flex items-start space-x-3.5">
                       <img
-                        src={ord.product_image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=300&q=80'}
+                        src={getProductImage(ord) || ord.product_image || getCategoryFallbackImage('Handloom Saree')}
                         alt={ord.product_title}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = getCategoryFallbackImage(ord.category || 'Handloom Saree');
+                        }}
                         className="w-16 h-16 rounded-2xl object-cover bg-stone-100 border border-stone-200 shrink-0"
                       />
 

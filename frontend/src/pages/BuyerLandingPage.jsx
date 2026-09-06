@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Search, 
   Sparkles, 
@@ -196,7 +197,7 @@ export const BuyerLandingPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => {
             const displayTitle = lang === 'hi' && product.title_hi ? product.title_hi : product.title_en;
-            const imgSrc = product.enhanced_image_url || product.original_image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+            const imgSrc = getProductImage(product);
 
             return (
               <div
@@ -209,6 +210,10 @@ export const BuyerLandingPage = () => {
                   <img
                     src={imgSrc}
                     alt={product.title_en}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getCategoryFallbackImage(product.category);
+                    }}
                     className="w-full h-full object-contain rounded-2xl group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />

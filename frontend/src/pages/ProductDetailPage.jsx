@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   ArrowLeft, 
   Award, 
@@ -61,7 +62,7 @@ export const ProductDetailPage = () => {
   const displayDesc = lang === 'hi' && p.description_hi ? p.description_hi : p.description_en;
   const displayStory = lang === 'hi' && p.cultural_story_hi ? p.cultural_story_hi : p.cultural_story_en;
   const bullets = (lang === 'hi' && p.bullet_points_hi?.length) ? p.bullet_points_hi : p.bullet_points_en || [];
-  const imgSrc = p.enhanced_image_url || p.original_image_url;
+  const imgSrc = getProductImage(p);
 
   // Toggle GeM Publishing
   const handleToggleGeM = async () => {
@@ -118,6 +119,10 @@ export const ProductDetailPage = () => {
             <img
               src={imgSrc}
               alt={p.title_en}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = getCategoryFallbackImage(p.category);
+              }}
               className="w-full h-full object-contain rounded-2xl"
             />
 

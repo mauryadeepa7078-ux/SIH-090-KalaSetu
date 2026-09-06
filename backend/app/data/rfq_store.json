@@ -7,7 +7,7 @@
     "quantity": 150,
     "target_price": 2800.0,
     "location": "New Delhi Central Depot",
-    "status": "ACCEPTED",
+    "status": "OPEN",
     "inquiry_date": "2026-09-02",
     "requirements": "Bulk procurement for upcoming National Aadi Mahotsav corporate VIP gift hampers. Must have authentic GI certification."
   },
@@ -31,7 +31,7 @@
     "quantity": 200,
     "target_price": 1300.0,
     "location": "Janpath, New Delhi",
-    "status": "ACCEPTED",
+    "status": "OPEN",
     "inquiry_date": "2026-09-01",
     "requirements": "Hand-painted 10-inch decorative wall plates with export quality thermocol packaging for international tourists."
   },

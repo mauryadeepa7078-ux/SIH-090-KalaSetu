@@ -85,6 +85,22 @@ Return ONLY a valid JSON object matching this exact schema:
     return generate_fallback_catalog(raw_text, category, artisan_name)
 
 
+CATEGORY_DEFAULT_IMAGES = {
+    "Handloom Saree": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+    "Terracotta Pottery": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+    "Brass Dokra Craft": "https://images.unsplash.com/photo-1582561424760-0321d75e81fa?auto=format&fit=crop&w=800&q=80",
+    "Madhubani Painting": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+    "Blue Pottery": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+    "Wood Carving": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80",
+    "Leather Craft": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=800&q=80",
+    "Zari Embroidery": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80",
+    "Indian Handicraft": "https://images.unsplash.com/photo-1582561424760-0321d75e81fa?auto=format&fit=crop&w=800&q=80"
+}
+
+def get_category_image(category: str) -> str:
+    return CATEGORY_DEFAULT_IMAGES.get(category, CATEGORY_DEFAULT_IMAGES["Indian Handicraft"])
+
+
 def generate_fallback_catalog(raw_text: str, category: str = None, artisan_name: str = "Artisan") -> ProductCatalogResponse:
     """
     Resilient smart catalog generator ensuring instant, 100% reliable hackathon demonstrations.
@@ -101,12 +117,36 @@ def generate_fallback_catalog(raw_text: str, category: str = None, artisan_name:
         title_en = "Handcrafted Authentic Banarasi Katan Silk Saree"
         title_hi = "पारंपरिक हस्तनिर्मित बनारसी कातान सिल्क साड़ी"
         tags = ["Handloom", "BanarasiSilk", "HeritageWeave", "VaranasiCraft", "FestiveWear"]
+    elif any(k in raw_lower for k in ["लकड़ी", "wood", "carving", "channapatna", "चन्नापटना", "खिलौना", "toy"]):
+        detected_cat = "Wood Carving"
+        mat = "Seasoned Wrightia Wood & Natural Lac"
+        dim = "8 x 4 x 4 Inches"
+        care = "Wipe with dry soft microfiber cloth."
+        title_en = "Channapatna Eco-Friendly Hand-Turned Lacquer Wooden Craft"
+        title_hi = "चन्नापटना पर्यावरण-अनुकूल लैकर लकड़ी का हस्तशिल्प"
+        tags = ["WoodCarving", "Channapatna", "HandmadeToy", "NonToxic", "EcoCraft"]
+    elif any(k in raw_lower for k in ["चमड़ा", "leather", "kolhapuri", "चप्पल", "footwear", "सैंडल"]):
+        detected_cat = "Leather Craft"
+        mat = "Vegetable Tanned Buffalo Leather"
+        dim = "Standard Handcrafted Sizes"
+        care = "Apply natural oil occasionally. Avoid soaking in water."
+        title_en = "Authentic Kolhapuri Handcrafted Vegetable-Tanned Leather Craft"
+        title_hi = "प्रामाणिक कोल्हापुरी हस्तनिर्मित वनस्पति-टैन्ड चमड़ा उत्पाद"
+        tags = ["LeatherCraft", "Kolhapuri", "Handmade", "VegetableTanned", "GIProduct"]
+    elif any(k in raw_lower for k in ["कढ़ाई", "जरी", "embroidery", "zari", "kutch", "दर्जी", "मिरर", "mirror"]):
+        detected_cat = "Zari Embroidery"
+        mat = "Cotton Fabric, Silk Thread & Mirror Work"
+        dim = "36 x 14 Inches"
+        care = "Dry Clean or gentle hand spot cleaning only."
+        title_en = "Kutch Hand-Embroidered Rabari Mirrorwork & Zari Craft"
+        title_hi = "कच्छ हस्तनिर्मित रबारी कशीदाकारी व जरी तोरण"
+        tags = ["ZariEmbroidery", "KutchCraft", "Mirrorwork", "Handmade", "FestiveDecor"]
     elif any(k in raw_lower for k in ["मिट्टी", "clay", "pottery", "terracotta", "घड़ा", "मटका", "दीया", "कुल्हड़"]):
         detected_cat = "Terracotta Pottery"
         mat = "Natural Riverbed Clay & Organic Pigments"
         dim = "10 x 8 x 6 Inches"
         care = "Hand wash with mild warm water. Avoid abrasive scrubs."
-        title_en = "Traditional Hand-molded Terracotta Earthen Decorative Urn"
+        title_en = "Traditional Hand-molded Terracotta Earthen Decorative Craft"
         title_hi = "पारंपरिक हस्तनिर्मित टेराकोटा मिट्टी का सजावटी पात्र"
         tags = ["Terracotta", "ClayCraft", "EcoFriendly", "HomeDecor", "NaturalPottery"]
     elif any(k in raw_lower for k in ["पीतल", "brass", "dokra", "dhokra", "धातु", "bell metal", "मूर्ती"]):

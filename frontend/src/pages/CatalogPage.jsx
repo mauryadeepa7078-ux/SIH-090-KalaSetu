@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Search, 
   Plus, 
@@ -162,7 +163,7 @@ export const CatalogPage = () => {
           {filteredProducts.map((product) => {
             const isPending = product.sync_status === 'PENDING';
             const displayTitle = lang === 'hi' && product.title_hi ? product.title_hi : product.title_en;
-            const imgSrc = product.enhanced_image_url || product.original_image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+            const imgSrc = getProductImage(product);
 
             return (
               <div
@@ -175,6 +176,10 @@ export const CatalogPage = () => {
                   <img
                     src={imgSrc}
                     alt={product.title_en}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getCategoryFallbackImage(product.category);
+                    }}
                     className="w-full h-full object-contain rounded-2xl group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                   />
