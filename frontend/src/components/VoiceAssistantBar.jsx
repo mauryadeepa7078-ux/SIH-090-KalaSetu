@@ -5,23 +5,49 @@ import { Mic, MicOff, Volume2, Sparkles, ChevronUp, ChevronDown } from 'lucide-r
 
 export const VoiceAssistantBar = () => {
   const { isListening, startVoiceNavigation, recognizedText, assistantReply, speakGuide } = useVoiceNav();
-  const { t, lang } = useApp();
+  const { t, lang, userRole } = useApp();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const sampleCommands = [
-    { label: 'नया उत्पाद', cmd: 'नया उत्पाद' },
-    { label: 'बिक्री देखें', cmd: 'बिक्री देखें' },
-    { label: 'मूल्य जांचें', cmd: 'मूल्य जांचें' },
-    { label: 'GeM मार्केट', cmd: 'GeM पोर्टल' },
-    { label: 'सिंक करें', cmd: 'सिंक करें' },
-  ];
+  const sampleCommands = userRole === 'businessman'
+    ? [
+        { label: 'B2B हब', cmd: 'B2B हब खोलें' },
+        { label: 'GeM टेंडर', cmd: 'GeM पोर्टल टेंडर' },
+        { label: 'थोक RFQ', cmd: 'थोक RFQ कोटेशन' },
+        { label: 'क्लस्टर्स', cmd: 'कारीगर क्लस्टर्स' }
+      ]
+    : userRole === 'buyer'
+    ? [
+        { label: 'शिल्प बाज़ार', cmd: 'शिल्प बाज़ार खोलें' },
+        { label: 'मेरे ऑर्डर', cmd: 'मेरे ऑर्डर दिखाएं' },
+        { label: 'कार्ट', cmd: 'कार्ट देखें' },
+        { label: 'विरासत कथाएँ', cmd: 'विरासत कथाएँ' }
+      ]
+    : [
+        { label: 'नया उत्पाद', cmd: 'नया उत्पाद' },
+        { label: 'मेरे ऑर्डर', cmd: 'ऑर्डर और पूछताछ' },
+        { label: 'बिक्री देखें', cmd: 'बिक्री देखें' },
+        { label: 'मूल्य जांचें', cmd: 'मूल्य जांचें' },
+        { label: 'सिंक करें', cmd: 'सिंक करें' }
+      ];
 
-  const conversationalQuestions = [
-    { label: '💰 सही दाम कैसे तय होगा?', cmd: 'यह प्राइस कैसे तय होता है?' },
-    { label: '🏛️ GeM पोर्टल क्या है?', cmd: 'GeM पोर्टल क्या है और कैसे काम करता है?' },
-    { label: '📷 फोटो कैसे लें?', cmd: 'फोटो का बैकग्राउंड कैसे हटेगा?' },
-    { label: '📜 प्रामाणिकता सर्टिफिकेट?', cmd: 'MoSJE सर्टिफिकेट क्या है?' }
-  ];
+  const conversationalQuestions = userRole === 'businessman'
+    ? [
+        { label: '📋 थोक RFQ कैसे बनाएं?', cmd: 'थोक RFQ और MOQ डिस्काउंट कैसे काम करता है?' },
+        { label: '🏛️ GeM टेंडर कंप्लायंस?', cmd: 'GeM सरकारी टेंडर प्रक्रिया क्या है?' },
+        { label: '🧾 GSTIN इनवॉइस किट?', cmd: 'GST टैक्स और HSN कोड कैसे मिलेगा?' }
+      ]
+    : userRole === 'buyer'
+    ? [
+        { label: '🚚 ऑर्डर डिलीवरी ट्रैकिंग?', cmd: 'मेरा ऑर्डर कब तक डिलीवर होगा?' },
+        { label: '🏅 GI प्रामाणिकता?', cmd: 'क्या यह उत्पाद 100% प्रामाणिक GI क्राफ्ट है?' },
+        { label: '💬 कारीगर से बात?', cmd: 'कारीगर से सीधे कैसे संपर्क करें?' }
+      ]
+    : [
+        { label: '💰 सही दाम कैसे तय होगा?', cmd: 'यह प्राइस कैसे तय होता है?' },
+        { label: '📷 फोटो कैसे लें?', cmd: 'फोटो का बैकग्राउंड कैसे हटेगा?' },
+        { label: '🎙️ आवाज से कैटलॉग?', cmd: 'बोलकर कैटलॉग कैसे बनता है?' },
+        { label: '📜 प्रामाणिकता सर्टिफिकेट?', cmd: 'MoSJE सर्टिफिकेट क्या है?' }
+      ];
 
   return (
     <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end">

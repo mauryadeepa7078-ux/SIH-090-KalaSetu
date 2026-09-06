@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const CertificatePage = () => {
-  const { selectedProduct, setActiveTab, t, lang } = useApp();
+  const { selectedProduct, setActiveTab, t, lang, userRole } = useApp();
   const [certData, setCertData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -77,11 +77,11 @@ export const CertificatePage = () => {
       {/* Top action bar */}
       <div className="flex items-center justify-between no-print">
         <button
-          onClick={() => setActiveTab('catalog')}
-          className="inline-flex items-center space-x-1.5 text-xs font-bold text-stone-600 hover:text-stone-900 bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-sm"
+          onClick={() => setActiveTab(userRole === 'artisan' ? 'catalog' : (userRole === 'businessman' ? 'businessman-home' : 'buyer-market'))}
+          className="inline-flex items-center space-x-1.5 text-xs font-bold text-stone-600 hover:text-stone-900 bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-sm transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to Catalog</span>
+          <span>Back to {userRole === 'artisan' ? 'Catalog' : (userRole === 'businessman' ? 'B2B Hub' : 'Marketplace')}</span>
         </button>
 
         <button

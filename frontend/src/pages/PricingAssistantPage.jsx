@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { offlineStorage } from '../services/offlineStorage';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import confetti from 'canvas-confetti';
 import { 
   DollarSign, 
@@ -96,7 +97,7 @@ export const PricingAssistantPage = () => {
   // Save product to Backend or Offline Queue
   const handleSaveAndPublish = async () => {
     setIsSaving(true);
-    const chosenImage = activeDraft.enhanced_image_url || activeDraft.original_image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+    const chosenImage = getProductImage(activeDraft) || getCategoryFallbackImage(activeDraft.category || 'Handloom Saree');
     
     const finalProduct = {
       ...activeDraft,
@@ -113,6 +114,7 @@ export const PricingAssistantPage = () => {
       hours_spent: parseFloat(hoursSpent) || 16.0,
       price_explanation: pricingResult.explanation_en || '',
       enhanced_image_url: chosenImage,
+      enhanced_image_data: activeDraft.enhanced_image_data,
       original_image_url: activeDraft.original_image_url || chosenImage,
       artisan_name: activeDraft.artisan_name || 'Master Artisan Ram Das',
       artisan_village: activeDraft.artisan_village || 'Kotwa, Varanasi',

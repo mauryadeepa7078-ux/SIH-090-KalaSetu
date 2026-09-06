@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Building2, 
   FileText, 
@@ -284,8 +285,12 @@ export const BusinessmanLandingPage = () => {
                 {/* Image & Badges */}
                 <div className="relative aspect-[4/3] bg-stone-100 overflow-hidden">
                   <img
-                    src={product.enhanced_image_url || product.original_image_url}
+                    src={getProductImage(product)}
                     alt={product.title_en}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = getCategoryFallbackImage(product.category);
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
 
