@@ -55,6 +55,7 @@ export const Navbar = () => {
   // 1. Artisan-specific nav items (Strict RBAC: Creator & studio tools only)
   const artisanNavItems = [
     { id: 'artisan-home', label: 'Studio Home', icon: Sparkles, desc: 'Photo & Voice first artisan hub' },
+    { id: 'artisan-orders', label: 'My Orders / Inquiries', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Retail orders & GeM bulk inquiries' },
     { id: 'camera', label: t('navPhotoStudio') || 'AI Photo Studio', icon: Camera, highlight: true, desc: 'Remove background & enhance lighting' },
     { id: 'voice', label: t('navVoiceCatalog') || 'Voice-to-Catalog', icon: Mic, desc: 'Generate bilingual listings from voice' },
     { id: 'pricing', label: t('navPricing') || 'Smart Pricing', icon: DollarSign, desc: 'Dynamic Scikit-Learn pricing model' },
@@ -90,9 +91,10 @@ export const Navbar = () => {
   const bottomTabs = userRole === 'artisan'
     ? [
         { id: 'artisan-home', label: 'Studio', icon: Sparkles },
+        { id: 'artisan-orders', label: 'Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null },
         { id: 'camera', label: 'Photo Lo', icon: Camera, isFab: true },
         { id: 'voice', label: 'Bolkar', icon: Mic },
-        { id: 'pricing', label: 'मूल्य', icon: DollarSign },
+        { id: 'catalog', label: 'Catalog', icon: ShoppingBag },
       ]
     : userRole === 'businessman'
     ? [

@@ -46,15 +46,15 @@ class ProductCatalogResponse(BaseModel):
 class ProductCreate(BaseModel):
     id: Optional[str] = None
     title_en: str
-    title_hi: str
-    description_en: str
-    description_hi: str
+    title_hi: Optional[str] = ""
+    description_en: Optional[str] = ""
+    description_hi: Optional[str] = ""
     cultural_story_en: Optional[str] = ""
     cultural_story_hi: Optional[str] = ""
     bullet_points_en: Optional[List[str]] = []
     bullet_points_hi: Optional[List[str]] = []
-    category: str
-    material_type: str
+    category: Optional[str] = "Handicraft"
+    material_type: Optional[str] = "Natural Material"
     dimensions: Optional[str] = "Standard"
     care_instructions: Optional[str] = "Wipe gently with soft dry cloth"
     tags: Optional[List[str]] = []
@@ -72,10 +72,10 @@ class ProductCreate(BaseModel):
     enhanced_image_url: Optional[str] = ""
     
     # Artisan & Trust Details
-    artisan_name: str
+    artisan_name: Optional[str] = "Master Artisan"
     artisan_phone: Optional[str] = ""
-    artisan_village: str
-    artisan_state: str
+    artisan_village: Optional[str] = "Artisan Cluster"
+    artisan_state: Optional[str] = "India"
     mosje_scheme_id: Optional[str] = "MoSJE-VISH-2026-908"
     gi_tagged: bool = False
     gi_certification_no: Optional[str] = ""

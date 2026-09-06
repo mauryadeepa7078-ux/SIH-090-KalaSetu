@@ -14,6 +14,7 @@ import { BuyerLandingPage } from './pages/BuyerLandingPage';
 import { BusinessmanLandingPage } from './pages/BusinessmanLandingPage';
 import { BuyerOrdersPage } from './pages/BuyerOrdersPage';
 import { BuyerCartPage } from './pages/BuyerCartPage';
+import { ArtisanOrdersPage } from './pages/ArtisanOrdersPage';
 import { CatalogPage } from './pages/CatalogPage';
 import { PhotoStudioPage } from './pages/PhotoStudioPage';
 import { VoiceCatalogPage } from './pages/VoiceCatalogPage';
@@ -47,7 +48,7 @@ const MainContent = () => {
       }
     } else {
       // Artisan Role
-      const artisanAllowedTabs = ['artisan-home', 'camera', 'voice', 'pricing', 'catalog', 'detail', 'certificate', 'whatsapp', 'analytics', 'community'];
+      const artisanAllowedTabs = ['artisan-home', 'artisan-orders', 'camera', 'voice', 'pricing', 'catalog', 'detail', 'certificate', 'whatsapp', 'analytics', 'community'];
       if (!artisanAllowedTabs.includes(activeTab)) {
         return <ArtisanLandingPage />;
       }
@@ -56,6 +57,8 @@ const MainContent = () => {
     switch (activeTab) {
       case 'artisan-home':
         return <ArtisanLandingPage />;
+      case 'artisan-orders':
+        return <ArtisanOrdersPage />;
       case 'businessman-home':
         return <BusinessmanLandingPage />;
       case 'buyer-market':

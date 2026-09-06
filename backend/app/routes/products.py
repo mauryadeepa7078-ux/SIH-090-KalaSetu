@@ -10,10 +10,14 @@ def list_products(
     category: Optional[str] = Query(None, description="Filter by craft category"),
     search: Optional[str] = Query(None, description="Search query")
 ):
-    return db_store.get_all_products(category=category, search=search)
+    print(f"[BACKEND-API] GET /api/products received (category={category}, search={search})")
+    products = db_store.get_all_products(category=category, search=search)
+    print(f"[BACKEND-API] GET /api/products returning {len(products)} products")
+    return products
 
 @router.get("/{product_id}")
 def get_product(product_id: str):
+    print(f"[BACKEND-API] GET /api/products/{product_id}")
     product = db_store.get_product_by_id(product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -21,12 +25,21 @@ def get_product(product_id: str):
 
 @router.post("")
 def save_product(product: ProductCreate):
-    saved = db_store.add_or_update_product(product.model_dump())
-    return {
-        "status": "success",
-        "message": "Product saved successfully",
-        "product": saved
-    }
+    print(f"[BACKEND-API] POST /api/products received: Title='{product.title_en}', Artisan='{product.artisan_name}', Price=₹{product.price}")
+    try:
+        product_dict = product.model_dump()
+        print(f"[BACKEND-API] Attempting database write for product ID: {product_dict.get('id') or 'NEW'}")
+        saved = db_store.add_or_update_product(product_dict)
+        print(f"[BACKEND-API] Database write confirmed! Saved ID: {saved.get('id')}")
+        return {
+            "status": "success",
+            "message": "Product saved successfully",
+            "product": saved
+        }
+    except Exception as e:
+        print(f"[BACKEND-API-ERROR] Failed to save product: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database write error: {str(e)}")
+
 
 @router.delete("/{product_id}")
 def delete_product(product_id: str):

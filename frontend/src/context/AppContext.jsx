@@ -348,23 +348,57 @@ export const AppProvider = ({ children }) => {
   const loadProducts = async () => {
     setLoading(true);
     try {
+      console.log('[AppContext] loadProducts called. isOnline:', isOnline);
+      let productList = [];
       if (isOnline) {
-        const data = await api.getProducts();
-        const productList = Array.isArray(data) ? data : [];
-        setProducts(productList);
-        offlineStorage.setCachedProducts(productList);
+        try {
+          const data = await api.getProducts();
+          productList = Array.isArray(data) ? data : (data?.products || []);
+        } catch (apiErr) {
+          console.warn('[AppContext] API fetch error, falling back to local storage cache:', apiErr);
+          productList = offlineStorage.getCachedProducts();
+        }
       } else {
-        const cached = offlineStorage.getCachedProducts();
-        setProducts(Array.isArray(cached) ? cached : []);
+        productList = offlineStorage.getCachedProducts();
       }
+
+      // Merge with pending local queue so newly added items are always visible
+      const pending = offlineStorage.getPendingQueue();
+      const combinedMap = new Map();
+      pending.forEach(p => combinedMap.set(p.id, p));
+      productList.forEach(p => {
+        if (!combinedMap.has(p.id)) combinedMap.set(p.id, p);
+      });
+      const finalProducts = Array.from(combinedMap.values());
+      console.log(`[AppContext] Loaded ${finalProducts.length} total products (including ${pending.length} pending offline items).`);
+      setProducts(finalProducts);
+      offlineStorage.setCachedProducts(finalProducts);
     } catch (e) {
-      console.warn('Backend offline, using local cache:', e);
+      console.error('[AppContext] Error in loadProducts:', e);
       const cached = offlineStorage.getCachedProducts();
       setProducts(Array.isArray(cached) ? cached : []);
     } finally {
       setLoading(false);
       refreshPendingQueue();
     }
+  };
+
+  const updateOrderStatus = (orderId, newStatus, stageIndex = null) => {
+    const updated = orders.map(o => {
+      if (o.id === orderId) {
+        const nextStage = stageIndex !== null ? stageIndex : (
+          newStatus === 'CONFIRMED' ? 1 :
+          newStatus === 'PACKED' ? 2 :
+          newStatus === 'SHIPPED' ? 3 :
+          newStatus === 'DELIVERED' ? 5 : o.stage_index
+        );
+        return { ...o, status: newStatus, stage_index: nextStage };
+      }
+      return o;
+    });
+    setOrders(updated);
+    setSafeStorage('kalasetu_buyer_orders', JSON.stringify(updated));
+    showToast(`Order ${orderId} updated to ${newStatus}`, 'success');
   };
 
 
@@ -470,6 +504,7 @@ export const AppProvider = ({ children }) => {
         orders,
         setOrders,
         placeOrder,
+        updateOrderStatus,
         cart,
         setCart,
         addToCart,

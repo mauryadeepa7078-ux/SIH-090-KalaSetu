@@ -29,11 +29,14 @@ async def ai_photo_studio(
     - OpenCV CLAHE, auto white-balance, brightness correction
     - 1:1 square e-commerce studio format standardization
     """
+    print(f"[BACKEND-API] POST /api/ai/photo-studio received: filename='{file.filename}', content_type='{file.content_type}', remove_bg={remove_bg}, standardize={standardize}")
     try:
         image_bytes = await file.read()
         if not image_bytes:
+            print("[BACKEND-API-ERROR] Empty image file received in photo-studio endpoint")
             raise HTTPException(status_code=400, detail="Empty image file received.")
         
+        print(f"[BACKEND-API] Processing image of size {len(image_bytes)} bytes with AI pipeline...")
         result = process_artisan_photo(
             image_bytes=image_bytes,
             remove_bg=remove_bg,
@@ -42,13 +45,16 @@ async def ai_photo_studio(
             brightness=brightness,
             contrast=contrast
         )
+        print(f"[BACKEND-API] AI Photo Studio completed successfully. Enhanced image URL: {result.get('enhanced_image_url')}")
         return {
             "status": "success",
             "message": "Image processed through AI Photo Studio",
             "data": result
         }
     except Exception as e:
+        print(f"[BACKEND-API-ERROR] Photo Studio processing error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Photo Studio error: {str(e)}")
+
 
 @router.post("/transcribe-voice")
 async def transcribe_voice(file: UploadFile = File(...)):

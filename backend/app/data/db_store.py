@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -38,12 +39,30 @@ class DatabaseStore:
                 self._save_rfqs()
 
     def _save_products(self):
-        with open(DB_FILE, "w", encoding="utf-8") as f:
-            json.dump(self.products, f, ensure_ascii=False, indent=2)
+        try:
+            with open(DB_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.products, f, ensure_ascii=False, indent=2)
+                f.flush()
+                try:
+                    os.fsync(f.fileno())
+                except Exception:
+                    pass
+            print(f"[BACKEND-DB] Successfully persisted {len(self.products)} products to disk: {DB_FILE}")
+        except Exception as e:
+            print(f"[BACKEND-DB-ERROR] Error writing products to disk: {e}")
 
     def _save_rfqs(self):
-        with open(RFQ_FILE, "w", encoding="utf-8") as f:
-            json.dump(self.rfqs, f, ensure_ascii=False, indent=2)
+        try:
+            with open(RFQ_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.rfqs, f, ensure_ascii=False, indent=2)
+                f.flush()
+                try:
+                    os.fsync(f.fileno())
+                except Exception:
+                    pass
+            print(f"[BACKEND-DB] Successfully persisted {len(self.rfqs)} RFQs to disk: {RFQ_FILE}")
+        except Exception as e:
+            print(f"[BACKEND-DB-ERROR] Error writing RFQs to disk: {e}")
 
     def reset_demo_data(self) -> List[Dict[str, Any]]:
         """
@@ -61,7 +80,7 @@ class DatabaseStore:
         self.rfqs = [dict(r) for r in SEED_RFQS]
         self._save_products()
         self._save_rfqs()
-        print("[OK] Demo database reset successfully to 10 authentic artisan products.")
+        print(f"[OK] Demo database reset successfully to {len(self.products)} authentic artisan products.")
         return self.products
 
     def get_all_products(self, category: Optional[str] = None, search: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -71,6 +90,7 @@ class DatabaseStore:
         if search:
             s = search.lower()
             results = [p for p in results if s in p.get("title_en", "").lower() or s in p.get("title_hi", "").lower() or s in p.get("artisan_name", "").lower() or s in p.get("artisan_state", "").lower()]
+        print(f"[BACKEND-DB] get_all_products returning {len(results)} products (category={category}, search={search})")
         return sorted(results, key=lambda x: x.get("created_at", ""), reverse=True)
 
     def get_product_by_id(self, product_id: str) -> Optional[Dict[str, Any]]:
@@ -95,15 +115,19 @@ class DatabaseStore:
             except Exception:
                 product_data["qr_badge_url"] = f"/static/qrcodes/qr_{prod_id}.png"
 
+        print(f"[BACKEND-DB] add_or_update_product called for ID={prod_id}, title={product_data.get('title_en')}")
+
         # Check existing
         for i, existing in enumerate(self.products):
             if existing.get("id") == prod_id:
                 self.products[i] = product_data
                 self._save_products()
+                print(f"[BACKEND-DB] Updated existing product ID={prod_id}. Total products in DB: {len(self.products)}")
                 return product_data
 
         self.products.insert(0, product_data)
         self._save_products()
+        print(f"[BACKEND-DB] Inserted new product ID={prod_id}. Total products in DB: {len(self.products)}")
         return product_data
 
     def delete_product(self, product_id: str) -> bool:
@@ -111,8 +135,10 @@ class DatabaseStore:
         self.products = [p for p in self.products if p.get("id") != product_id]
         if len(self.products) < initial_len:
             self._save_products()
+            print(f"[BACKEND-DB] Deleted product ID={product_id}. Remaining: {len(self.products)}")
             return True
         return False
+
 
     def sync_batch(self, offline_products: List[Dict[str, Any]]) -> Dict[str, Any]:
         synced_count = 0

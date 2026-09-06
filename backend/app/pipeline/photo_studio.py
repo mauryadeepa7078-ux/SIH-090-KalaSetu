@@ -1,6 +1,7 @@
 import io
 import os
 import uuid
+import base64
 import numpy as np
 from PIL import Image, ImageOps, ImageEnhance, ImageFilter
 from pathlib import Path
@@ -196,11 +197,27 @@ def process_artisan_photo(
     # Save processed studio image
     final_img.save(enhanced_path, format="JPEG", quality=92, optimize=True)
 
+    # Encode to base64 data URI for instant reliable frontend display across domains/Vercel/mobile
+    buffered_enhanced = io.BytesIO()
+    final_img.save(buffered_enhanced, format="JPEG", quality=90)
+    enhanced_b64 = base64.b64encode(buffered_enhanced.getvalue()).decode('utf-8')
+    enhanced_data_uri = f"data:image/jpeg;base64,{enhanced_b64}"
+
+    buffered_raw = io.BytesIO()
+    raw_img.convert("RGB").save(buffered_raw, format="JPEG", quality=85)
+    raw_b64 = base64.b64encode(buffered_raw.getvalue()).decode('utf-8')
+    raw_data_uri = f"data:image/jpeg;base64,{raw_b64}"
+
+    print(f"[PHOTO-STUDIO] Processed photo successfully: ID={img_id}, dimensions={final_img.width}x{final_img.height}, bg_removed={remove_bg}, enhanced={apply_enhancement}")
+
     return {
         "original_image_url": f"/static/uploads/{original_filename}",
         "enhanced_image_url": f"/static/uploads/{enhanced_filename}",
+        "enhanced_image_data": enhanced_data_uri,
+        "original_image_data": raw_data_uri,
         "width": final_img.width,
         "height": final_img.height,
         "bg_removed": remove_bg,
         "enhanced": apply_enhancement
     }
+

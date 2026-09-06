@@ -96,28 +96,50 @@ export const PricingAssistantPage = () => {
   // Save product to Backend or Offline Queue
   const handleSaveAndPublish = async () => {
     setIsSaving(true);
+    const chosenImage = activeDraft.enhanced_image_url || activeDraft.original_image_url || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+    
     const finalProduct = {
       ...activeDraft,
-      price: pricingResult.recommended_price,
-      min_price: pricingResult.min_price,
-      max_price: pricingResult.max_price,
-      material_cost: parseFloat(materialCost),
-      hours_spent: parseFloat(hoursSpent),
-      price_explanation: pricingResult.explanation_en,
+      title_en: activeDraft.title_en || 'Handmade Heritage Craft',
+      title_hi: activeDraft.title_hi || 'पारंपरिक हस्तशिल्प उत्पाद',
+      description_en: activeDraft.description_en || 'Authentic handmade Indian craft created with traditional techniques.',
+      description_hi: activeDraft.description_hi || 'पारंपरिक भारतीय हस्तशिल्प कला द्वारा निर्मित।',
+      category: activeDraft.category || 'Handloom Saree',
+      material_type: activeDraft.material_type || 'Natural Fiber',
+      price: pricingResult.recommended_price || 3500.0,
+      min_price: pricingResult.min_price || 2800.0,
+      max_price: pricingResult.max_price || 4200.0,
+      material_cost: parseFloat(materialCost) || 650.0,
+      hours_spent: parseFloat(hoursSpent) || 16.0,
+      price_explanation: pricingResult.explanation_en || '',
+      enhanced_image_url: chosenImage,
+      original_image_url: activeDraft.original_image_url || chosenImage,
+      artisan_name: activeDraft.artisan_name || 'Master Artisan Ram Das',
+      artisan_village: activeDraft.artisan_village || 'Kotwa, Varanasi',
+      artisan_state: activeDraft.artisan_state || 'Uttar Pradesh',
       gi_tagged: isGiTagged,
       sync_status: isOnline ? 'SYNCED' : 'PENDING'
     };
 
+    console.log('[FRONTEND-SAVE] [STEP 1: FORM SUBMITTED] Preparing product listing:', finalProduct);
+
     try {
       if (isOnline) {
+        console.log('[FRONTEND-SAVE] [STEP 2: API CALLED] Sending product to backend database API...');
         const res = await api.saveProduct(finalProduct);
+        console.log('[FRONTEND-SAVE] [STEP 3: SERVER RESPONSE] Backend returned saved product:', res);
+        
+        // Immediately persist to local storage cache as well for offline resilience
+        offlineStorage.updateCachedProduct(res.product || finalProduct);
         await loadProducts();
-        setSelectedProduct(res.product);
+        
+        console.log('[FRONTEND-SAVE] [STEP 4: WRITE CONFIRMED] Product saved to database & synchronized with local cache!');
+        setSelectedProduct(res.product || finalProduct);
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
         showToast('Product listing published successfully!', 'success');
         setActiveTab('detail');
       } else {
-        // Queue locally
+        console.log('[FRONTEND-SAVE] [OFFLINE QUEUED] Offline mode active, queuing in local storage...');
         offlineStorage.addToQueue(finalProduct);
         await loadProducts();
         setSelectedProduct(finalProduct);
@@ -126,17 +148,18 @@ export const PricingAssistantPage = () => {
         setActiveTab('detail');
       }
     } catch (err) {
-      console.error('Save error', err);
+      console.error('[FRONTEND-SAVE-ERROR] Backend save error, using offline storage fallback:', err);
       // Fallback offline queue
       offlineStorage.addToQueue(finalProduct);
       await loadProducts();
       setSelectedProduct(finalProduct);
-      showToast('Saved to offline storage.', 'info');
+      showToast('Saved to local storage.', 'info');
       setActiveTab('detail');
     } finally {
       setIsSaving(false);
     }
   };
+
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">

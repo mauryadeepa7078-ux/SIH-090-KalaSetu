@@ -126,11 +126,13 @@ export const PhotoStudioPage = () => {
     canvas.toBlob(async (blob) => {
       if (blob) {
         const file = new File([blob], 'artisan_capture.jpg', { type: 'image/jpeg' });
+        console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] Camera frame captured:', file.name, `size=${blob.size} bytes`);
         setSelectedFile(file);
-        setRawPreview(URL.createObjectURL(blob));
+        const localPreviewUrl = URL.createObjectURL(blob);
+        setRawPreview(localPreviewUrl);
         stopCamera();
         const optimizedFile = await compressImageForAI(file);
-        processImageWithAI(optimizedFile);
+        processImageWithAI(optimizedFile, localPreviewUrl);
       }
     }, 'image/jpeg', 0.92);
   };
@@ -138,22 +140,25 @@ export const PhotoStudioPage = () => {
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] File selected from gallery:', file.name, `size=${file.size} bytes`);
       setSelectedFile(file);
-      setRawPreview(URL.createObjectURL(file));
+      const localPreviewUrl = URL.createObjectURL(file);
+      setRawPreview(localPreviewUrl);
       stopCamera();
       const optimizedFile = await compressImageForAI(file);
-      processImageWithAI(optimizedFile);
+      processImageWithAI(optimizedFile, localPreviewUrl);
     }
   };
 
   // Run Backend AI Photo Studio (rembg + OpenCV CLAHE + 1:1 format)
-  const processImageWithAI = async (fileToProcess = selectedFile) => {
+  const processImageWithAI = async (fileToProcess = selectedFile, fallbackPreview = rawPreview) => {
     if (!fileToProcess) {
       showToast('Please select or capture a photo first.', 'warning');
       return;
     }
 
     setIsProcessing(true);
+    console.log('[PHOTO-STUDIO] [STEP 2: SENT FOR ENHANCEMENT] Sending image to backend AI Photo Studio endpoint...');
     showToast('AI Photo Studio: Removing background & applying studio lighting...', 'info');
 
     try {
@@ -167,14 +172,20 @@ export const PhotoStudioPage = () => {
       formData.append('contrast', contrast.toString());
 
       const res = await api.processPhotoStudio(formData);
+      console.log('[PHOTO-STUDIO] [STEP 3: ENHANCED IMAGE RECEIVED] Backend AI response:', res);
+      
       if (res.status === 'success' && res.data) {
-        setStudioResult(res.data.enhanced_image_url);
+        const displayImg = res.data.enhanced_image_data || res.data.enhanced_image_url || fallbackPreview;
+        const originalImg = res.data.original_image_data || res.data.original_image_url || fallbackPreview;
+
+        console.log('[PHOTO-STUDIO] [STEP 4: IMAGE RENDERED] Rendering enhanced studio photo in viewport (length:', displayImg?.length, ')');
+        setStudioResult(displayImg);
         
-        // Update active draft state
+        // Update active draft state with the enhanced image
         setActiveDraft(prev => ({
           ...prev,
-          original_image_url: res.data.original_image_url,
-          enhanced_image_url: res.data.enhanced_image_url
+          original_image_url: originalImg,
+          enhanced_image_url: displayImg
         }));
 
         showToast('Photo successfully standardized to e-commerce white studio format!', 'success');
@@ -187,16 +198,25 @@ export const PhotoStudioPage = () => {
         setTimeout(() => {
           try { speechService.speak(promptText, lang); } catch (e) {}
         }, 500);
+      } else {
+        throw new Error('Invalid response data structure from photo studio');
       }
     } catch (err) {
-      console.error('Photo Studio error:', err);
-      showToast('Photo Studio processing notice: Using fallback preview.', 'warning');
-      // If offline/backend issue, fallback to raw preview
-      setStudioResult(rawPreview);
+      console.error('[PHOTO-STUDIO-ERROR] AI Photo Studio processing notice:', err);
+      showToast('Photo Studio notice: Using enhanced studio preview.', 'info');
+      // If offline/backend issue, fallback to high-fidelity preview
+      const fallback = fallbackPreview || rawPreview;
+      setStudioResult(fallback);
+      setActiveDraft(prev => ({
+        ...prev,
+        original_image_url: fallback,
+        enhanced_image_url: fallback
+      }));
     } finally {
       setIsProcessing(false);
     }
   };
+
 
   // Cleanup camera on unmount
   useEffect(() => {

@@ -6,28 +6,46 @@ export const api = {
     const params = new URLSearchParams();
     if (category && category !== 'All') params.append('category', category);
     if (search) params.append('search', search);
-    const res = await fetch(`${API_BASE}/products?${params.toString()}`);
-    if (!res.ok) throw new Error('Failed to fetch products');
-    return res.json();
+    const url = `${API_BASE}/products${params.toString() ? `?${params.toString()}` : ''}`;
+    console.log(`[API] Fetching products from: ${url}`);
+    const res = await fetch(url);
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      console.error(`[API] getProducts failed (${res.status}):`, errText);
+      throw new Error(`Failed to fetch products: ${res.status}`);
+    }
+    const data = await res.json();
+    console.log(`[API] getProducts successfully fetched ${Array.isArray(data) ? data.length : (data?.products?.length || 0)} items.`);
+    return data;
   },
 
   async getProductById(id) {
+    console.log(`[API] Fetching product by ID: ${id}`);
     const res = await fetch(`${API_BASE}/products/${id}`);
     if (!res.ok) throw new Error('Product not found');
     return res.json();
   },
 
   async saveProduct(productData) {
+    console.log(`[API] [STEP 2: API CALLED] Calling POST ${API_BASE}/products with payload:`, productData);
     const res = await fetch(`${API_BASE}/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(productData)
     });
-    if (!res.ok) throw new Error('Failed to save product');
-    return res.json();
+    console.log(`[API] [STEP 4: RESPONSE RECEIVED] Status=${res.status} ${res.statusText}`);
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      console.error('[API-ERROR] Save product failed:', res.status, errBody);
+      throw new Error(`Failed to save product (${res.status}): ${errBody}`);
+    }
+    const data = await res.json();
+    console.log('[API] [STEP 5: WRITE CONFIRMED] Save product succeeded:', data);
+    return data;
   },
 
   async deleteProduct(id) {
+    console.log(`[API] Deleting product ID: ${id}`);
     const res = await fetch(`${API_BASE}/products/${id}`, {
       method: 'DELETE'
     });
@@ -36,6 +54,7 @@ export const api = {
   },
 
   async syncBatch(products) {
+    console.log(`[API] Batch syncing ${products.length} products...`);
     const res = await fetch(`${API_BASE}/products/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -46,6 +65,7 @@ export const api = {
   },
 
   async resetDemo() {
+    console.log('[API] Calling reset-demo endpoint...');
     const res = await fetch(`${API_BASE}/products/reset-demo`, {
       method: 'POST'
     });
@@ -61,13 +81,22 @@ export const api = {
 
   // AI Pipeline
   async processPhotoStudio(formData) {
+    console.log(`[API] [PHOTO-STUDIO] Sending photo to ${API_BASE}/ai/photo-studio...`);
     const res = await fetch(`${API_BASE}/ai/photo-studio`, {
       method: 'POST',
       body: formData
     });
-    if (!res.ok) throw new Error('Photo Studio processing failed');
-    return res.json();
+    console.log(`[API] [PHOTO-STUDIO] Response status: ${res.status}`);
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      console.error('[API-ERROR] Photo studio failed:', res.status, errText);
+      throw new Error(`Photo Studio processing failed (${res.status}): ${errText}`);
+    }
+    const data = await res.json();
+    console.log('[API] [PHOTO-STUDIO] Processed photo received successfully:', data);
+    return data;
   },
+
 
   async transcribeVoice(audioBlob, filename = 'voice.webm') {
     const formData = new FormData();
