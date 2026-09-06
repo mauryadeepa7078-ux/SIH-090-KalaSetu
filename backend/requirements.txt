@@ -10,6 +10,5 @@ pillow>=10.2.0
 opencv-python-headless>=4.9.0.80
 scikit-learn>=1.4.0
 qrcode[pil]>=7.4.2
-rembg>=2.0.56
 google-generativeai>=0.4.1
 aiofiles>=23.2.1
