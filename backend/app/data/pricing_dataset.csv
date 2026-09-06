@@ -1,0 +1,31 @@
+category,material_type,material_cost,hours_spent,skill_level_score,dimensions_score,is_gi_tagged,market_price
+Handloom Saree,Pure Silk,1800,48,3,2,1,7500
+Handloom Saree,Organic Cotton,450,24,2,2,1,2200
+Handloom Saree,Tussar Silk,1200,36,3,2,1,5400
+Handloom Saree,Chanderi Cotton-Silk,900,30,2,2,1,3800
+Terracotta Pottery,Natural Clay,80,6,1,1,0,450
+Terracotta Pottery,Riverbed Clay,150,14,2,2,1,1100
+Terracotta Pottery,Glazed Ceramic Clay,250,18,2,2,0,1650
+Brass Dokra Craft,Bell Metal Alloy,600,28,3,1,1,3200
+Brass Dokra Craft,Recycled Brass,400,20,2,1,1,2100
+Brass Dokra Craft,High Purity Brass,950,42,3,2,1,4900
+Madhubani Painting,Handmade Khadi Paper & Natural Dyes,200,16,2,1,1,1800
+Madhubani Painting,Tussar Silk Fabric Canvas,700,38,3,2,1,4200
+Madhubani Painting,Cotton Canvas,350,22,2,2,1,2600
+Blue Pottery,Quartz & Glass Dough,300,12,2,1,1,1450
+Blue Pottery,Quartz Dough,650,26,3,2,1,3100
+Wood Carving,Teakwood,850,35,3,2,1,4600
+Wood Carving,Sheesham Wood,500,20,2,1,0,2400
+Wood Carving,Sandalwood/Rosewood,1800,60,3,2,1,9800
+Leather Craft,Genuine Buffalo Hide,450,15,2,1,1,1950
+Leather Craft,Full Grain Goat Leather,750,24,3,2,1,3400
+Zari Embroidery,Zari & Velvet,600,25,2,1,0,2800
+Zari Embroidery,Gold Gilded Thread,1400,50,3,2,1,6800
+Jute Craft,Natural Golden Jute,120,8,1,1,0,650
+Jute Craft,Braided Jute & Cotton,220,12,2,2,0,1150
+Bamboo Weaving,Treated Forest Bamboo,150,10,1,1,0,750
+Bamboo Weaving,Fine Polished Cane,350,22,2,2,1,1850
+Bidriware,Zinc-Copper Inlaid Silver,1100,32,3,1,1,5200
+Bidriware,Pure Silver Sheet Inlay,2200,55,3,2,1,10500
+Kolhapuri Chappals,Vegetable Tanned Leather,550,18,2,1,1,2450
+Kolhapuri Chappals,Hand-braided Sole Leather,850,28,3,1,1,3900

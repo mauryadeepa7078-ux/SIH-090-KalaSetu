@@ -1,0 +1,50 @@
+[
+  {
+    "id": "rfq-301",
+    "buyer_name": "TRIFED (Tribal Cooperative Marketing Federation)",
+    "organization": "Ministry of Tribal Affairs, Govt of India",
+    "category": "Brass Dokra Craft",
+    "quantity": 150,
+    "target_price": 2800.0,
+    "location": "New Delhi Central Depot",
+    "status": "ACCEPTED",
+    "inquiry_date": "2026-09-02",
+    "requirements": "Bulk procurement for upcoming National Aadi Mahotsav corporate VIP gift hampers. Must have authentic GI certification."
+  },
+  {
+    "id": "rfq-302",
+    "buyer_name": "FabIndia Overseas Pvt Ltd",
+    "organization": "FabIndia Sourcing & Artisan Alliance",
+    "category": "Handloom Saree",
+    "quantity": 80,
+    "target_price": 6200.0,
+    "location": "Gurugram Sourcing Hub",
+    "status": "QUOTED",
+    "inquiry_date": "2026-08-29",
+    "requirements": "Autumn Festive Collection supply. Pure mulberry silk certification required with custom branded tag loops."
+  },
+  {
+    "id": "rfq-303",
+    "buyer_name": "Central Cottage Industries Emporium (CCIE)",
+    "organization": "Ministry of Textiles, Govt of India",
+    "category": "Blue Pottery",
+    "quantity": 200,
+    "target_price": 1300.0,
+    "location": "Janpath, New Delhi",
+    "status": "ACCEPTED",
+    "inquiry_date": "2026-09-01",
+    "requirements": "Hand-painted 10-inch decorative wall plates with export quality thermocol packaging for international tourists."
+  },
+  {
+    "id": "rfq-304",
+    "buyer_name": "State Bank of India (CSR Foundation)",
+    "organization": "Corporate Relations & Gifting",
+    "category": "Madhubani Painting",
+    "quantity": 300,
+    "target_price": 2100.0,
+    "location": "Mumbai Head Office",
+    "status": "ACCEPTED",
+    "inquiry_date": "2026-08-24",
+    "requirements": "Festive Diwali gifts for executive partners. Framed Mithila folk art with MoSJE artisan authenticity seal."
+  }
+]
