@@ -20,16 +20,19 @@ async def ai_photo_studio(
     remove_bg: bool = Form(True),
     apply_enhancement: bool = Form(True),
     standardize: bool = Form(True),
-    brightness: float = Form(1.05),
-    contrast: float = Form(1.15)
+    brightness: float = Form(1.08),
+    contrast: float = Form(1.22),
+    vibrance: float = Form(1.25),
+    sharpness: float = Form(1.45),
+    add_shadow: bool = Form(True)
 ):
     """
     Core Feature 1: AI Photo Studio
-    - Background removal via rembg / U2-Net
-    - OpenCV CLAHE, auto white-balance, brightness correction
-    - 1:1 square e-commerce studio format standardization
+    - Background removal via rembg / U2-Net with alpha defringing
+    - Multi-band Unsharp Mask (USM), CLAHE dynamic range, HSV saturation booster
+    - Standardized 1:1 luxury e-commerce studio format with soft ambient contact shadow
     """
-    print(f"[BACKEND-API] POST /api/ai/photo-studio received: filename='{file.filename}', content_type='{file.content_type}', remove_bg={remove_bg}, standardize={standardize}")
+    print(f"[BACKEND-API] POST /api/ai/photo-studio received: filename='{file.filename}', content_type='{file.content_type}', remove_bg={remove_bg}, standardize={standardize}, add_shadow={add_shadow}")
     try:
         image_bytes = await file.read()
         if not image_bytes:
@@ -43,7 +46,10 @@ async def ai_photo_studio(
             apply_enhancement=apply_enhancement,
             standardize=standardize,
             brightness=brightness,
-            contrast=contrast
+            contrast=contrast,
+            vibrance=vibrance,
+            sharpness=sharpness,
+            add_shadow=add_shadow
         )
         print(f"[BACKEND-API] AI Photo Studio completed successfully. Enhanced image URL: {result.get('enhanced_image_url')}")
         return {

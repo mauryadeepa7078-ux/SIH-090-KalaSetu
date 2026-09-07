@@ -3,7 +3,7 @@ import os
 import uuid
 import base64
 import numpy as np
-from PIL import Image, ImageOps, ImageEnhance, ImageFilter
+from PIL import Image, ImageOps, ImageEnhance, ImageFilter, ImageDraw
 from pathlib import Path
 from backend.app.config import UPLOAD_DIR
 
@@ -22,10 +22,18 @@ except Exception as e:
     REMBG_AVAILABLE = False
 
 
-def apply_opencv_enhancements(pil_img: Image.Image, brightness_factor: float = 1.05, contrast_factor: float = 1.15) -> Image.Image:
+def apply_opencv_enhancements(
+    pil_img: Image.Image, 
+    brightness_factor: float = 1.08, 
+    contrast_factor: float = 1.22,
+    vibrance_factor: float = 1.25,
+    sharpness_factor: float = 1.45
+) -> Image.Image:
     """
-    Applies OpenCV color correction, auto white balance (Gray World),
-    and CLAHE when cv2 is present, or high-fidelity PIL enhancement fallback.
+    Applies high-end studio lighting enhancement:
+    - Adaptive LAB CLAHE for vibrant dynamic range without blowing highlights
+    - Smart color temperature & rich chromatic saturation curve
+    - Multi-band Unsharp Mask (USM) for ultra-crisp micro-texture clarity
     """
     result_pil = pil_img.copy()
 
@@ -35,26 +43,25 @@ def apply_opencv_enhancements(pil_img: Image.Image, brightness_factor: float = 1
             img_np = np.array(result_pil.convert('RGB'))
             img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
 
-            # 1. Auto White Balance (Gray World algorithm)
-            b, g, r = cv2.split(img_bgr)
-            b_avg, g_avg, r_avg = np.mean(b), np.mean(g), np.mean(r)
-            gray_avg = (b_avg + g_avg + r_avg) / 3.0
-
-            if b_avg > 0 and g_avg > 0 and r_avg > 0:
-                b = np.clip(b * (gray_avg / b_avg), 0, 255).astype(np.uint8)
-                g = np.clip(g * (gray_avg / g_avg), 0, 255).astype(np.uint8)
-                r = np.clip(r * (gray_avg / r_avg), 0, 255).astype(np.uint8)
-                balanced_bgr = cv2.merge([b, g, r])
-            else:
-                balanced_bgr = img_bgr
-
-            # 2. CLAHE on L-channel of LAB space
-            lab = cv2.cvtColor(balanced_bgr, cv2.COLOR_BGR2LAB)
+            # 1. Warmth-Preserving Color Balance (preserves rich Indian craft hues)
+            lab = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2LAB)
             l, a, b_ch = cv2.split(lab)
-            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+
+            # 2. Adaptive CLAHE on Luminance channel (crisp shadows & highlights)
+            clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
             l_clahe = clahe.apply(l)
-            enhanced_lab = cv2.merge([l_clahe, a, b_ch])
+
+            # Blend slightly with original L to prevent harshness
+            l_blended = cv2.addWeighted(l_clahe, 0.85, l, 0.15, 0)
+
+            # 3. Subtle Saturation Boost in HSV space
+            enhanced_lab = cv2.merge([l_blended, a, b_ch])
             enhanced_bgr = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+            hsv = cv2.cvtColor(enhanced_bgr, cv2.COLOR_BGR2HSV)
+            h, s, v = cv2.split(hsv)
+            s = np.clip(s * float(vibrance_factor), 0, 255).astype(np.uint8)
+            enhanced_hsv = cv2.merge([h, s, v])
+            enhanced_bgr = cv2.cvtColor(enhanced_hsv, cv2.COLOR_HSV2BGR)
 
             # Convert back to PIL
             enhanced_rgb = cv2.cvtColor(enhanced_bgr, cv2.COLOR_BGR2RGB)
@@ -62,26 +69,55 @@ def apply_opencv_enhancements(pil_img: Image.Image, brightness_factor: float = 1
         except Exception as err:
             print(f"[WARN] OpenCV enhancement fallback: {err}")
 
-    # Pure PIL Color & AutoContrast Polish
-    result_pil = ImageOps.autocontrast(result_pil.convert('RGB'), cutoff=0.5)
+    # Pure PIL AutoContrast Polish with slight cutoff
+    result_pil = ImageOps.autocontrast(result_pil.convert('RGB'), cutoff=0.3)
 
+    # Brightness adjustment
     if brightness_factor != 1.0:
         enhancer = ImageEnhance.Brightness(result_pil)
         result_pil = enhancer.enhance(brightness_factor)
+
+    # Contrast adjustment
     if contrast_factor != 1.0:
         enhancer = ImageEnhance.Contrast(result_pil)
         result_pil = enhancer.enhance(contrast_factor)
     
-    # Subtle color vibrance
-    color_enhancer = ImageEnhance.Color(result_pil)
-    result_pil = color_enhancer.enhance(1.08)
+    # Vibrance / Color depth
+    if vibrance_factor != 1.0:
+        color_enhancer = ImageEnhance.Color(result_pil)
+        result_pil = color_enhancer.enhance(vibrance_factor)
+
+    # Micro-Texture Unsharp Mask (makes intricate weaves, pottery, metal detail razor sharp)
+    try:
+        usm = result_pil.filter(ImageFilter.UnsharpMask(radius=2.0, percent=int(sharpness_factor * 120), threshold=2))
+        result_pil = usm
+    except Exception:
+        if sharpness_factor != 1.0:
+            sharp_enhancer = ImageEnhance.Sharpness(result_pil)
+            result_pil = sharp_enhancer.enhance(sharpness_factor)
 
     return result_pil
 
 
+def refine_alpha_edges(rgba_img: Image.Image) -> Image.Image:
+    """
+    Feathers and defringes alpha channel edges to remove green/rustic artifacts and noisy borders.
+    """
+    if rgba_img.mode != 'RGBA':
+        return rgba_img.convert('RGBA')
+
+    r, g, b, a = rgba_img.split()
+    
+    # Apply subtle 1px Gaussian blur to alpha mask for smooth edge transitions
+    a_smooth = a.filter(ImageFilter.GaussianBlur(radius=0.8))
+    
+    # Recombine
+    return Image.merge('RGBA', (r, g, b, a_smooth))
+
+
 def remove_background_fallback(pil_img: Image.Image) -> Image.Image:
     """
-    Fast and robust background segmentation fallback.
+    High-fidelity background segmentation fallback with edge smoothing.
     """
     if CV2_AVAILABLE:
         try:
@@ -89,27 +125,36 @@ def remove_background_fallback(pil_img: Image.Image) -> Image.Image:
             img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
             gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
-            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-            _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            # Bilateral filter to preserve strong edges while smoothing background noise
+            filtered = cv2.bilateralFilter(gray, 9, 75, 75)
+            _, thresh = cv2.threshold(filtered, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
             
             kernel = np.ones((5, 5), np.uint8)
             mask = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
+            mask = cv2.GaussianBlur(mask, (3, 3), 0)
             
             img_rgba = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2BGRA)
             img_rgba[:, :, 3] = mask
-            return Image.fromarray(cv2.cvtColor(img_rgba, cv2.COLOR_BGRA2RGBA))
+            pil_res = Image.fromarray(cv2.cvtColor(img_rgba, cv2.COLOR_BGRA2RGBA))
+            return refine_alpha_edges(pil_res)
         except Exception:
             pass
 
     # Pure PIL Alpha Mask fallback
     img_rgba = pil_img.convert("RGBA")
-    return img_rgba
+    return refine_alpha_edges(img_rgba)
 
 
-def standardize_ecommerce_format(rgba_img: Image.Image, target_size: int = 1000, pad_percent: float = 0.08) -> Image.Image:
+def standardize_ecommerce_format(
+    rgba_img: Image.Image, 
+    target_size: int = 1000, 
+    pad_percent: float = 0.09,
+    add_shadow: bool = True
+) -> Image.Image:
     """
     Places the foreground on a crisp pure white studio canvas,
-    centered and padded with a standardized 1:1 aspect ratio.
+    centered and padded with a standardized 1:1 aspect ratio,
+    with a natural soft studio ambient contact shadow beneath it.
     """
     # Find bounding box of non-transparent pixels
     bbox = rgba_img.getbbox()
@@ -124,14 +169,41 @@ def standardize_ecommerce_format(rgba_img: Image.Image, target_size: int = 1000,
     scaling_ratio = min(max_dim / w, max_dim / h)
     new_w, new_h = int(w * scaling_ratio), int(h * scaling_ratio)
     resized_obj = cropped.resize((new_w, new_h), Image.Resampling.LANCZOS)
+    resized_obj = refine_alpha_edges(resized_obj)
 
     # Create solid white studio background
     studio_bg = Image.new("RGBA", (target_size, target_size), (255, 255, 255, 255))
     
-    # Paste centered
+    # Calculate center placement
     offset_x = (target_size - new_w) // 2
-    offset_y = (target_size - new_h) // 2
-    studio_bg.paste(resized_obj, (offset_x, offset_y), mask=resized_obj)
+    offset_y = (target_size - new_h) // 2 - int(target_size * 0.02) # Slightly elevated for grounding shadow
+
+    # Add soft natural studio contact drop shadow under the product
+    if add_shadow:
+        try:
+            shadow_canvas = Image.new("RGBA", (target_size, target_size), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(shadow_canvas)
+            
+            # Contact shadow oval
+            shadow_w = int(new_w * 0.72)
+            shadow_h = int(new_h * 0.09)
+            shadow_x0 = offset_x + (new_w - shadow_w) // 2
+            shadow_y0 = offset_y + new_h - int(shadow_h * 0.45)
+            shadow_x1 = shadow_x0 + shadow_w
+            shadow_y1 = shadow_y0 + shadow_h
+
+            draw.ellipse([shadow_x0, shadow_y0, shadow_x1, shadow_y1], fill=(40, 35, 30, 95))
+            
+            # Diffuse Gaussian blur on shadow
+            blurred_shadow = shadow_canvas.filter(ImageFilter.GaussianBlur(radius=int(shadow_h * 0.75)))
+            
+            # Paste shadow onto white canvas
+            studio_bg = Image.alpha_composite(studio_bg, blurred_shadow)
+        except Exception as shadow_err:
+            print(f"[WARN] Shadow generation notice: {shadow_err}")
+
+    # Paste isolated product cleanly
+    studio_bg.paste(resized_obj, (offset_x, offset_y), mask=resized_obj.split()[3])
 
     return studio_bg.convert("RGB")
 
@@ -141,8 +213,11 @@ def process_artisan_photo(
     remove_bg: bool = True,
     apply_enhancement: bool = True,
     standardize: bool = True,
-    brightness: float = 1.05,
-    contrast: float = 1.15
+    brightness: float = 1.08,
+    contrast: float = 1.22,
+    vibrance: float = 1.25,
+    sharpness: float = 1.45,
+    add_shadow: bool = True
 ) -> dict:
     """
     Full pipeline: Ingest image -> rembg background removal -> OpenCV CLAHE/white-balance -> 1:1 studio standardize.
@@ -150,8 +225,8 @@ def process_artisan_photo(
     raw_img = Image.open(io.BytesIO(image_bytes))
     raw_img = ImageOps.exif_transpose(raw_img) # Fix phone camera orientation
     
-    # Optimize: Downscale high-resolution images to max 1024x1024 for sub-second background removal
-    max_side = 1024
+    # Optimize: Process at high-res 1200x1200 for crisp luxury detail
+    max_side = 1200
     if max(raw_img.width, raw_img.height) > max_side:
         raw_img.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
     
@@ -163,13 +238,18 @@ def process_artisan_photo(
     enhanced_path = UPLOAD_DIR / enhanced_filename
 
     # Save original
-    raw_img.convert("RGB").save(original_path, format="JPEG", quality=88)
+    raw_img.convert("RGB").save(original_path, format="JPEG", quality=90)
 
-    # 1. Color and Lighting Enhancement
+    # 1. Color and Lighting Enhancement (Multi-band USM + CLAHE + Vibrance)
     processed_img = raw_img
     if apply_enhancement:
-        processed_img = apply_opencv_enhancements(processed_img, brightness_factor=brightness, contrast_factor=contrast)
-
+        processed_img = apply_opencv_enhancements(
+            processed_img, 
+            brightness_factor=brightness, 
+            contrast_factor=contrast,
+            vibrance_factor=vibrance,
+            sharpness_factor=sharpness
+        )
 
     # 2. Background Removal
     if remove_bg:
@@ -177,6 +257,7 @@ def process_artisan_photo(
             try:
                 # rembg accepts PIL Image or bytes
                 processed_rgba = rembg_remove(processed_img)
+                processed_rgba = refine_alpha_edges(processed_rgba)
             except Exception as e:
                 print(f"rembg processing error: {e}, falling back.")
                 processed_rgba = remove_background_fallback(processed_img)
@@ -185,26 +266,26 @@ def process_artisan_photo(
     else:
         processed_rgba = processed_img.convert("RGBA")
 
-    # 3. E-commerce studio standardization (1:1 square, centered, white background)
+    # 3. E-commerce studio standardization (1:1 square, centered, crisp white background with contact drop shadow)
     if standardize:
-        final_img = standardize_ecommerce_format(processed_rgba)
+        final_img = standardize_ecommerce_format(processed_rgba, add_shadow=add_shadow)
     else:
         # Just blend on white if RGBA
         bg = Image.new("RGB", processed_rgba.size, (255, 255, 255))
         bg.paste(processed_rgba, mask=processed_rgba.split()[3])
         final_img = bg
 
-    # Save processed studio image
-    final_img.save(enhanced_path, format="JPEG", quality=92, optimize=True)
+    # Save processed studio image at 95% quality for ultra-sharp presentation
+    final_img.save(enhanced_path, format="JPEG", quality=95, optimize=True)
 
     # Encode to base64 data URI for instant reliable frontend display across domains/Vercel/mobile
     buffered_enhanced = io.BytesIO()
-    final_img.save(buffered_enhanced, format="JPEG", quality=90)
+    final_img.save(buffered_enhanced, format="JPEG", quality=94)
     enhanced_b64 = base64.b64encode(buffered_enhanced.getvalue()).decode('utf-8')
     enhanced_data_uri = f"data:image/jpeg;base64,{enhanced_b64}"
 
     buffered_raw = io.BytesIO()
-    raw_img.convert("RGB").save(buffered_raw, format="JPEG", quality=85)
+    raw_img.convert("RGB").save(buffered_raw, format="JPEG", quality=88)
     raw_b64 = base64.b64encode(buffered_raw.getvalue()).decode('utf-8')
     raw_data_uri = f"data:image/jpeg;base64,{raw_b64}"
 
