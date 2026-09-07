@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   Smartphone, 
   Share2, 
@@ -14,7 +14,8 @@ import {
 export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeInstall, lang = 'hi' }) => {
   if (!isOpen) return null;
 
-  const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  const isStandalone = typeof window !== 'undefined' && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
@@ -55,7 +56,19 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
         </div>
 
         {/* Platform-Specific Install Steps */}
-        {canNativeInstall ? (
+        {isStandalone ? (
+          <div className="p-4 bg-emerald-950/40 border border-emerald-600/40 rounded-2xl text-center space-y-2">
+            <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+            <h4 className="font-bold text-sm text-emerald-200">
+              {lang === 'hi' ? 'ऐप पहले से इंस्टॉल है!' : 'App Is Already Installed!'}
+            </h4>
+            <p className="text-xs text-stone-300">
+              {lang === 'hi'
+                ? 'KalaSetu आपके डिवाइस की होम स्क्रीन पर स्टैंडअलोन मोड में सक्रिय है।'
+                : 'KalaSetu is already installed and running as a standalone PWA on your device.'}
+            </p>
+          </div>
+        ) : canNativeInstall ? (
           <div className="space-y-4 text-center py-2">
             <p className="text-xs text-stone-300">
               {lang === 'hi'
@@ -75,26 +88,27 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
           </div>
         ) : isIOS ? (
           <div className="space-y-3 bg-stone-950/80 p-4 rounded-2xl border border-stone-800 text-xs">
-            <span className="text-[10px] uppercase font-bold text-orange-400 tracking-wider block">
-              iOS Safari Installation Steps (3 Easy Steps):
-            </span>
+            <div className="flex items-center space-x-2 text-orange-400 font-bold text-xs">
+              <Share2 className="w-4 h-4 text-blue-400" />
+              <span>iOS Safari Installation (3 Easy Steps):</span>
+            </div>
             <div className="space-y-2.5 text-stone-300">
               <div className="flex items-start space-x-2.5">
                 <div className="w-5 h-5 rounded-full bg-stone-800 text-orange-400 font-bold flex items-center justify-center shrink-0 mt-0.5">1</div>
                 <div>
-                  Safari के नीचे या ऊपर स्थित <span className="font-bold text-white flex-inline items-center bg-stone-800 px-1.5 py-0.5 rounded text-stone-200">Share / शेयर <Share2 className="w-3 h-3 inline mx-0.5 text-blue-400" /></span> बटन पर टैप करें।
+                  Safari में नीचे स्थित <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded text-blue-300">Share / शेयर <Share2 className="w-3 h-3 inline mx-0.5 text-blue-400" /></span> बटन पर टैप करें।
                 </div>
               </div>
               <div className="flex items-start space-x-2.5">
                 <div className="w-5 h-5 rounded-full bg-stone-800 text-orange-400 font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
                 <div>
-                  नीचे स्क्रॉल करें और <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded">"Add to Home Screen" <PlusSquare className="w-3 h-3 inline mx-0.5 text-orange-400" /></span> चुनें।
+                  नीचे स्क्रॉल करें और <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded text-orange-300">"Add to Home Screen" <PlusSquare className="w-3 h-3 inline mx-0.5 text-orange-400" /></span> चुनें।
                 </div>
               </div>
               <div className="flex items-start space-x-2.5">
                 <div className="w-5 h-5 rounded-full bg-stone-800 text-orange-400 font-bold flex items-center justify-center shrink-0 mt-0.5">3</div>
                 <div>
-                  ऊपर दाएं कोने में <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded">"Add / जोड़ें"</span> पर टैप करें।
+                  ऊपर दाएं कोने में <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded text-emerald-300">"Add / जोड़ें"</span> पर टैप करें।
                 </div>
               </div>
             </div>
@@ -102,7 +116,7 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
         ) : (
           <div className="space-y-3 bg-stone-950/80 p-4 rounded-2xl border border-stone-800 text-xs text-stone-300">
             <span className="text-[10px] uppercase font-bold text-orange-400 tracking-wider block">
-              Desktop / Browser Instructions:
+              Desktop & Chrome Instructions:
             </span>
             <p className="leading-relaxed">
               {lang === 'hi'

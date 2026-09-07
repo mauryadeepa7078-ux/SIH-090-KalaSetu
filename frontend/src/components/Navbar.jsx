@@ -58,29 +58,71 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [deferredPrompt, setDeferredPrompt] = useState(
+    typeof window !== 'undefined' ? (window.deferredPwaPrompt || null) : null
+  );
 
-  // Capture PWA beforeinstallprompt event
+  // Capture PWA beforeinstallprompt event with fallback to global store
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.deferredPwaPrompt) {
+      setDeferredPrompt(window.deferredPwaPrompt);
+    }
+
     const handleBeforeInstall = (e) => {
       e.preventDefault();
+      window.deferredPwaPrompt = e;
       setDeferredPrompt(e);
-      console.log('[PWA] beforeinstallprompt captured successfully.');
+      console.log('[PWA Navbar] beforeinstallprompt event captured and ready for 1-tap install.');
+    };
+
+    const handlePromptAvailable = () => {
+      if (typeof window !== 'undefined' && window.deferredPwaPrompt) {
+        setDeferredPrompt(window.deferredPwaPrompt);
+      }
+    };
+
+    const handleAppInstalled = () => {
+      console.log('[PWA Navbar] KalaSetu app installed.');
+      setDeferredPrompt(null);
+      if (typeof window !== 'undefined') window.deferredPwaPrompt = null;
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('pwa-prompt-available', handlePromptAvailable);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('pwa-prompt-available', handlePromptAvailable);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
 
-  const handleInstallClick = () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
+  const handleNativeInstall = async () => {
+    const promptEvent = deferredPrompt || (typeof window !== 'undefined' ? window.deferredPwaPrompt : null);
+    if (promptEvent) {
+      console.log('[PWA Navbar] Triggering native install prompt dialog...');
+      try {
+        await promptEvent.prompt();
+        const choiceResult = await promptEvent.userChoice;
+        console.log('[PWA Navbar] User choice outcome:', choiceResult.outcome);
         if (choiceResult.outcome === 'accepted') {
-          console.log('[PWA] User accepted the install prompt');
+          console.log('[PWA Navbar] User accepted the KalaSetu app install.');
         }
         setDeferredPrompt(null);
-      });
+        if (typeof window !== 'undefined') window.deferredPwaPrompt = null;
+      } catch (err) {
+        console.warn('[PWA Navbar] Error displaying native prompt:', err);
+      }
+    }
+  };
+
+  const handleInstallClick = () => {
+    const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+    const promptEvent = deferredPrompt || (typeof window !== 'undefined' ? window.deferredPwaPrompt : null);
+
+    if (promptEvent && !isIOS) {
+      handleNativeInstall();
     } else {
       setIsPwaModalOpen(true);
     }
@@ -384,8 +426,8 @@ export const Navbar = () => {
       <PwaInstallModal
         isOpen={isPwaModalOpen}
         onClose={() => setIsPwaModalOpen(false)}
-        onNativeInstall={handleInstallClick}
-        canNativeInstall={!!deferredPrompt}
+        onNativeInstall={handleNativeInstall}
+        canNativeInstall={!!(deferredPrompt || (typeof window !== 'undefined' && window.deferredPwaPrompt))}
         lang={lang}
       />
 
