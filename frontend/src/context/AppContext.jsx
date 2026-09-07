@@ -114,6 +114,46 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
 
+  // Light / Dark Theme State Management (Persisted & System Preference Aware)
+  const storedTheme = (() => {
+    try {
+      const t = getSafeStorage('kalasetu_theme', null);
+      if (t === 'dark' || t === 'light') return t;
+      if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+      return 'dark';
+    } catch (e) {
+      return 'dark';
+    }
+  })();
+
+  const [theme, setTheme] = useState(storedTheme);
+
+  // Sync theme to document element
+  useEffect(() => {
+    try {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      setSafeStorage('kalasetu_theme', theme);
+    } catch (e) {}
+  }, [theme]);
+
+  const toggleTheme = (overrideTheme) => {
+    const nextTheme = overrideTheme || (theme === 'dark' ? 'light' : 'dark');
+    setTheme(nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    setSafeStorage('kalasetu_theme', nextTheme);
+    showToast(nextTheme === 'dark' ? '🌙 Dark Mode Activated' : '☀️ Light Mode Activated', 'info');
+  };
+
   // Active tab routing based on role (3 Roles)
   const [activeTab, setActiveTab] = useState(
     storedRole === 'artisan' ? 'artisan-home' : (storedRole === 'businessman' ? 'businessman-home' : 'buyer-market')
@@ -577,7 +617,9 @@ export const AppProvider = ({ children }) => {
         companionStep,
         setCompanionStep,
         proactiveMessage,
-        setProactiveMessage
+        setProactiveMessage,
+        theme,
+        toggleTheme
       }}
     >
       {children}

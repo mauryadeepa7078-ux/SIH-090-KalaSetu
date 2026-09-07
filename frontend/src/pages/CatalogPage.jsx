@@ -70,14 +70,14 @@ export const CatalogPage = () => {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-semibold">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-semibold font-sans">
               <Sparkles className="w-3.5 h-3.5" />
               <span>MoSJE AI Virtual Business Manager</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-hindi">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif">
               {lang === 'hi' ? 'कारीगर डिजिटल कैटलॉग व इन्वेंटरी' : 'Artisan Digital Inventory & Catalog'}
             </h2>
-            <p className="text-sm text-stone-300 leading-relaxed">
+            <p className="text-sm text-stone-300 leading-relaxed font-sans">
               {lang === 'hi' 
                 ? 'AI फोटो स्टूडियो और आवाज से 2 मिनट में अपने हस्तशिल्प को डिजिटल रूप दें। GeM और ONDC पर सीधे बेचें।'
                 : 'Digitize your handmade crafts in 2 minutes with AI Photo Studio & Multilingual Voice. Sell directly on GeM & ONDC.'}
@@ -87,14 +87,14 @@ export const CatalogPage = () => {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={() => setActiveTab('camera')}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm shadow-lg shadow-orange-900/50 active:scale-95 transition-all min-h-[48px]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm shadow-lg shadow-orange-900/40 active:scale-95 transition-all min-h-[48px]"
             >
               <Plus className="w-5 h-5" />
               <span>{t('newListing')}</span>
             </button>
             <button
               onClick={() => setActiveTab('voice')}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-4 rounded-2xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 font-semibold text-sm transition-all min-h-[48px]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-4 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 font-semibold text-sm transition-all min-h-[48px]"
             >
               <Sparkles className="w-4 h-4 text-orange-400" />
               <span>{t('navVoiceCatalog')}</span>
@@ -114,22 +114,22 @@ export const CatalogPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'hi' ? 'उत्पाद, शिल्प श्रेणी या शिल्पकार का नाम खोजें...' : 'Search by craft, title, or artisan name...'}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm shadow-sm"
+              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm shadow-sm transition-colors font-sans"
             />
           </div>
         </div>
 
         {/* Category horizontal scroll */}
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-          <Filter className="w-4 h-4 text-stone-500 flex-shrink-0 ml-1" />
+          <Filter className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 ml-1" />
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedCategory === cat
-                  ? 'bg-orange-600 text-white shadow-md'
-                  : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                  ? 'bg-orange-600 text-white shadow-sm'
+                  : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
               }`}
             >
               {cat}
@@ -142,18 +142,18 @@ export const CatalogPage = () => {
       {loading ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-12 h-12 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-sm font-medium text-stone-500">Loading authentic artisan listings...</p>
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 font-sans">Loading authentic artisan listings...</p>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="py-16 text-center bg-white rounded-3xl border border-stone-200 p-8 space-y-4">
+        <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-8 space-y-4 shadow-sm">
           <Layers className="w-12 h-12 text-stone-400 mx-auto" />
-          <h3 className="text-lg font-bold text-stone-800">No products found</h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+          <h3 className="text-lg font-bold text-stone-800 dark:text-stone-200 font-serif">No products found</h3>
+          <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto font-sans">
             Try adjusting your search query or add a new handmade craft using AI Photo Studio.
           </p>
           <button
             onClick={() => setActiveTab('camera')}
-            className="px-5 py-2.5 rounded-xl bg-orange-600 text-white font-bold text-xs shadow-md hover:bg-orange-700"
+            className="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-md transition-all font-sans"
           >
             {t('newListing')}
           </button>
@@ -169,10 +169,10 @@ export const CatalogPage = () => {
               <div
                 key={product.id}
                 onClick={() => handleOpenProduct(product)}
-                className="group bg-white rounded-3xl border border-stone-200 hover:border-orange-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="group bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 hover:border-orange-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
                 {/* Product Image Container */}
-                <div className="relative aspect-square bg-stone-50 overflow-hidden flex items-center justify-center p-3">
+                <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 overflow-hidden flex items-center justify-center p-3">
                   <img
                     src={imgSrc}
                     alt={product.title_en}
@@ -218,35 +218,35 @@ export const CatalogPage = () => {
                 {/* Content */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
-                      <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold text-[11px]">
+                    <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400 font-medium">
+                      <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold text-[11px]">
                         {product.category}
                       </span>
                       <span>{product.artisan_village}</span>
                     </div>
 
-                    <h3 className="font-bold text-stone-900 text-sm line-clamp-2 leading-snug group-hover:text-orange-600 transition-colors font-hindi">
+                    <h3 className="font-bold text-stone-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors font-serif">
                       {displayTitle}
                     </h3>
                   </div>
 
                   {/* Price and Artisan Name */}
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-stone-400 block uppercase font-bold tracking-wider">
+                      <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold tracking-wider font-sans">
                         {t('recommendedPrice')}
                       </span>
-                      <span className="text-lg font-black text-stone-900">
+                      <span className="text-lg font-black text-stone-900 dark:text-white font-sans">
                         ₹{product.price?.toLocaleString('en-IN')}
                       </span>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] font-semibold text-stone-700 block">
+                      <span className="text-[11px] font-semibold text-stone-700 dark:text-stone-200 block font-sans">
                         {product.artisan_name}
                       </span>
                       {product.gem_published && (
-                        <span className="inline-flex items-center text-[10px] text-blue-600 font-bold">
+                        <span className="inline-flex items-center text-[10px] text-blue-600 dark:text-blue-400 font-bold">
                           <Building2 className="w-3 h-3 mr-0.5" /> GeM Live
                         </span>
                       )}

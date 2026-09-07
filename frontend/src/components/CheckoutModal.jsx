@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
@@ -84,10 +84,10 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
               <Zap className="w-5 h-5 fill-amber-400" />
             </div>
             <div>
-              <span className="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-black/20 text-stone-950">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-black/20 text-stone-950 font-sans">
                 Direct Artisan Purchase
               </span>
-              <h3 className="text-base sm:text-lg font-black tracking-tight text-stone-950 font-hindi">
+              <h3 className="text-base sm:text-lg font-black tracking-tight text-stone-950 font-serif">
                 {lang === 'hi' ? 'सुरक्षित चेकआउट व डिलीवरी फॉर्म' : 'Secure Artisan Checkout'}
               </h3>
             </div>
@@ -115,13 +115,13 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
               className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover bg-stone-800 border border-stone-700 shrink-0"
             />
             <div className="flex-1 min-w-0">
-              <span className="text-[10px] uppercase font-bold text-amber-400 block truncate">
+              <span className="text-[10px] uppercase font-bold text-amber-400 block truncate font-sans">
                 {product.category || 'Handicraft'} • {product.artisan_name}
               </span>
-              <h4 className="font-extrabold text-sm text-white truncate font-hindi">
+              <h4 className="font-extrabold text-sm text-white truncate font-serif">
                 {displayTitle}
               </h4>
-              <div className="flex items-center space-x-2 mt-1">
+              <div className="flex items-center space-x-2 mt-1 font-sans">
                 <span className="text-sm font-black text-amber-400">
                   ₹{unitPrice.toLocaleString('en-IN')}
                 </span>
@@ -131,7 +131,7 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
           </div>
 
           {/* Quantity Selector & Units */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-800/80 border border-stone-700">
+          <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-800/80 border border-stone-700 font-sans">
             <div>
               <span className="text-xs font-bold text-stone-200 block">Quantity / संख्या:</span>
               <span className="text-[10px] text-stone-400">Directly handwoven by artisan</span>
@@ -158,7 +158,7 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
           </div>
 
           {/* Buyer Details Grid */}
-          <div className="space-y-3">
+          <div className="space-y-3 font-sans">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-stone-300 flex items-center space-x-1.5">
@@ -222,7 +222,7 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
           </div>
 
           {/* Pricing & Free Shipping Box */}
-          <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-600/40 space-y-2 text-xs">
+          <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-600/40 space-y-2 text-xs font-sans">
             <div className="flex justify-between text-stone-300">
               <span>Items Total ({qty} unit{qty > 1 ? 's' : ''}):</span>
               <span className="font-mono font-bold text-white">₹{subtotal.toLocaleString('en-IN')}</span>
@@ -238,7 +238,7 @@ export const CheckoutModal = ({ isOpen, onClose, product, initialQty = 1 }) => {
           </div>
 
           {/* Submit Button */}
-          <div className="pt-2">
+          <div className="pt-2 font-sans">
             <button
               type="submit"
               disabled={isSubmitting}

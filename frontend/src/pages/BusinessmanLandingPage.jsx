@@ -251,11 +251,11 @@ export const BusinessmanLandingPage = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg sm:text-xl font-black text-stone-900 flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg sm:text-xl font-black text-stone-900 dark:text-white flex items-center space-x-2 font-serif">
+              <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <span>Direct Artisan Cluster Sourcing Directory</span>
             </h2>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
               Procure in bulk (MOQ 50+ units) directly from state craft corporations and verified artisan guilds
             </p>
           </div>
@@ -266,15 +266,15 @@ export const BusinessmanLandingPage = () => {
             <button
               key={c.id}
               onClick={() => setSelectedCluster(c.id)}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border shrink-0 ${
+              className={`px-3.5 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border shrink-0 font-sans ${
                 selectedCluster === c.id
                   ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-900/30'
-                  : 'bg-white border-stone-200 text-stone-700 hover:bg-stone-50 hover:border-blue-400'
+                  : 'bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-blue-400'
               }`}
             >
               <span>{c.name}</span>
               <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full ${
-                selectedCluster === c.id ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-500'
+                selectedCluster === c.id ? 'bg-white/20 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
               }`}>
                 {c.artisans}
               </span>
@@ -293,11 +293,11 @@ export const BusinessmanLandingPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search wholesale products, GI tags, clusters..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-stone-200 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm font-sans"
             />
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-semibold text-stone-600 self-end sm:self-auto">
+          <div className="flex items-center space-x-2 text-xs font-semibold text-stone-600 dark:text-stone-400 self-end sm:self-auto font-sans">
             <span>Showing {filteredProducts.length} Wholesale Verified Products</span>
           </div>
         </div>
@@ -312,10 +312,10 @@ export const BusinessmanLandingPage = () => {
             return (
               <div
                 key={product.id}
-                className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
+                className="bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
                 {/* Image & Badges */}
-                <div className="relative aspect-[4/3] bg-stone-100 overflow-hidden">
+                <div className="relative aspect-[4/3] bg-stone-100 dark:bg-stone-950 overflow-hidden">
                   <img
                     src={getProductImage(product)}
                     alt={product.title_en}
@@ -333,11 +333,11 @@ export const BusinessmanLandingPage = () => {
                     </div>
                   )}
 
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-blue-900/90 backdrop-blur-sm text-blue-200 text-[10px] font-bold border border-blue-500/40">
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-blue-900/90 backdrop-blur-sm text-blue-200 text-[10px] font-bold border border-blue-500/40 font-sans">
                     MOQ: {moq} Units
                   </div>
 
-                  <div className="absolute bottom-3 left-3 right-3 p-2 rounded-xl bg-stone-950/80 backdrop-blur-md border border-stone-800 text-[11px] text-stone-300 flex items-center justify-between">
+                  <div className="absolute bottom-3 left-3 right-3 p-2 rounded-xl bg-stone-950/80 backdrop-blur-md border border-stone-800 text-[11px] text-stone-300 flex items-center justify-between font-sans">
                     <span className="truncate">📍 {product.artisan_village}, {product.artisan_state}</span>
                     <span className="text-amber-400 font-bold shrink-0">{product.artisan_name}</span>
                   </div>
@@ -346,34 +346,34 @@ export const BusinessmanLandingPage = () => {
                 {/* Card Body */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 font-sans">
                       {product.category || 'Handicraft'} • MoSJE Verified
                     </span>
-                    <h3 className="font-extrabold text-stone-900 text-base line-clamp-1">
+                    <h3 className="font-extrabold text-stone-900 dark:text-white text-base line-clamp-1 font-serif">
                       {lang === 'hi' && product.title_hi ? product.title_hi : product.title_en}
                     </h3>
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed font-sans">
                       {lang === 'hi' && product.description_hi ? product.description_hi : product.description_en}
                     </p>
                   </div>
 
                   {/* Pricing Breakdown */}
-                  <div className="p-3 rounded-2xl bg-blue-50/70 border border-blue-100 space-y-1">
+                  <div className="p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 space-y-1">
                     <div className="flex items-baseline justify-between">
                       <div>
-                        <span className="text-[10px] text-stone-500 uppercase font-bold block">Wholesale Rate (MOQ 50+)</span>
-                        <span className="text-lg font-black text-blue-950">₹{wholesalePrice.toLocaleString('en-IN')}</span>
-                        <span className="text-[10px] text-stone-400 ml-1.5 line-through">₹{product.price?.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] text-stone-500 dark:text-stone-400 uppercase font-bold block font-sans">Wholesale Rate (MOQ 50+)</span>
+                        <span className="text-lg font-black text-blue-950 dark:text-cyan-300 font-sans">₹{wholesalePrice.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] text-stone-400 ml-1.5 line-through font-sans">₹{product.price?.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-emerald-700 font-bold block">Est. Batch Savings</span>
-                        <span className="text-xs font-black text-emerald-600">+₹{bulkSavings.toLocaleString('en-IN')}</span>
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold block font-sans">Est. Batch Savings</span>
+                        <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 font-sans">+₹{bulkSavings.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="grid grid-cols-2 gap-2 pt-1 font-sans">
                     <button
                       onClick={() => handleOpenRfq(product)}
                       className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center space-x-1 shadow-md transition-colors"
@@ -387,7 +387,7 @@ export const BusinessmanLandingPage = () => {
                         setSelectedProduct(product);
                         setActiveTab('detail');
                       }}
-                      className="py-2.5 px-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs flex items-center justify-center space-x-1 transition-colors"
+                      className="py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-750 text-stone-800 dark:text-stone-200 font-bold text-xs flex items-center justify-center space-x-1 transition-colors"
                     >
                       <span>Spec Sheet</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -401,16 +401,16 @@ export const BusinessmanLandingPage = () => {
       </div>
 
       {/* Compliance & Export Pack Banner */}
-      <div className="p-6 rounded-3xl bg-white border border-stone-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="p-6 rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
-          <div className="p-3.5 rounded-2xl bg-emerald-100 text-emerald-700">
+          <div className="p-3.5 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
             <FileCheck className="w-7 h-7" />
           </div>
           <div>
-            <h3 className="text-base font-extrabold text-stone-900">
+            <h3 className="text-base font-extrabold text-stone-900 dark:text-white font-serif">
               Institutional Compliance & HSN Tax Export Package
             </h3>
-            <p className="text-xs text-stone-500 max-w-xl leading-relaxed">
+            <p className="text-xs text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed font-sans">
               Auto-generate GSTIN-compliant e-Invoices, e-Way bills, GeM bid compliance sheets, and MoSJE origin authenticity certificates for seamless institutional auditing.
             </p>
           </div>
@@ -418,7 +418,7 @@ export const BusinessmanLandingPage = () => {
 
         <button
           onClick={() => showToast('Downloading HSN & GeM Compliance Kit (PDF)...', 'success')}
-          className="px-5 py-3 rounded-2xl bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs flex items-center space-x-2 shrink-0 transition-colors shadow-md"
+          className="px-5 py-3 rounded-2xl bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-700 text-white font-bold text-xs flex items-center space-x-2 shrink-0 transition-colors shadow-md font-sans"
         >
           <Download className="w-4 h-4 text-emerald-400" />
           <span>Download Compliance Kit (PDF)</span>

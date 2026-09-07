@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -22,18 +23,24 @@ export default {
         },
         india: {
           saffron: '#FF9933',
+          terracotta: '#C2410C',
+          gold: '#D4AF37',
+          marigold: '#F59E0B',
           white: '#FFFFFF',
           green: '#138808',
-          navy: '#000080',
-          indigo: '#4B0082',
-          gold: '#D4AF37'
+          navy: '#0F172A',
+          indigo: '#1E3A8A',
+          parchment: '#FAF8F5'
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        hindi: ['Noto Sans Devanagari', 'sans-serif']
+        sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['"Playfair Display"', '"Noto Serif Devanagari"', 'Georgia', 'serif'],
+        heritage: ['Cinzel', '"Playfair Display"', '"Noto Serif Devanagari"', 'serif'],
+        hindi: ['"Noto Sans Devanagari"', '"Noto Serif Devanagari"', 'sans-serif']
       }
     },
   },
   plugins: [],
 }
+

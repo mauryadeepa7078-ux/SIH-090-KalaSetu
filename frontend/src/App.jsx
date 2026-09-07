@@ -101,7 +101,7 @@ const MainContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 flex flex-col relative text-stone-900 selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex flex-col relative text-stone-900 dark:text-stone-100 selection:bg-orange-500 selection:text-white transition-colors duration-200 craft-pattern-bg">
       {/* Navbar & Offline Sync Bar */}
       <Navbar />
       <OfflineBanner />

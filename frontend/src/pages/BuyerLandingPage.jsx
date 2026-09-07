@@ -78,23 +78,23 @@ export const BuyerLandingPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in pb-28">
       
       {/* Buyer Marketplace Hero Banner */}
-      <div className="bg-gradient-to-r from-stone-900 via-stone-900 to-amber-950/80 rounded-3xl p-6 sm:p-8 text-white border border-amber-800/40 shadow-2xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-stone-900 via-stone-900 to-amber-950/80 rounded-3xl p-6 sm:p-8 text-white border border-amber-800/40 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-80 h-80 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2.5 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold font-sans">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>MoSJE Verified Artisan Marketplace</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-hindi">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-serif">
               {lang === 'hi' 
                 ? 'भारतीय प्रामाणिक हस्तशिल्प बाज़ार' 
                 : 'Direct Indian Heritage & GI Craft Marketplace'}
             </h2>
 
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-sans">
               {lang === 'hi' 
                 ? 'सीधे भारत सरकार (MoSJE) द्वारा सत्यापित मास्टर कारीगरों से खरीदें। 100% प्रामाणिक, GI टैग प्रमाणित और डिजिटल QR प्रमाण पत्र सहित।'
                 : 'Purchase directly from master artisans verified under Ministry of Social Justice & Empowerment (MoSJE). 100% authentic, GI-tagged with digital QR provenance.'}
@@ -104,7 +104,7 @@ export const BuyerLandingPage = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
             <button
               onClick={() => switchRole('artisan')}
-              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-300 border border-stone-700 text-xs font-bold transition-all flex items-center justify-center space-x-2"
+              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-md"
               title="Switch to Seller / Creator view"
             >
               <Palette className="w-4 h-4 text-orange-400" />
@@ -125,7 +125,7 @@ export const BuyerLandingPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'hi' ? 'शिल्प, साड़ी, मूर्ति, पॉटरी या कारीगर खोजें...' : 'Search crafts, silk sarees, pottery, paintings, artisans...'}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-stone-300 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm shadow-sm"
+              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm shadow-sm transition-colors font-sans"
             />
           </div>
 
@@ -133,7 +133,7 @@ export const BuyerLandingPage = () => {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="px-4 py-3 rounded-2xl bg-white border border-stone-300 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm"
+            className="px-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm transition-colors font-sans"
           >
             {states.map(st => (
               <option key={st} value={st}>{st === 'All' ? 'All States (सभी राज्य)' : st}</option>
@@ -145,26 +145,26 @@ export const BuyerLandingPage = () => {
             onClick={() => setGiOnly(!giOnly)}
             className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 shadow-sm min-h-[44px] ${
               giOnly
-                ? 'bg-amber-600 text-white border border-amber-500'
-                : 'bg-white text-stone-700 border border-stone-300 hover:bg-stone-50'
+                ? 'bg-amber-600 text-white border border-amber-500 shadow-md'
+                : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
             }`}
           >
-            <Award className={`w-4 h-4 ${giOnly ? 'text-white' : 'text-amber-600'}`} />
+            <Award className={`w-4 h-4 ${giOnly ? 'text-white' : 'text-amber-600 dark:text-amber-400'}`} />
             <span>GI Certified Only</span>
           </button>
         </div>
 
         {/* Categories scrollbar */}
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-          <Filter className="w-4 h-4 text-stone-500 shrink-0 ml-1" />
+          <Filter className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0 ml-1" />
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedCategory === cat
-                  ? 'bg-amber-600 text-white shadow-md'
-                  : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
               }`}
             >
               {cat}
@@ -177,18 +177,18 @@ export const BuyerLandingPage = () => {
       {loading ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-sm font-medium text-stone-500">Connecting to verified craft units...</p>
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 font-sans">Connecting to verified craft units...</p>
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="py-16 text-center bg-white rounded-3xl border border-stone-200 p-8 space-y-4 shadow-sm">
+        <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-8 space-y-4 shadow-sm">
           <Layers className="w-12 h-12 text-stone-400 mx-auto" />
-          <h3 className="text-lg font-bold text-stone-800">No crafts matching your criteria</h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+          <h3 className="text-lg font-bold text-stone-800 dark:text-stone-200 font-serif">No crafts matching your criteria</h3>
+          <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto font-sans">
             Try resetting filters or searching for another craft category like Silk Saree or Blue Pottery.
           </p>
           <button
             onClick={() => { setSelectedCategory('All'); setSelectedState('All'); setGiOnly(false); setSearchQuery(''); }}
-            className="px-5 py-2.5 rounded-xl bg-amber-600 text-white font-bold text-xs shadow-md"
+            className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-md transition-all font-sans"
           >
             Reset Filters
           </button>
@@ -203,10 +203,10 @@ export const BuyerLandingPage = () => {
               <div
                 key={product.id}
                 onClick={() => handleOpenProduct(product)}
-                className="group bg-white rounded-3xl border border-stone-200 hover:border-amber-500 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="group bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 hover:border-amber-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
                 {/* Product Image */}
-                <div className="relative aspect-square bg-stone-50 overflow-hidden flex items-center justify-center p-3">
+                <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 overflow-hidden flex items-center justify-center p-3">
                   <img
                     src={imgSrc}
                     alt={product.title_en}
@@ -254,37 +254,37 @@ export const BuyerLandingPage = () => {
                 {/* Content Details */}
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
-                      <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 font-semibold text-[11px]">
+                    <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400 font-medium">
+                      <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold text-[11px]">
                         {product.category}
                       </span>
-                      <span className="flex items-center text-stone-500 text-[11px]">
+                      <span className="flex items-center text-stone-500 dark:text-stone-400 text-[11px]">
                         <MapPin className="w-3 h-3 mr-0.5" />
                         {product.artisan_village}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-stone-900 text-sm line-clamp-2 leading-snug group-hover:text-amber-600 transition-colors font-hindi">
+                    <h3 className="font-bold text-stone-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors font-serif">
                       {displayTitle}
                     </h3>
                   </div>
 
                   {/* Price & Master Artisan */}
-                  <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-stone-400 block uppercase font-bold tracking-wider">
+                      <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold tracking-wider font-sans">
                         Direct Price
                       </span>
-                      <span className="text-lg font-black text-stone-900">
+                      <span className="text-lg font-black text-stone-900 dark:text-white font-sans">
                         ₹{product.price?.toLocaleString('en-IN')}
                       </span>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] font-bold text-stone-800 block">
+                      <span className="text-[11px] font-bold text-stone-800 dark:text-stone-200 block font-sans">
                         {product.artisan_name}
                       </span>
-                      <span className="text-[10px] text-stone-500 block">
+                      <span className="text-[10px] text-stone-500 dark:text-stone-400 block font-sans">
                         {product.craft_lineage_years || 20}+ Yrs Lineage
                       </span>
                     </div>

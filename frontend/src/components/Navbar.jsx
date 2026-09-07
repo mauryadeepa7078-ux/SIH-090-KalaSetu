@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { ProfileDropdown } from './ProfileDropdown';
 import { PwaInstallModal } from './PwaInstallModal';
@@ -30,7 +30,12 @@ import {
   Layers,
   ChevronDown,
   User,
-  Download
+  Download,
+  Sun,
+  Moon,
+  FileCheck,
+  PackageCheck,
+  SlidersHorizontal
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -52,15 +57,31 @@ export const Navbar = () => {
     switchRole,
     openOnboarding,
     orders,
-    cart
+    cart,
+    theme,
+    toggleTheme
   } = useApp();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(
     typeof window !== 'undefined' ? (window.deferredPwaPrompt || null) : null
   );
+
+  const moreMenuRef = useRef(null);
+
+  // Close More Menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
+        setIsMoreMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Capture PWA beforeinstallprompt event with fallback to global store
   useEffect(() => {
@@ -128,153 +149,202 @@ export const Navbar = () => {
     }
   };
 
-  // 1. Artisan-specific nav items (Strict RBAC: Creator & studio tools only)
-  const artisanNavItems = [
-    { id: 'artisan-home', label: 'Studio Home', icon: Sparkles, desc: 'Photo & Voice first artisan hub' },
-    { id: 'artisan-orders', label: 'My Orders / Inquiries', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Retail orders & GeM bulk inquiries' },
-    { id: 'camera', label: t('navPhotoStudio') || 'AI Photo Studio', icon: Camera, highlight: true, desc: 'Remove background & enhance lighting' },
-    { id: 'voice', label: t('navVoiceCatalog') || 'Voice-to-Catalog', icon: Mic, desc: 'Generate bilingual listings from voice' },
-    { id: 'pricing', label: t('navPricing') || 'Smart Pricing', icon: DollarSign, desc: 'Dynamic Scikit-Learn pricing model' },
-    { id: 'catalog', label: 'Mera Catalog', icon: ShoppingBag, desc: 'View digitized inventory & crafts' },
-    { id: 'whatsapp', label: t('navWhatsApp') || 'WhatsApp Bot', icon: MessageCircle, desc: 'Direct WhatsApp seller assistant' },
-    { id: 'analytics', label: t('navAnalytics') || 'Analytics', icon: BarChart3, desc: 'Sales, views, and inquiry charts' },
-    { id: 'community', label: t('navCommunity') || 'Community', icon: Users, desc: 'Artisan peer network and feed' },
+  // -------------------------------------------------------------
+  // Streamlined Navigation Groupings (3-4 Core Items + More Dropdown)
+  // -------------------------------------------------------------
+
+  // Artisan Core vs Secondary
+  const artisanPrimaryNav = [
+    { id: 'artisan-home', label: 'Studio Home', icon: Sparkles, desc: 'Photo & voice first creator hub' },
+    { id: 'camera', label: t('navPhotoStudio') || 'AI Studio', icon: Camera, highlight: true, desc: 'Lighting & background enhancement' },
+    { id: 'voice', label: t('navVoiceCatalog') || 'Voice Catalog', icon: Mic, desc: 'Bilingual AI voice descriptions' },
+    { id: 'catalog', label: 'Mera Catalog', icon: ShoppingBag, desc: 'Digitized craft inventory' },
   ];
 
-  // 2. Buyer-specific nav items (Strict RBAC: Consumer marketplace only)
-  const buyerNavItems = [
-    { id: 'buyer-market', label: 'Marketplace', icon: ShoppingBag, desc: 'Explore GI crafts & verified artisans' },
-    { id: 'orders', label: 'My Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Real-time 6-stage delivery & DNK tracking' },
+  const artisanSecondaryNav = [
+    { id: 'pricing', label: t('navPricing') || 'Smart Pricing Assistant', icon: DollarSign, desc: 'ML fair-wage benchmark calculator' },
+    { id: 'artisan-orders', label: 'Orders & Bulk Inquiries', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Retail fulfillment & GeM purchase inquiries' },
+    { id: 'whatsapp', label: t('navWhatsApp') || 'WhatsApp Assistant', icon: MessageCircle, desc: 'Conversational seller bot' },
+    { id: 'analytics', label: t('navAnalytics') || 'Performance Analytics', icon: BarChart3, desc: 'Sales, views, and cluster charts' },
+    { id: 'community', label: t('navCommunity') || 'Artisan Community', icon: Users, desc: 'Peer artisan feed and guild network' },
+    { id: 'certificate', label: 'GI Authenticity Certificates', icon: Award, desc: 'Verified GI tags and provenance QR' },
+  ];
+
+  // Buyer Core vs Secondary
+  const buyerPrimaryNav = [
+    { id: 'buyer-market', label: 'Marketplace', icon: ShoppingBag, desc: 'Authentic GI Indian crafts' },
+    { id: 'orders', label: 'My Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: '6-stage IndiaPost DNK live tracking' },
     { id: 'cart', label: 'Cart', icon: ShoppingBag, badge: cart.length > 0 ? cart.length : null, desc: 'Shopping cart & instant checkout' },
-    { id: 'community', label: 'Heritage Stories', icon: Users, desc: 'Artisan heritage and fair calendar' },
+    { id: 'community', label: 'Heritage Stories', icon: Users, desc: 'Artisan lineage & craft fair calendar' },
   ];
 
-  // 3. Businessman-specific nav items (Strict RBAC: B2B, GeM, RFQ, Bulk tenders only)
-  const businessmanNavItems = [
-    { id: 'businessman-home', label: 'B2B Hub', icon: Briefcase, desc: 'Institutional sourcing & cluster directory' },
-    { id: 'businessman-orders', label: 'B2B & RFQ Tracker', icon: Truck, desc: '6-stage live procurement & tender timeline' },
-    { id: 'gem', label: 'GeM & ONDC Tenders', icon: Building2, desc: 'Government & corporate bulk procurement' },
+  const buyerSecondaryNav = [
+    { id: 'certificate', label: 'Verify GI Heritage Certificate', icon: ShieldCheck, desc: 'Verify craft origin & MoSJE stamp' },
+  ];
+
+  // Businessman Core vs Secondary
+  const businessmanPrimaryNav = [
+    { id: 'businessman-home', label: 'B2B Procurement', icon: Briefcase, desc: 'Direct artisan cluster sourcing' },
+    { id: 'businessman-orders', label: 'B2B & RFQ Tracker', icon: PackageCheck, desc: '6-stage live milestone tracker' },
+    { id: 'gem', label: 'GeM & ONDC Tenders', icon: Building2, desc: 'Government & corporate bulk tenders' },
+  ];
+
+  const businessmanSecondaryNav = [
     { id: 'whatsapp', label: 'Cluster Inquiries', icon: MessageCircle, desc: 'Direct cooperative communication' },
-    { id: 'community', label: 'Craft Clusters', icon: Users, desc: 'State craft guilds & cluster directory' },
+    { id: 'community', label: 'Craft Clusters & Guilds', icon: Users, desc: 'Directory of registered artisan cooperatives' },
+    { id: 'certificate', label: 'Institutional Compliance', icon: FileCheck, desc: 'GST, GI & MoSJE compliance credentials' },
   ];
 
-  const allNavItems = userRole === 'artisan' 
-    ? artisanNavItems 
-    : userRole === 'businessman' 
-    ? businessmanNavItems 
-    : buyerNavItems;
+  const primaryNavItems = userRole === 'artisan'
+    ? artisanPrimaryNav
+    : userRole === 'businessman'
+    ? businessmanPrimaryNav
+    : buyerPrimaryNav;
+
+  const secondaryNavItems = userRole === 'artisan'
+    ? artisanSecondaryNav
+    : userRole === 'businessman'
+    ? businessmanSecondaryNav
+    : buyerSecondaryNav;
+
+  const allNavItems = [...primaryNavItems, ...secondaryNavItems];
+  const isSecondaryActive = secondaryNavItems.some(item => item.id === activeTab);
 
   // Mobile Bottom Navigation Tabs (4 distinct items per role)
   const bottomTabs = userRole === 'artisan'
     ? [
         { id: 'artisan-home', label: 'Studio', icon: Sparkles },
         { id: 'artisan-orders', label: 'Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null },
-        { id: 'camera', label: 'Photo Lo', icon: Camera, isFab: true },
-        { id: 'voice', label: 'Bolkar', icon: Mic },
+        { id: 'camera', label: 'Photo Studio', icon: Camera, isFab: true },
+        { id: 'voice', label: 'Voice', icon: Mic },
         { id: 'catalog', label: 'Catalog', icon: ShoppingBag },
       ]
     : userRole === 'businessman'
     ? [
         { id: 'businessman-home', label: 'B2B Hub', icon: Briefcase },
+        { id: 'businessman-orders', label: 'Orders', icon: PackageCheck, badge: 1 },
         { id: 'gem', label: 'GeM Board', icon: Building2, isFab: true },
         { id: 'whatsapp', label: 'Inquiries', icon: MessageCircle },
-        { id: 'community', label: 'Clusters', icon: Users },
       ]
     : [
-        { id: 'buyer-market', label: 'Explore', icon: ShoppingBag },
+        { id: 'buyer-market', label: 'Market', icon: ShoppingBag },
         { id: 'orders', label: 'Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null },
-        { id: 'cart', label: 'Cart', icon: ShoppingBag, badge: cart.length > 0 ? cart.length : null },
+        { id: 'cart', label: 'Cart', icon: ShoppingBag, isFab: true, badge: cart.length > 0 ? cart.length : null },
         { id: 'community', label: 'Stories', icon: Users },
       ];
 
-  const handleMobileNavClick = (tabId) => {
-    setActiveTab(tabId);
-    setIsMobileMenuOpen(false);
-  };
-
   return (
     <>
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-stone-900 border-b border-stone-800 shadow-md">
-        {/* Top Info Strip */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between gap-2 border-b border-stone-800/80 text-xs">
-          <div className="flex items-center space-x-2 text-stone-300">
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-orange-950/90 border border-orange-600/40 text-orange-400 font-bold tracking-wide text-[10px] sm:text-xs">
-              SIH 2026 • SIH26090
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 transition-colors duration-200">
+        
+        {/* Top Utility Bar */}
+        <div className="bg-stone-100/80 dark:bg-stone-950/80 border-b border-stone-200 dark:border-stone-800/60 px-4 sm:px-6 py-1.5 flex items-center justify-between text-xs text-stone-600 dark:text-stone-300 transition-colors">
+          
+          {/* Left: Ministry Brand & Status */}
+          <div className="flex items-center space-x-3">
+            <span className="hidden md:inline-flex items-center space-x-1 font-semibold text-[11px] text-stone-500 dark:text-stone-400">
+              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse inline-block" />
+              <span>MoSJE • SIH-26090 Initiative</span>
             </span>
-            <span className="hidden md:inline text-stone-400">
-              MoSJE • Heritage & Culture
-            </span>
-          </div>
 
-          {/* Quick controls */}
-          <div className="flex items-center space-x-2">
-            
-            {/* Role Verified Status Badge (Static, RBAC strictly enforced via Onboarding) */}
-            <div className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold border min-h-[32px] ${
-              userRole === 'artisan'
-                ? 'bg-orange-950/90 text-orange-300 border-orange-600/50'
-                : userRole === 'businessman'
-                ? 'bg-blue-950/90 text-blue-300 border-blue-600/50'
-                : 'bg-amber-950/90 text-amber-300 border-amber-600/50'
-            }`}>
-              {userRole === 'artisan' && <Palette className="w-3.5 h-3.5 text-orange-400" />}
-              {userRole === 'businessman' && <Building2 className="w-3.5 h-3.5 text-blue-400" />}
-              {userRole === 'buyer' && <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />}
-              <span>
-                {userRole === 'artisan' ? 'Artisan Studio' : userRole === 'businessman' ? 'Businessman (B2B)' : 'Buyer Portal'}
-              </span>
-            </div>
-
-            {/* Offline simulator toggle button */}
+            {/* Offline Simulator Pill */}
             <button
               onClick={toggleOfflineSimulation}
-              title={isOnline ? "Simulate Offline Mode" : "Simulate Online Mode"}
-              className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all min-h-[32px] ${
+              className={`flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all ${
                 isOnline 
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-700/50 hover:bg-emerald-900' 
-                  : 'bg-amber-950 text-amber-400 border border-amber-700/50 animate-pulse'
+                  ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30' 
+                  : 'bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/30 animate-pulse'
               }`}
             >
-              {isOnline ? <Wifi className="w-3.5 h-3.5" /> : <WifiOff className="w-3.5 h-3.5" />}
-              <span>{isOnline ? 'Online' : 'Offline'}</span>
+              {isOnline ? <Wifi className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <WifiOff className="w-3 h-3 text-red-600 dark:text-red-400" />}
+              <span>{isOnline ? t('online') : t('offline')}</span>
             </button>
 
-            {/* Sync status badge if items pending */}
+            {/* Role Switcher Pill */}
+            <div className="hidden sm:flex items-center bg-stone-200/70 dark:bg-stone-800/80 p-0.5 rounded-xl border border-stone-300/60 dark:border-stone-700/60">
+              <button
+                onClick={() => switchRole('artisan')}
+                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
+                  userRole === 'artisan'
+                    ? 'bg-orange-600 text-white shadow-sm'
+                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
+                }`}
+              >
+                🎨 Artisan
+              </button>
+              <button
+                onClick={() => switchRole('buyer')}
+                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
+                  userRole === 'buyer'
+                    ? 'bg-amber-600 text-stone-950 shadow-sm'
+                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
+                }`}
+              >
+                🛍️ Buyer
+              </button>
+              <button
+                onClick={() => switchRole('businessman')}
+                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
+                  userRole === 'businessman'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
+                }`}
+              >
+                🏢 B2B / GeM
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Actions, Language, Theme, Profile */}
+          <div className="flex items-center space-x-2 sm:space-x-2.5">
             {pendingQueue.length > 0 && (
               <button
                 onClick={triggerSync}
-                className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-orange-600 text-white font-bold text-[11px] animate-bounce shadow-md hover:bg-orange-700 min-h-[32px]"
+                className="flex items-center space-x-1 px-2 py-0.5 bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 rounded-full text-[11px] font-bold animate-pulse"
               >
                 <RefreshCw className="w-3 h-3 animate-spin" />
                 <span>Sync ({pendingQueue.length})</span>
               </button>
             )}
 
+            {/* Light / Dark Mode Toggle Button */}
+            <button
+              onClick={() => toggleTheme()}
+              title={theme === 'dark' ? 'Switch to Light Mode (दिन का दृश्य)' : 'Switch to Dark Mode (रात का दृश्य)'}
+              aria-label="Toggle Theme"
+              className="p-1.5 rounded-xl bg-stone-200/80 dark:bg-stone-800 border border-stone-300/80 dark:border-stone-700 text-stone-700 dark:text-amber-400 hover:scale-105 active:scale-95 transition-all min-h-[30px] flex items-center justify-center shadow-sm"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-3.5 h-3.5 text-amber-400 rotate-0 hover:rotate-45 transition-transform" />
+              ) : (
+                <Moon className="w-3.5 h-3.5 text-stone-700" />
+              )}
+            </button>
+
             {/* All 15 Indian Languages selector */}
-            <div className="flex items-center space-x-1 bg-stone-800 border border-stone-700 rounded-lg px-2 py-1 min-h-[32px]">
-              <Globe className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
+            <div className="flex items-center space-x-1 bg-stone-200/80 dark:bg-stone-800 border border-stone-300/80 dark:border-stone-700 rounded-xl px-2 py-1 min-h-[30px]">
+              <Globe className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400 flex-shrink-0" />
               <select
                 value={lang}
                 onChange={(e) => setLang(e.target.value)}
                 aria-label="Language Selector"
-                className="bg-transparent text-stone-200 text-xs font-semibold focus:outline-none cursor-pointer"
+                className="bg-transparent text-stone-800 dark:text-stone-200 text-xs font-semibold focus:outline-none cursor-pointer"
               >
-                <option value="hi" className="bg-stone-800">हिंदी (Hindi)</option>
-                <option value="en" className="bg-stone-800">English</option>
-                <option value="bn" className="bg-stone-800">বাংলা (Bengali)</option>
-                <option value="mr" className="bg-stone-800">मराठी (Marathi)</option>
-                <option value="te" className="bg-stone-800">తెలుగు (Telugu)</option>
-                <option value="ta" className="bg-stone-800">தமிழ் (Tamil)</option>
-                <option value="gu" className="bg-stone-800">ગુજરાતી (Gujarati)</option>
-                <option value="ur" className="bg-stone-800">اردو (Urdu)</option>
-                <option value="kn" className="bg-stone-800">ಕನ್ನಡ (Kannada)</option>
-                <option value="or" className="bg-stone-800">ଓଡ଼ିଆ (Odia)</option>
-                <option value="ml" className="bg-stone-800">മലയാളം (Malayalam)</option>
-                <option value="pa" className="bg-stone-800">ਪੰਜਾਬੀ (Punjabi)</option>
-                <option value="as" className="bg-stone-800">অসমীয়া (Assamese)</option>
-                <option value="mai" className="bg-stone-800">मैथिली (Maithili)</option>
-                <option value="bho" className="bg-stone-800">भोजपुरी (Bhojpuri)</option>
+                <option value="hi" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">हिंदी (Hindi)</option>
+                <option value="en" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">English</option>
+                <option value="bn" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">বাংলা (Bengali)</option>
+                <option value="mr" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">मराठी (Marathi)</option>
+                <option value="te" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">తెలుగు (Telugu)</option>
+                <option value="ta" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">தமிழ் (Tamil)</option>
+                <option value="gu" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">ગુજરાતી (Gujarati)</option>
+                <option value="ur" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">اردو (Urdu)</option>
+                <option value="kn" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">ಕನ್ನಡ (Kannada)</option>
+                <option value="or" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">ଓଡ଼ିଆ (Odia)</option>
+                <option value="ml" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">മലയാളം (Malayalam)</option>
+                <option value="pa" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="as" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">অসমীয়া (Assamese)</option>
+                <option value="mai" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">मैथिली (Maithili)</option>
+                <option value="bho" className="bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100">भोजपुरी (Bhojpuri)</option>
               </select>
             </div>
 
@@ -282,7 +352,7 @@ export const Navbar = () => {
             <button
               onClick={handleInstallClick}
               title={lang === 'hi' ? 'ऐप इंस्टॉल करें' : 'Install PWA App'}
-              className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-stone-950 font-black text-[11px] shadow-sm transition-all min-h-[32px] active:scale-95"
+              className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-stone-950 font-black text-[11px] shadow-sm transition-all min-h-[30px] active:scale-95"
             >
               <Download className="w-3.5 h-3.5 fill-stone-950" />
               <span className="hidden sm:inline">{lang === 'hi' ? 'ऐप इंस्टॉल करें' : 'Install App'}</span>
@@ -294,16 +364,16 @@ export const Navbar = () => {
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 title="User Profile & Settings"
-                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition-all min-h-[32px] ${
+                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition-all min-h-[30px] ${
                   userRole === 'artisan'
-                    ? 'bg-orange-600 text-white border-orange-400 shadow-md shadow-orange-950/40'
+                    ? 'bg-orange-600 text-white border-orange-500 shadow-md shadow-orange-950/20'
                     : userRole === 'businessman'
-                    ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-950/40'
-                    : 'bg-amber-600 text-stone-950 border-amber-400 shadow-md shadow-amber-950/40'
+                    ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-950/20'
+                    : 'bg-amber-600 text-stone-950 border-amber-500 shadow-md shadow-amber-950/20'
                 }`}
               >
                 <User className="w-3.5 h-3.5" />
-                <span className="max-w-[80px] sm:max-w-[120px] truncate">
+                <span className="max-w-[70px] sm:max-w-[110px] truncate">
                   {currentUser?.name ? currentUser.name.split(' ')[0] : 'Profile'}
                 </span>
                 <ChevronDown className="w-3 h-3" />
@@ -320,26 +390,27 @@ export const Navbar = () => {
             <button
               onClick={() => setIsMobileFrame(!isMobileFrame)}
               title={isMobileFrame ? "Switch to Full Screen Responsive" : "Switch to Mobile Phone Frame Preview"}
-              className="p-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 transition-colors hidden sm:flex min-h-[32px] items-center justify-center"
+              className="p-1.5 rounded-xl bg-stone-200/80 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-300/80 dark:border-stone-700 transition-colors hidden sm:flex min-h-[30px] items-center justify-center shadow-sm"
             >
-              {isMobileFrame ? <Monitor className="w-4 h-4" /> : <Smartphone className="w-4 h-4" />}
+              {isMobileFrame ? <Monitor className="w-3.5 h-3.5" /> : <Smartphone className="w-3.5 h-3.5" />}
             </button>
 
             {/* Reset Demo Data Button (Desktop) */}
             <button
               onClick={() => setShowResetModal(true)}
               title="Reset to 10 pristine seed artisan listings"
-              className="hidden lg:flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-red-950/80 hover:text-red-300 text-stone-400 border border-stone-700 text-xs font-semibold transition-colors min-h-[32px]"
+              className="hidden lg:flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-stone-200/80 dark:bg-stone-800 hover:bg-red-100 dark:hover:bg-red-950/80 text-stone-600 dark:text-stone-400 hover:text-red-700 dark:hover:text-red-300 border border-stone-300/80 dark:border-stone-700 text-xs font-semibold transition-colors min-h-[30px]"
             >
               <RotateCcw className="w-3 h-3" />
-              <span>Reset Demo</span>
+              <span>Reset</span>
             </button>
           </div>
         </div>
 
         {/* Main App Bar */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Brand */}
+          
+          {/* Brand Logo & Editorial Title */}
           <div 
             onClick={() => setActiveTab(userRole === 'artisan' ? 'artisan-home' : userRole === 'businessman' ? 'businessman-home' : 'buyer-market')}
             className="flex items-center space-x-3 cursor-pointer group"
@@ -349,7 +420,7 @@ export const Navbar = () => {
                 ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 shadow-blue-900/30'
                 : 'bg-gradient-to-tr from-orange-600 via-amber-600 to-yellow-500 shadow-orange-900/30'
             }`}>
-              <div className="w-full h-full bg-stone-950 rounded-[14px] flex items-center justify-center">
+              <div className="w-full h-full bg-stone-900 dark:bg-stone-950 rounded-[14px] flex items-center justify-center">
                 {userRole === 'businessman' ? (
                   <Building2 className="w-5 h-5 text-blue-400" />
                 ) : (
@@ -359,28 +430,28 @@ export const Navbar = () => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white font-hindi">
+                <h1 className="text-xl sm:text-2xl font-black tracking-tight text-stone-900 dark:text-white font-heritage">
                   {t('appName')}
                 </h1>
-                <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold border ${
+                <span className={`text-[10px] sm:text-xs px-2.5 py-0.5 rounded-full font-extrabold border ${
                   userRole === 'artisan'
-                    ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+                    ? 'bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30'
                     : userRole === 'businessman'
-                    ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                    : 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30'
+                    : 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30'
                 }`}>
-                  {userRole === 'artisan' ? 'AI Virtual Manager' : userRole === 'businessman' ? 'B2B & GeM Procurement' : 'Heritage Marketplace'}
+                  {userRole === 'artisan' ? 'Artisan AI Studio' : userRole === 'businessman' ? 'B2B & GeM Portal' : 'Heritage Craft Market'}
                 </span>
               </div>
-              <p className="text-[11px] text-stone-400 hidden sm:block">
-                {userRole === 'businessman' ? 'Institutional Wholesale & Government Tender Linkage' : t('appSub')}
+              <p className="text-[11px] text-stone-500 dark:text-stone-400 hidden sm:block font-medium">
+                {userRole === 'businessman' ? 'Direct Artisan Cluster Sourcing & GeM Tenders' : t('appSub')}
               </p>
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1">
-            {allNavItems.map((item) => {
+          {/* Calm Desktop Navigation: Primary 3-4 items + More Dropdown */}
+          <nav className="hidden lg:flex items-center space-x-1.5">
+            {primaryNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -390,11 +461,11 @@ export const Navbar = () => {
                   className={`relative flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] ${
                     isActive
                       ? userRole === 'businessman'
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-900/40'
-                        : 'bg-orange-600 text-white shadow-md shadow-orange-900/40'
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-900/30'
+                        : 'bg-orange-600 text-white shadow-md shadow-orange-900/30'
                       : item.highlight
-                      ? 'bg-stone-800 text-orange-400 border border-orange-600/30 hover:bg-orange-950'
-                      : 'text-stone-300 hover:bg-stone-800 hover:text-white'
+                      ? 'bg-orange-50 dark:bg-stone-800/90 text-orange-700 dark:text-orange-400 border border-orange-300 dark:border-orange-500/30 hover:bg-orange-100 dark:hover:bg-orange-950/40'
+                      : 'text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-900 dark:hover:text-white'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -407,16 +478,81 @@ export const Navbar = () => {
                 </button>
               );
             })}
+
+            {/* "More Tools / अधिक सुविधाएं" Dropdown Menu */}
+            {secondaryNavItems.length > 0 && (
+              <div className="relative" ref={moreMenuRef}>
+                <button
+                  onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] border ${
+                    isSecondaryActive
+                      ? 'bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white border-orange-500/50'
+                      : 'bg-stone-100 dark:bg-stone-850/80 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:bg-stone-200 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
+                  <span>{lang === 'hi' ? 'अधिक सुविधाएं' : 'More Tools'}</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isMoreMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isMoreMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-3xl shadow-2xl p-2 z-50 animate-fade-in space-y-1">
+                    <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-stone-400 border-b border-stone-100 dark:border-stone-800">
+                      {lang === 'hi' ? 'विशेष सुविधाएं व नेटवर्क' : 'Specialized AI & Business Tools'}
+                    </div>
+
+                    {secondaryNavItems.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeTab === item.id;
+
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setActiveTab(item.id);
+                            setIsMoreMenuOpen(false);
+                          }}
+                          className={`w-full flex items-start space-x-3 p-2.5 rounded-2xl text-left transition-all ${
+                            isActive
+                              ? 'bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-600/30'
+                              : 'hover:bg-stone-100 dark:hover:bg-stone-800/70 text-stone-800 dark:text-stone-200'
+                          }`}
+                        >
+                          <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${
+                            isActive ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                          }`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-xs leading-snug">{item.label}</span>
+                              {item.badge != null && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            {item.desc && (
+                              <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-1 mt-0.5">{item.desc}</p>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
           {/* Mobile Hamburger Menu Toggle Button */}
           <div className="lg:hidden flex items-center space-x-2">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Open Mobile Menu"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6 text-orange-400" /> : <Menu className="w-6 h-6 text-stone-200" />}
+              {isMobileMenuOpen ? <X className="w-6 h-6 text-orange-500" /> : <Menu className="w-6 h-6 text-stone-700 dark:text-stone-200" />}
             </button>
           </div>
         </div>
@@ -434,18 +570,20 @@ export const Navbar = () => {
       {/* Mobile Fullscreen Slide-Over Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-stone-900 border-t border-stone-700 rounded-t-[32px] p-6 max-h-[85vh] overflow-y-auto space-y-5 shadow-2xl">
+          <div className="bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-700 rounded-t-[32px] p-6 max-h-[85vh] overflow-y-auto space-y-5 shadow-2xl">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-5 h-5 text-orange-400" />
-                <span className="font-extrabold text-white text-base">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
+              <div>
+                <h3 className="text-lg font-black text-stone-900 dark:text-white font-serif">
+                  {lang === 'hi' ? 'नेविगेशन मेनू' : 'Navigation Menu'}
+                </h3>
+                <span className="text-xs text-stone-500 dark:text-stone-400 font-sans">
                   {userRole === 'artisan' ? 'Artisan Studio' : userRole === 'businessman' ? 'B2B & GeM Procurement' : 'Buyer Marketplace'}
                 </span>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-full bg-stone-800 text-stone-300 hover:text-white min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="p-2 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -465,35 +603,35 @@ export const Navbar = () => {
                         ? userRole === 'businessman'
                           ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold shadow-lg'
                           : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white font-bold shadow-lg'
-                        : 'bg-stone-800/80 text-stone-200 hover:bg-stone-800 border border-stone-750'
+                        : 'bg-stone-50 dark:bg-stone-800/80 text-stone-800 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-750'
                     }`}
                   >
                     <div className="flex items-center space-x-3.5">
-                      <div className={`p-2.5 rounded-xl ${isActive ? 'bg-white/20 text-white' : 'bg-stone-900 text-orange-400'}`}>
+                      <div className={`p-2.5 rounded-xl ${isActive ? 'bg-white/20 text-white' : 'bg-stone-100 dark:bg-stone-900 text-orange-600 dark:text-orange-400'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-bold block">{item.label}</span>
+                          <span className="text-sm font-bold block font-sans">{item.label}</span>
                           {item.badge != null && (
-                            <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black leading-none">
+                            <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black leading-none font-sans">
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <span className={`text-[11px] block ${isActive ? 'text-orange-100' : 'text-stone-400'}`}>
+                        <span className={`text-[11px] block font-sans ${isActive ? 'text-orange-100' : 'text-stone-500 dark:text-stone-400'}`}>
                           {item.desc}
                         </span>
                       </div>
                     </div>
-                    <ChevronRight className={`w-5 h-5 ${isActive ? 'text-white' : 'text-stone-500'}`} />
+                    <ChevronRight className={`w-5 h-5 ${isActive ? 'text-white' : 'text-stone-400 dark:text-stone-500'}`} />
                   </button>
                 );
               })}
             </div>
 
             {/* Mobile Drawer Profile & Utilities */}
-            <div className="pt-3 border-t border-stone-800 space-y-2">
+            <div className="pt-3 border-t border-stone-200 dark:border-stone-800 space-y-2 font-sans">
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
@@ -510,9 +648,9 @@ export const Navbar = () => {
                   setIsMobileMenuOpen(false);
                   setIsProfileOpen(true);
                 }}
-                className="w-full py-3 px-4 rounded-2xl bg-stone-800 text-stone-200 border border-stone-700 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
+                className="w-full py-3 px-4 rounded-2xl bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
               >
-                <User className="w-4 h-4 text-orange-400" />
+                <User className="w-4 h-4 text-orange-500 dark:text-orange-400" />
                 <span>{currentUser?.name || 'My Profile'} (प्रोफ़ाइल व खाता)</span>
               </button>
 
@@ -521,7 +659,7 @@ export const Navbar = () => {
                   setIsMobileMenuOpen(false);
                   setShowResetModal(true);
                 }}
-                className="w-full py-3 px-4 rounded-2xl bg-stone-800 hover:bg-red-950/60 text-red-400 border border-red-900/40 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
+                className="w-full py-3 px-4 rounded-2xl bg-stone-100 dark:bg-stone-800 hover:bg-red-50 dark:hover:bg-red-950/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/40 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>{t('resetDemo')}</span>
