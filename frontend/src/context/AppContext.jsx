@@ -164,6 +164,7 @@ export const AppProvider = ({ children }) => {
   const [pendingQueue, setPendingQueue] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isMobileFrame, setIsMobileFrame] = useState(false); // Mobile frame preview toggle
+  const [screenDevice, setScreenDevice] = useState('responsive'); // 'responsive' | 'android' | 'ios'
   const [showResetModal, setShowResetModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
@@ -585,6 +586,8 @@ export const AppProvider = ({ children }) => {
         setActiveDraft,
         isMobileFrame,
         setIsMobileFrame,
+        screenDevice,
+        setScreenDevice,
         showResetModal,
         setShowResetModal,
         handleResetDemo,

@@ -48,9 +48,10 @@ export const Navbar = () => {
     isOnline, 
     toggleOfflineSimulation, 
     pendingQueue, 
-    triggerSync, 
     isMobileFrame, 
     setIsMobileFrame, 
+    screenDevice,
+    setScreenDevice,
     setShowResetModal,
     userRole,
     currentUser,
@@ -386,13 +387,51 @@ export const Navbar = () => {
               />
             </div>
 
-            {/* Device frame preview toggle */}
+            {/* Device Viewport Mode Switcher (Laptop / Android / iOS) */}
             <button
-              onClick={() => setIsMobileFrame(!isMobileFrame)}
-              title={isMobileFrame ? "Switch to Full Screen Responsive" : "Switch to Mobile Phone Frame Preview"}
-              className="p-1.5 rounded-xl bg-stone-200/80 dark:bg-stone-800 hover:bg-stone-300 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 border border-stone-300/80 dark:border-stone-700 transition-colors hidden sm:flex min-h-[30px] items-center justify-center shadow-sm"
+              onClick={() => {
+                if (screenDevice === 'responsive') {
+                  setScreenDevice('android');
+                  setIsMobileFrame(true);
+                } else if (screenDevice === 'android') {
+                  setScreenDevice('ios');
+                  setIsMobileFrame(true);
+                } else {
+                  setScreenDevice('responsive');
+                  setIsMobileFrame(false);
+                }
+              }}
+              title={
+                screenDevice === 'responsive' 
+                  ? "Current: Laptop / Responsive View (Click for Android View)" 
+                  : screenDevice === 'android' 
+                  ? "Current: Android Phone View (Click for iOS View)" 
+                  : "Current: iOS iPhone View (Click for Laptop View)"
+              }
+              className={`px-2.5 py-1 rounded-xl text-xs font-bold border transition-all hidden sm:flex min-h-[30px] items-center justify-center space-x-1 shadow-sm ${
+                screenDevice === 'responsive'
+                  ? 'bg-stone-200/80 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-300/80 dark:border-stone-700'
+                  : screenDevice === 'android'
+                  ? 'bg-emerald-600/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/40'
+                  : 'bg-blue-600/20 text-blue-700 dark:text-blue-400 border-blue-500/40'
+              }`}
             >
-              {isMobileFrame ? <Monitor className="w-3.5 h-3.5" /> : <Smartphone className="w-3.5 h-3.5" />}
+              {screenDevice === 'responsive' ? (
+                <>
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span className="text-[11px] hidden md:inline">Laptop</span>
+                </>
+              ) : screenDevice === 'android' ? (
+                <>
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-[11px] hidden md:inline">Android</span>
+                </>
+              ) : (
+                <>
+                  <Smartphone className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span className="text-[11px] hidden md:inline">iOS</span>
+                </>
+              )}
             </button>
 
             {/* Reset Demo Data Button (Desktop) */}
@@ -669,8 +708,11 @@ export const Navbar = () => {
         </div>
       )}
 
-      {/* Ergonomic Mobile Bottom Tab Bar (Permanent on Small Screens) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-stone-900/95 backdrop-blur-md border-t border-stone-800 shadow-2xl px-2 py-1.5 flex items-center justify-around">
+      {/* Ergonomic Mobile Bottom Tab Bar (Permanent on Small Screens & Safe Area Aware) */}
+      <div 
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-stone-900/95 backdrop-blur-md border-t border-stone-800 shadow-2xl px-2 py-1.5 flex items-center justify-around"
+        style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}
+      >
         {bottomTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

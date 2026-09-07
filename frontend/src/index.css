@@ -45,16 +45,57 @@
 }
 
 @layer base {
+  html {
+    width: 100%;
+    min-height: 100%;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
     background-color: var(--bg-app);
     color: var(--text-primary);
     font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: -0.01em;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4 {
     letter-spacing: -0.02em;
   }
+
+  /* Ensure inputs never trigger unwanted zoom on iOS Safari */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: inherit;
+    }
+  }
+}
+
+/* Safe Area Inset Helpers for iOS (iPhone/iPad) & Android Notches */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.bottom-safe {
+  bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Custom Heritage & Modern UI Components */

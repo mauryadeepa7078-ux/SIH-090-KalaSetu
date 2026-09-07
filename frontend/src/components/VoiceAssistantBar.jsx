@@ -50,7 +50,9 @@ export const VoiceAssistantBar = () => {
       ];
 
   return (
-    <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end animate-fade-in">
+    <div 
+      className="fixed z-50 flex flex-col items-end animate-fade-in right-4 sm:right-6 bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:bottom-6"
+    >
       {/* Voice commands hint drawer */}
       {isExpanded && (
         <div className="mb-3 p-5 bg-stone-900/95 backdrop-blur-xl border border-orange-500/40 rounded-3xl shadow-2xl w-80 sm:w-96 text-xs text-stone-200 transition-all animate-float">
