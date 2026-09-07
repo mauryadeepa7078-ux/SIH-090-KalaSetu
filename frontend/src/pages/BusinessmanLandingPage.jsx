@@ -158,36 +158,36 @@ export const BusinessmanLandingPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8 animate-fade-in">
       
       {/* Hero Banner for Businessman / Institutional Procurement */}
-      <div className="relative rounded-[32px] overflow-hidden bg-gradient-to-r from-stone-900 via-blue-950 to-stone-900 border border-blue-800/40 p-6 sm:p-10 shadow-2xl text-stone-100">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 border border-blue-500/30 p-6 sm:p-9 shadow-xl text-stone-100">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           <div className="lg:col-span-8 space-y-3.5">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-300 text-xs font-bold">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/40 text-blue-300 text-xs font-bold font-sans">
               <Building2 className="w-3.5 h-3.5 text-blue-400" />
-              <span>Government e-Marketplace (GeM) & ONDC Institutional Procurement Hub</span>
+              <span>Government e-Marketplace (GeM) & ONDC Institutional Procurement</span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight font-hindi">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white leading-tight font-serif">
               संस्थागत थोक खरीद व GeM टेंडर पोर्टल
             </h1>
-            <p className="text-sm sm:text-base text-stone-300 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed font-sans">
               Source GI-certified authentic Indian handicrafts directly from MoSJE-registered artisan cooperatives at zero intermediary markup. Integrated with GeM contracts, GST compliance, and bulk freight logistics.
             </p>
 
-            <div className="pt-2 flex flex-wrap gap-3">
+            <div className="pt-2 flex flex-wrap gap-3 font-sans">
               <button
                 onClick={() => setActiveTab('businessman-orders')}
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-extrabold text-xs sm:text-sm flex items-center space-x-2 shadow-lg shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all min-h-[44px]"
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-extrabold text-xs sm:text-sm flex items-center space-x-2 shadow-lg shadow-blue-950/40 hover:scale-105 active:scale-95 transition-all min-h-[44px]"
               >
                 <PackageCheck className="w-4 h-4" />
-                <span>Track B2B Orders & RFQs (थोक ऑर्डर व प्रगति) ➔</span>
+                <span>Track B2B Orders & RFQs (थोक ऑर्डर) ➔</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('gem')}
-                className="px-5 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 font-bold text-xs sm:text-sm flex items-center space-x-2 min-h-[44px] transition-all"
+                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-stone-200 border border-white/20 font-bold text-xs sm:text-sm flex items-center space-x-2 min-h-[44px] transition-all backdrop-blur-md"
               >
                 <Layers className="w-4 h-4 text-cyan-400" />
                 <span>GeM Tenders & RFQ Board</span>
@@ -198,50 +198,50 @@ export const BusinessmanLandingPage = () => {
                   if (products.length > 0) handleOpenRfq(products[0]);
                   else showToast('No products available for RFQ', 'info');
                 }}
-                className="px-5 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 font-bold text-xs sm:text-sm flex items-center space-x-2 min-h-[44px] transition-all"
+                className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-stone-200 border border-white/20 font-bold text-xs sm:text-sm flex items-center space-x-2 min-h-[44px] transition-all backdrop-blur-md"
               >
                 <Plus className="w-4 h-4 text-blue-400" />
-                <span>Create Custom Bulk RFQ</span>
+                <span>Custom Bulk RFQ</span>
               </button>
             </div>
           </div>
 
           {/* Quick Stats Grid */}
           <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl bg-stone-850/90 border border-stone-700/80 space-y-1">
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
               <div className="flex items-center justify-between text-blue-400">
                 <Briefcase className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-stone-400">GeM Tenders</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">GeM Tenders</span>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white">₹48.6 L</div>
-              <p className="text-[10px] text-emerald-400 font-medium">12 Active Tenders</p>
+              <div className="text-xl sm:text-2xl font-black text-white font-sans">₹48.6 L</div>
+              <p className="text-[10px] text-emerald-400 font-medium font-sans">12 Active Tenders</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-stone-850/90 border border-stone-700/80 space-y-1">
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
               <div className="flex items-center justify-between text-amber-400">
                 <Award className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-stone-400">Verified Hubs</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Verified Hubs</span>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white">24 Guilds</div>
-              <p className="text-[10px] text-amber-300 font-medium">100% MoSJE Verified</p>
+              <div className="text-xl sm:text-2xl font-black text-white font-sans">24 Guilds</div>
+              <p className="text-[10px] text-amber-300 font-medium font-sans">100% MoSJE Verified</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-stone-850/90 border border-stone-700/80 space-y-1">
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
               <div className="flex items-center justify-between text-emerald-400">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-stone-400">Savings</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Savings</span>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white">28.4%</div>
-              <p className="text-[10px] text-stone-400 font-medium">Zero Middlemen</p>
+              <div className="text-xl sm:text-2xl font-black text-white font-sans">28.4%</div>
+              <p className="text-[10px] text-slate-400 font-medium font-sans">Zero Middlemen</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-stone-850/90 border border-stone-700/80 space-y-1">
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
               <div className="flex items-center justify-between text-cyan-400">
                 <Truck className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-stone-400">Freight</span>
+                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Freight</span>
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white">IndiaPost</div>
-              <p className="text-[10px] text-cyan-300 font-medium">DNK Niryat Kendra</p>
+              <div className="text-xl sm:text-2xl font-black text-white font-sans">IndiaPost</div>
+              <p className="text-[10px] text-cyan-300 font-medium font-sans">DNK Export Kendra</p>
             </div>
           </div>
         </div>

@@ -14,7 +14,9 @@ import {
   Palette,
   ExternalLink,
   ShoppingBag,
-  Heart
+  Heart,
+  ArrowRight,
+  Zap
 } from 'lucide-react';
 
 export const BuyerLandingPage = () => {
@@ -75,57 +77,58 @@ export const BuyerLandingPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in pb-28">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-7 animate-fade-in pb-28">
       
       {/* Buyer Marketplace Hero Banner */}
-      <div className="bg-gradient-to-r from-stone-900 via-stone-900 to-amber-950/80 rounded-3xl p-6 sm:p-8 text-white border border-amber-800/40 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-80 h-80 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="bg-gradient-to-r from-stone-900 via-amber-950/80 to-stone-900 rounded-3xl p-6 sm:p-9 text-white border border-amber-600/30 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2.5 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold font-sans">
-              <ShieldCheck className="w-3.5 h-3.5" />
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold font-sans">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
               <span>MoSJE Verified Artisan Marketplace</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-serif">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-serif text-white leading-tight">
               {lang === 'hi' 
                 ? 'भारतीय प्रामाणिक हस्तशिल्प बाज़ार' 
-                : 'Direct Indian Heritage & GI Craft Marketplace'}
-            </h2>
+                : 'Authentic Indian Heritage & GI Craft Marketplace'}
+            </h1>
 
             <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-sans">
               {lang === 'hi' 
                 ? 'सीधे भारत सरकार (MoSJE) द्वारा सत्यापित मास्टर कारीगरों से खरीदें। 100% प्रामाणिक, GI टैग प्रमाणित और डिजिटल QR प्रमाण पत्र सहित।'
-                : 'Purchase directly from master artisans verified under Ministry of Social Justice & Empowerment (MoSJE). 100% authentic, GI-tagged with digital QR provenance.'}
+                : 'Direct-from-artisan luxury collection verified under Ministry of Social Justice & Empowerment (MoSJE). 100% authentic, GI-certified with blockchain provenance.'}
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
             <button
               onClick={() => switchRole('artisan')}
-              className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-md"
+              className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-stone-200 border border-white/20 text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-md backdrop-blur-md"
               title="Switch to Seller / Creator view"
             >
               <Palette className="w-4 h-4 text-orange-400" />
-              <span>{lang === 'hi' ? 'कारीगर मोड में बदलें' : 'Switch to Artisan View'}</span>
+              <span>{lang === 'hi' ? 'कारीगर मोड में बदलें' : 'Switch to Artisan Mode'}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Search & Comprehensive Filters */}
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Search bar */}
           <div className="relative flex-1">
-            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'hi' ? 'शिल्प, साड़ी, मूर्ति, पॉटरी या कारीगर खोजें...' : 'Search crafts, silk sarees, pottery, paintings, artisans...'}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm shadow-sm transition-colors font-sans"
+              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm shadow-sm transition-colors font-sans"
             />
           </div>
 
@@ -133,10 +136,10 @@ export const BuyerLandingPage = () => {
           <select
             value={selectedState}
             onChange={(e) => setSelectedState(e.target.value)}
-            className="px-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm transition-colors font-sans"
+            className="px-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 text-xs sm:text-sm font-semibold text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-sm transition-colors font-sans"
           >
             {states.map(st => (
-              <option key={st} value={st}>{st === 'All' ? 'All States (सभी राज्य)' : st}</option>
+              <option key={st} value={st}>{st === 'All' ? 'All States (समस्त राज्य)' : st}</option>
             ))}
           </select>
 
@@ -146,7 +149,7 @@ export const BuyerLandingPage = () => {
             className={`px-4 py-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 shadow-sm min-h-[44px] ${
               giOnly
                 ? 'bg-amber-600 text-white border border-amber-500 shadow-md'
-                : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+                : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border border-stone-200/90 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
             }`}
           >
             <Award className={`w-4 h-4 ${giOnly ? 'text-white' : 'text-amber-600 dark:text-amber-400'}`} />
@@ -164,7 +167,7 @@ export const BuyerLandingPage = () => {
               className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 selectedCategory === cat
                   ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200/80 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
               }`}
             >
               {cat}
@@ -177,7 +180,7 @@ export const BuyerLandingPage = () => {
       {loading ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 font-sans">Connecting to verified craft units...</p>
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 font-sans">Connecting to verified artisan cooperatives...</p>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="py-16 text-center bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 p-8 space-y-4 shadow-sm">
@@ -203,7 +206,7 @@ export const BuyerLandingPage = () => {
               <div
                 key={product.id}
                 onClick={() => handleOpenProduct(product)}
-                className="group bg-white dark:bg-stone-900 rounded-3xl border border-stone-200 dark:border-stone-800 hover:border-amber-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="group bg-white dark:bg-stone-900 rounded-[28px] border border-stone-200/90 dark:border-stone-800 hover:border-amber-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
                 {/* Product Image */}
                 <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 overflow-hidden flex items-center justify-center p-3">
@@ -270,10 +273,10 @@ export const BuyerLandingPage = () => {
                   </div>
 
                   {/* Price & Master Artisan */}
-                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                  <div className="pt-2.5 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold tracking-wider font-sans">
-                        Direct Price
+                        Direct Artisan Price
                       </span>
                       <span className="text-lg font-black text-stone-900 dark:text-white font-sans">
                         ₹{product.price?.toLocaleString('en-IN')}
@@ -281,7 +284,7 @@ export const BuyerLandingPage = () => {
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] font-bold text-stone-800 dark:text-stone-200 block font-sans">
+                      <span className="text-[11px] font-bold text-stone-800 dark:text-stone-200 block font-sans truncate max-w-[130px]">
                         {product.artisan_name}
                       </span>
                       <span className="text-[10px] text-stone-500 dark:text-stone-400 block font-sans">
@@ -298,3 +301,4 @@ export const BuyerLandingPage = () => {
     </div>
   );
 };
+

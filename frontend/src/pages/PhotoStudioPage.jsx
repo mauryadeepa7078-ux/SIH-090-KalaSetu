@@ -234,17 +234,17 @@ export const PhotoStudioPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6 animate-fade-in pb-24">
       {/* Header */}
       <div className="text-center sm:text-left space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold">
-          <Wand2 className="w-3.5 h-3.5 text-orange-600" />
-          <span>Core Feature 1: AI Photo Studio</span>
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 text-xs font-bold border border-orange-500/20 font-sans">
+          <Wand2 className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+          <span>Core Studio • AI Photo Studio</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-hindi">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-white font-serif">
           {t('cameraTitle')}
         </h2>
-        <p className="text-xs sm:text-sm text-stone-600 max-w-2xl">
+        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-2xl font-sans">
           {t('cameraSubtitle')}
         </p>
       </div>
@@ -252,22 +252,22 @@ export const PhotoStudioPage = () => {
       {/* Main Studio Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Image Viewport (Before/After) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl p-5 border border-stone-200 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-stone-100">
-            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 flex items-center space-x-1.5">
-              <ImageIcon className="w-4 h-4 text-orange-600" />
+        <div className="lg:col-span-7 bg-white dark:bg-stone-900 rounded-[28px] p-5 sm:p-6 border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800 font-sans">
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center space-x-1.5">
+              <ImageIcon className="w-4 h-4 text-orange-600 dark:text-orange-400" />
               <span>Studio Viewport (1:1 Square)</span>
             </span>
             {studioResult && (
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center space-x-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-bold flex items-center space-x-1">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>AI Processed</span>
               </span>
             )}
           </div>
 
           {/* Main Visual Display */}
-          <div className="relative aspect-square w-full bg-stone-50 rounded-2xl overflow-hidden border border-stone-200 flex items-center justify-center p-2">
+          <div className="relative aspect-square w-full bg-stone-50 dark:bg-stone-950 rounded-2xl overflow-hidden border border-stone-200/80 dark:border-stone-800 flex items-center justify-center p-2">
             {isCameraActive ? (
               <div className="relative w-full h-full bg-black rounded-xl overflow-hidden flex items-center justify-center">
                 <video
@@ -285,14 +285,14 @@ export const PhotoStudioPage = () => {
                 </button>
               </div>
             ) : isProcessing ? (
-              <div className="text-center space-y-4 p-8">
+              <div className="text-center space-y-4 p-8 font-sans">
                 <div className="relative w-16 h-16 mx-auto">
-                  <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
+                  <div className="w-16 h-16 border-4 border-orange-200 dark:border-orange-900/50 border-t-orange-600 rounded-full animate-spin"></div>
                   <Sparkles className="w-6 h-6 text-orange-600 absolute inset-0 m-auto animate-pulse" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-stone-800">{t('processingImage')}</p>
-                  <p className="text-xs text-stone-500 mt-1">
+                  <p className="text-sm font-bold text-stone-800 dark:text-stone-200">{t('processingImage')}</p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
                     Running U2-Net Background Removal & OpenCV CLAHE Equalization...
                   </p>
                 </div>
@@ -314,14 +314,14 @@ export const PhotoStudioPage = () => {
                 />
               </div>
             ) : (
-              <div className="text-center p-8 space-y-3">
-                <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center mx-auto text-orange-600">
+              <div className="text-center p-8 space-y-3 font-sans">
+                <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mx-auto text-orange-600 dark:text-orange-400">
                   <Camera className="w-8 h-8" />
                 </div>
-                <p className="text-sm font-semibold text-stone-700">
+                <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">
                   Take a photo of your craft or upload from gallery
                 </p>
-                <p className="text-xs text-stone-400 max-w-xs mx-auto">
+                <p className="text-xs text-stone-500 dark:text-stone-400 max-w-xs mx-auto">
                   AI will remove the rustic background and place your craft on a pristine white e-commerce canvas.
                 </p>
               </div>
@@ -331,7 +331,7 @@ export const PhotoStudioPage = () => {
           </div>
 
           {/* Quick Capture Buttons */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 font-sans">
             <button
               onClick={() => {
                 if (isCameraActive) stopCamera();
@@ -340,7 +340,7 @@ export const PhotoStudioPage = () => {
               className={`py-3.5 px-4 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all min-h-[48px] active:scale-95 ${
                 isCameraActive
                   ? 'bg-red-600 text-white'
-                  : 'bg-stone-900 hover:bg-stone-800 text-white shadow-md'
+                  : 'bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-750 text-white shadow-md'
               }`}
             >
               <Camera className="w-4 h-4" />
@@ -349,9 +349,9 @@ export const PhotoStudioPage = () => {
 
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="py-3.5 px-4 rounded-2xl bg-orange-50 hover:bg-orange-100 active:bg-orange-200 text-orange-800 border border-orange-200 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all min-h-[48px]"
+              className="py-3.5 px-4 rounded-2xl bg-orange-500/10 hover:bg-orange-500/15 active:bg-orange-500/20 text-orange-800 dark:text-orange-300 border border-orange-500/20 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all min-h-[48px]"
             >
-              <Upload className="w-4 h-4 text-orange-600" />
+              <Upload className="w-4 h-4 text-orange-600 dark:text-orange-400" />
               <span>{t('uploadPhoto')}</span>
             </button>
 
@@ -368,19 +368,19 @@ export const PhotoStudioPage = () => {
         {/* Right Column: AI Studio Controls & Pipeline Settings */}
         <div className="lg:col-span-5 space-y-5">
           {/* AI Settings Card */}
-          <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-sm space-y-4">
-            <div className="flex items-center space-x-2 text-stone-900 font-bold text-sm pb-2 border-b border-stone-100">
-              <Sliders className="w-4 h-4 text-orange-600" />
+          <div className="bg-white dark:bg-stone-900 rounded-[28px] p-5 sm:p-6 border border-stone-200/90 dark:border-stone-800 shadow-sm space-y-4 font-sans">
+            <div className="flex items-center space-x-2 text-stone-900 dark:text-white font-bold text-sm pb-2 border-b border-stone-100 dark:border-stone-800">
+              <Sliders className="w-4 h-4 text-orange-600 dark:text-orange-400" />
               <span>AI Photo Studio Enhancements</span>
             </div>
 
             {/* Toggle: rembg Background Removal */}
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 border border-stone-200">
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 dark:bg-stone-950/60 border border-stone-200/80 dark:border-stone-800">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-stone-800 block">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
                   {t('removeBgLabel')}
                 </span>
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-stone-500 dark:text-stone-400">
                   Pretrained U2-Net automated foreground isolation
                 </span>
               </div>
@@ -393,12 +393,12 @@ export const PhotoStudioPage = () => {
             </div>
 
             {/* Toggle: OpenCV CLAHE & Auto White Balance */}
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 border border-stone-200">
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 dark:bg-stone-950/60 border border-stone-200/80 dark:border-stone-800">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-stone-800 block">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
                   {t('enhanceLightingLabel')}
                 </span>
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-stone-500 dark:text-stone-400">
                   Gray World balance & adaptive histogram boost
                 </span>
               </div>
@@ -411,12 +411,12 @@ export const PhotoStudioPage = () => {
             </div>
 
             {/* Toggle: E-Commerce 1:1 Canvas */}
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 border border-stone-200">
+            <div className="flex items-center justify-between p-3 rounded-2xl bg-stone-50 dark:bg-stone-950/60 border border-stone-200/80 dark:border-stone-800">
               <div className="space-y-0.5">
-                <span className="text-xs font-bold text-stone-800 block">
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
                   {t('standardizeLabel')}
                 </span>
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-stone-500 dark:text-stone-400">
                   Centered square framing with pure white background
                 </span>
               </div>
@@ -431,9 +431,9 @@ export const PhotoStudioPage = () => {
             {/* Brightness & Contrast Sliders */}
             <div className="space-y-3 pt-2">
               <div>
-                <div className="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+                <div className="flex justify-between text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
                   <span className="flex items-center space-x-1">
-                    <Sun className="w-3.5 h-3.5 text-amber-600" />
+                    <Sun className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
                     <span>Lighting Brightness</span>
                   </span>
                   <span>{brightness.toFixed(2)}x</span>
@@ -450,9 +450,9 @@ export const PhotoStudioPage = () => {
               </div>
 
               <div>
-                <div className="flex justify-between text-xs font-semibold text-stone-700 mb-1">
+                <div className="flex justify-between text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
                   <span className="flex items-center space-x-1">
-                    <Contrast className="w-3.5 h-3.5 text-stone-700" />
+                    <Contrast className="w-3.5 h-3.5 text-stone-700 dark:text-stone-300" />
                     <span>Color Contrast (CLAHE)</span>
                   </span>
                   <span>{contrast.toFixed(2)}x</span>
@@ -474,7 +474,7 @@ export const PhotoStudioPage = () => {
               <button
                 onClick={() => processImageWithAI(selectedFile)}
                 disabled={isProcessing}
-                className="w-full py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center justify-center space-x-2 transition-all"
+                className="w-full py-2.5 rounded-xl bg-stone-800 dark:bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold flex items-center justify-center space-x-2 transition-all"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isProcessing ? 'animate-spin' : ''}`} />
                 <span>Re-Apply AI Filters</span>
@@ -483,15 +483,15 @@ export const PhotoStudioPage = () => {
           </div>
 
           {/* Next Step Action Button & Proactive AI Guide */}
-          <div className="bg-gradient-to-br from-orange-600 via-amber-600 to-yellow-600 rounded-3xl p-5 text-white shadow-xl space-y-3.5 border border-orange-400/40">
-            <div className="flex items-center justify-between text-sm font-bold">
+          <div className="bg-gradient-to-br from-orange-600 via-amber-600 to-yellow-600 rounded-[28px] p-5 text-white shadow-xl space-y-3.5 border border-orange-400/40">
+            <div className="flex items-center justify-between text-sm font-bold font-sans">
               <div className="flex items-center space-x-2">
                 <Sparkles className="w-5 h-5 text-yellow-200" />
                 <span>AI साथी मार्गदर्शन (Step 1 Complete)</span>
               </div>
             </div>
 
-            <div className="p-3 bg-black/20 rounded-2xl backdrop-blur-sm border border-white/10 text-xs font-semibold leading-relaxed">
+            <div className="p-3 bg-black/20 rounded-2xl backdrop-blur-sm border border-white/10 text-xs font-semibold leading-relaxed font-sans">
               <span className="text-[10px] uppercase tracking-wider text-yellow-200 block font-bold mb-0.5">
                 AI Voice Companion:
               </span>
@@ -502,7 +502,7 @@ export const PhotoStudioPage = () => {
 
             <button
               onClick={handleProceed}
-              className="w-full py-4 rounded-2xl bg-white text-orange-800 font-black text-sm shadow-2xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 ring-4 ring-white/30 animate-pulse min-h-[48px]"
+              className="w-full py-4 rounded-2xl bg-white text-orange-900 font-black text-sm shadow-2xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 ring-4 ring-white/30 animate-pulse min-h-[48px] font-sans"
             >
               <span>{t('proceedToVoice')}</span>
               <ArrowRight className="w-4 h-4 text-orange-600" />

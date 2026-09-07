@@ -14,7 +14,9 @@ import {
   Eye, 
   Building2,
   Filter,
-  Layers
+  Layers,
+  ShoppingBag,
+  ArrowUpRight
 } from 'lucide-react';
 
 export const CatalogPage = () => {
@@ -63,18 +65,18 @@ export const CatalogPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6 animate-fade-in pb-28">
       {/* Top Banner / Call to Action */}
-      <div className="bg-gradient-to-r from-stone-900 via-orange-950 to-stone-900 rounded-3xl p-6 sm:p-8 text-white border border-orange-800/40 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-orange-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="bg-gradient-to-r from-stone-900 via-orange-950/90 to-stone-900 rounded-3xl p-6 sm:p-8 text-white border border-orange-700/40 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs font-semibold font-sans">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 text-xs font-semibold font-sans">
+              <Sparkles className="w-3.5 h-3.5 text-orange-400" />
               <span>MoSJE AI Virtual Business Manager</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-serif">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight font-serif text-white">
               {lang === 'hi' ? 'कारीगर डिजिटल कैटलॉग व इन्वेंटरी' : 'Artisan Digital Inventory & Catalog'}
             </h2>
             <p className="text-sm text-stone-300 leading-relaxed font-sans">
@@ -87,14 +89,14 @@ export const CatalogPage = () => {
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <button
               onClick={() => setActiveTab('camera')}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm shadow-lg shadow-orange-900/40 active:scale-95 transition-all min-h-[48px]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-sm shadow-lg shadow-orange-900/40 active:scale-95 transition-all min-h-[48px]"
             >
               <Plus className="w-5 h-5" />
               <span>{t('newListing')}</span>
             </button>
             <button
               onClick={() => setActiveTab('voice')}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-4 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 font-semibold text-sm transition-all min-h-[48px]"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-3.5 rounded-2xl bg-stone-800/90 hover:bg-stone-750 text-stone-200 border border-stone-700/80 font-semibold text-sm transition-all min-h-[48px]"
             >
               <Sparkles className="w-4 h-4 text-orange-400" />
               <span>{t('navVoiceCatalog')}</span>
@@ -114,7 +116,7 @@ export const CatalogPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'hi' ? 'उत्पाद, शिल्प श्रेणी या शिल्पकार का नाम खोजें...' : 'Search by craft, title, or artisan name...'}
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm shadow-sm transition-colors font-sans"
+              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500/50 text-sm shadow-sm transition-colors font-sans"
             />
           </div>
         </div>
@@ -153,7 +155,7 @@ export const CatalogPage = () => {
           </p>
           <button
             onClick={() => setActiveTab('camera')}
-            className="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-md transition-all font-sans"
+            className="px-5 py-2.5 rounded-2xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-md transition-all font-sans"
           >
             {t('newListing')}
           </button>
@@ -219,10 +221,10 @@ export const CatalogPage = () => {
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs text-stone-500 dark:text-stone-400 font-medium">
-                      <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold text-[11px]">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-semibold text-[11px]">
                         {product.category}
                       </span>
-                      <span>{product.artisan_village}</span>
+                      <span className="text-xs text-stone-400">{product.artisan_village}</span>
                     </div>
 
                     <h3 className="font-bold text-stone-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors font-serif">
@@ -231,7 +233,7 @@ export const CatalogPage = () => {
                   </div>
 
                   {/* Price and Artisan Name */}
-                  <div className="pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                  <div className="pt-2.5 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold tracking-wider font-sans">
                         {t('recommendedPrice')}

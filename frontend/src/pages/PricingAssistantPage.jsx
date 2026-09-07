@@ -164,34 +164,36 @@ export const PricingAssistantPage = () => {
 
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in pb-28">
       {/* Header */}
-      <div className="text-center sm:text-left space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold">
-          <TrendingUp className="w-3.5 h-3.5 text-orange-600" />
-          <span>Core Feature 3: Dynamic Pricing Assistant (Scikit-Learn)</span>
+      <div className="space-y-1.5">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/20 text-xs font-bold tracking-wide font-sans">
+          <TrendingUp className="w-3.5 h-3.5" />
+          <span>Core Feature 3 • Dynamic Pricing Assistant (Scikit-Learn ML)</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-hindi">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-white font-serif">
           {t('pricingTitle')}
         </h2>
-        <p className="text-xs sm:text-sm text-stone-600 max-w-2xl">
+        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 max-w-2xl leading-relaxed font-sans">
           {t('pricingSubtitle')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
         {/* Left Column: Cost and Labor Inputs */}
-        <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-5">
-          <div className="flex items-center space-x-2 text-sm font-bold text-stone-900 pb-2 border-b border-stone-100">
-            <Calculator className="w-4 h-4 text-orange-600" />
+        <div className="lg:col-span-6 bg-white dark:bg-stone-900 rounded-[28px] p-6 sm:p-7 border border-stone-200/80 dark:border-stone-800 shadow-card hover:shadow-elevated transition-all space-y-5">
+          <div className="flex items-center space-x-2 text-sm font-extrabold text-stone-900 dark:text-white pb-3 border-b border-stone-100 dark:border-stone-800 font-serif">
+            <Calculator className="w-4 h-4 text-orange-600 dark:text-orange-400" />
             <span>Production Factors & Labor Input</span>
           </div>
 
           {/* Raw Material Cost */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-xs font-bold text-stone-700">
-              <label>{t('materialCostLabel')}</label>
-              <span className="text-orange-600 font-extrabold text-sm">₹{materialCost}</span>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-xs font-bold text-stone-700 dark:text-stone-300">
+              <label className="font-sans">{t('materialCostLabel')}</label>
+              <span className="text-orange-600 dark:text-orange-400 font-extrabold text-sm px-2.5 py-0.5 rounded-lg bg-orange-50 dark:bg-orange-950/50 border border-orange-200/60 dark:border-orange-900/40">
+                ₹{materialCost}
+              </span>
             </div>
             <input
               type="range"
@@ -200,9 +202,9 @@ export const PricingAssistantPage = () => {
               step="50"
               value={materialCost}
               onChange={(e) => setMaterialCost(parseFloat(e.target.value))}
-              className="w-full accent-orange-600 cursor-pointer"
+              className="w-full accent-orange-600 cursor-pointer h-2 bg-stone-100 dark:bg-stone-800 rounded-lg appearance-none"
             />
-            <div className="flex justify-between text-[10px] text-stone-400">
+            <div className="flex justify-between text-[10px] text-stone-400 dark:text-stone-500 font-medium">
               <span>₹50 (Clay/Jute)</span>
               <span>₹2,500 (Brass/Silk)</span>
               <span>₹5,000 (Pashmina/Silver)</span>
@@ -210,10 +212,12 @@ export const PricingAssistantPage = () => {
           </div>
 
           {/* Artisan Labor Hours */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-xs font-bold text-stone-700">
-              <label>{t('hoursSpentLabel')}</label>
-              <span className="text-orange-600 font-extrabold text-sm">{hoursSpent} Hours</span>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-xs font-bold text-stone-700 dark:text-stone-300">
+              <label className="font-sans">{t('hoursSpentLabel')}</label>
+              <span className="text-orange-600 dark:text-orange-400 font-extrabold text-sm px-2.5 py-0.5 rounded-lg bg-orange-50 dark:bg-orange-950/50 border border-orange-200/60 dark:border-orange-900/40">
+                {hoursSpent} Hours
+              </span>
             </div>
             <input
               type="range"
@@ -222,9 +226,9 @@ export const PricingAssistantPage = () => {
               step="1"
               value={hoursSpent}
               onChange={(e) => setHoursSpent(parseFloat(e.target.value))}
-              className="w-full accent-orange-600 cursor-pointer"
+              className="w-full accent-orange-600 cursor-pointer h-2 bg-stone-100 dark:bg-stone-800 rounded-lg appearance-none"
             />
-            <div className="flex justify-between text-[10px] text-stone-400">
+            <div className="flex justify-between text-[10px] text-stone-400 dark:text-stone-500 font-medium">
               <span>1 hr (Simple mold)</span>
               <span>25 hrs (Fine carving)</span>
               <span>80 hrs (Master weaving)</span>
@@ -233,17 +237,17 @@ export const PricingAssistantPage = () => {
 
           {/* Skill Level Selection */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-stone-700 block">{t('artisanSkillLabel')}</label>
+            <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('artisanSkillLabel')}</label>
             <div className="grid grid-cols-3 gap-2">
               {['Apprentice', 'Skilled', 'Master Artisan'].map((skill) => (
                 <button
                   key={skill}
                   type="button"
                   onClick={() => setSkillLevel(skill)}
-                  className={`py-2.5 px-1.5 rounded-xl text-[11px] sm:text-xs font-bold border transition-all min-h-[44px] flex items-center justify-center text-center leading-tight active:scale-95 ${
+                  className={`py-2.5 px-2 rounded-2xl text-[11px] sm:text-xs font-bold border transition-all min-h-[44px] flex items-center justify-center text-center leading-tight active:scale-95 ${
                     skillLevel === skill
-                      ? 'bg-orange-600 text-white border-orange-600 shadow-md'
-                      : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                      ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white border-transparent shadow-md'
+                      : 'bg-stone-50 dark:bg-stone-950 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
                   {skill === 'Apprentice' ? t('apprentice') : skill === 'Skilled' ? t('skilled') : t('masterArtisan')}
@@ -254,17 +258,17 @@ export const PricingAssistantPage = () => {
 
           {/* Size / Dimensions Grade */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-stone-700 block">{t('dimensionsGrade')}</label>
+            <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('dimensionsGrade')}</label>
             <div className="grid grid-cols-3 gap-2">
               {['Small', 'Medium', 'Large'].map((dim) => (
                 <button
                   key={dim}
                   type="button"
                   onClick={() => setDimensions(dim)}
-                  className={`py-2.5 px-2 rounded-xl text-[11px] sm:text-xs font-bold border transition-all min-h-[44px] flex items-center justify-center text-center active:scale-95 ${
+                  className={`py-2.5 px-2 rounded-2xl text-[11px] sm:text-xs font-bold border transition-all min-h-[44px] flex items-center justify-center text-center active:scale-95 ${
                     dimensions === dim
-                      ? 'bg-stone-900 text-white border-stone-900 shadow-md'
-                      : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                      ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 border-transparent shadow-md'
+                      : 'bg-stone-50 dark:bg-stone-950 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-100 dark:hover:bg-stone-800'
                   }`}
                 >
                   {dim}
@@ -274,14 +278,14 @@ export const PricingAssistantPage = () => {
           </div>
 
           {/* GI Tag Checkbox */}
-          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-orange-50/70 border border-orange-200">
-            <div className="flex items-center space-x-2.5">
-              <Award className="w-5 h-5 text-orange-600 flex-shrink-0" />
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-orange-50/80 dark:bg-orange-950/30 border border-orange-200/80 dark:border-orange-900/50">
+            <div className="flex items-center space-x-3">
+              <Award className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
               <div>
-                <span className="text-xs font-bold text-stone-900 block">
+                <span className="text-xs font-bold text-stone-900 dark:text-white block font-sans">
                   {t('giTaggedCheck')}
                 </span>
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-stone-500 dark:text-stone-400">
                   Adds +20% GI Heritage Premium recognized on MoSJE & GeM
                 </span>
               </div>
@@ -298,46 +302,49 @@ export const PricingAssistantPage = () => {
         {/* Right Column: Scikit-Learn Pricing Prediction & Cost Breakdown */}
         <div className="lg:col-span-6 space-y-5">
           {/* Main Price Recommendation Card */}
-          <div className="bg-gradient-to-br from-stone-900 via-orange-950 to-stone-900 text-white rounded-3xl p-6 border border-orange-800/40 shadow-xl space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+          <div className="bg-gradient-to-br from-stone-900 via-orange-950 to-stone-900 text-white rounded-[28px] p-6 sm:p-7 border border-orange-800/40 shadow-xl space-y-5 relative overflow-hidden">
+            
+            <div className="absolute top-0 right-0 -mt-12 -mr-12 w-48 h-48 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="flex items-center justify-between pb-3 border-b border-stone-800 relative z-10">
               <span className="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center space-x-1.5">
                 <Sparkles className="w-4 h-4" />
                 <span>AI Recommended Selling Price</span>
               </span>
-              <span className="text-xs text-stone-400 font-mono">
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-orange-900/60 border border-orange-700/50 text-orange-200 font-mono font-bold">
                 Scikit-Learn ML
               </span>
             </div>
 
-            <div className="text-center py-2">
-              <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+            <div className="text-center py-3 relative z-10">
+              <span className="text-4xl sm:text-5xl font-black text-white tracking-tight font-serif">
                 ₹{pricingResult.recommended_price?.toLocaleString('en-IN')}
               </span>
-              <p className="text-xs text-stone-300 mt-2">
+              <p className="text-xs text-stone-300 mt-2 font-sans">
                 Fair Market Range: <b className="text-orange-300">₹{pricingResult.min_price}</b> — <b className="text-orange-300">₹{pricingResult.max_price}</b>
               </p>
             </div>
 
             {/* Visual Stacked Cost Breakdown Bar */}
-            <div className="space-y-1.5 pt-2">
-              <div className="flex justify-between text-[11px] font-medium text-stone-300">
+            <div className="space-y-2 pt-2 relative z-10">
+              <div className="flex justify-between text-[11px] font-medium text-stone-300 font-sans">
                 <span>Material: ₹{pricingResult.material_cost}</span>
                 <span>Labor: ₹{pricingResult.labor_cost}</span>
                 <span>Margin: ₹{pricingResult.heritage_margin}</span>
               </div>
-              <div className="w-full h-3 bg-stone-800 rounded-full overflow-hidden flex">
+              <div className="w-full h-3.5 bg-stone-800 rounded-full overflow-hidden flex p-0.5 border border-white/10">
                 <div 
-                  className="bg-amber-500 h-full" 
+                  className="bg-amber-500 h-full rounded-l-full transition-all duration-500" 
                   style={{ width: `${Math.min(60, (pricingResult.material_cost / (pricingResult.recommended_price || 1)) * 100)}%` }}
                   title="Material Cost"
                 ></div>
                 <div 
-                  className="bg-orange-500 h-full" 
+                  className="bg-orange-500 h-full transition-all duration-500" 
                   style={{ width: `${Math.min(60, (pricingResult.labor_cost / (pricingResult.recommended_price || 1)) * 100)}%` }}
                   title="Artisan Labor Value"
                 ></div>
                 <div 
-                  className="bg-emerald-500 h-full flex-1" 
+                  className="bg-emerald-500 h-full flex-1 rounded-r-full transition-all duration-500" 
                   title="Fair Margin"
                 ></div>
               </div>
@@ -345,19 +352,19 @@ export const PricingAssistantPage = () => {
           </div>
 
           {/* Explainable "Why This Price?" Card */}
-          <div className="bg-white rounded-3xl p-5 border border-stone-200 shadow-sm space-y-3">
-            <div className="flex items-center space-x-2 text-stone-900 font-bold text-xs uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white dark:bg-stone-900 rounded-[28px] p-6 border border-stone-200/80 dark:border-stone-800 shadow-card space-y-3.5">
+            <div className="flex items-center space-x-2 text-stone-900 dark:text-white font-extrabold text-xs uppercase tracking-wider font-serif">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>{t('whyThisPrice')}</span>
             </div>
 
-            <p className="text-xs text-stone-700 leading-relaxed bg-stone-50 p-3 rounded-2xl border border-stone-200 font-hindi">
+            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed bg-stone-50 dark:bg-stone-950 p-4 rounded-2xl border border-stone-200 dark:border-stone-800 font-hindi">
               {lang === 'hi' ? pricingResult.explanation_hi : pricingResult.explanation_en}
             </p>
 
-            <div className="flex items-center justify-between text-[11px] text-stone-500 pt-1">
+            <div className="flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400 pt-1 font-sans">
               <span>Category Benchmark Average:</span>
-              <span className="font-bold text-stone-800">~₹{pricingResult.platform_avg}</span>
+              <span className="font-bold text-stone-800 dark:text-stone-200">~₹{pricingResult.platform_avg}</span>
             </div>
           </div>
 
@@ -365,7 +372,7 @@ export const PricingAssistantPage = () => {
           <button
             onClick={handleSaveAndPublish}
             disabled={isSaving}
-            className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-sm shadow-xl shadow-orange-900/40 hover:scale-[1.01] transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 hover:from-orange-500 hover:to-amber-500 text-white font-extrabold text-sm shadow-xl shadow-orange-900/30 active:scale-95 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 min-h-[48px]"
           >
             <CheckCircle2 className="w-5 h-5" />
             <span>{isSaving ? 'Publishing Product...' : t('saveAndPublish')}</span>

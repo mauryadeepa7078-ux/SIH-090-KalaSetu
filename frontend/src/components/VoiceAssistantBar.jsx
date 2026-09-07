@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useVoiceNav } from '../context/VoiceNavContext';
 import { useApp } from '../context/AppContext';
-import { Mic, MicOff, Volume2, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
+import { Mic, MicOff, Volume2, Sparkles, ChevronUp, ChevronDown, Bot } from 'lucide-react';
 
 export const VoiceAssistantBar = () => {
   const { isListening, startVoiceNavigation, recognizedText, assistantReply, speakGuide } = useVoiceNav();
@@ -50,26 +50,28 @@ export const VoiceAssistantBar = () => {
       ];
 
   return (
-    <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end animate-fade-in">
       {/* Voice commands hint drawer */}
       {isExpanded && (
-        <div className="mb-3 p-4 bg-stone-900/95 backdrop-blur-md border border-orange-600/40 rounded-2xl shadow-2xl w-80 sm:w-96 text-xs text-stone-200 transition-all animate-float">
-          <div className="flex items-center justify-between pb-2 border-b border-stone-800">
-            <div className="flex items-center space-x-1.5 font-semibold text-orange-400">
-              <Sparkles className="w-4 h-4" />
-              <span>{t('voiceNavActive')} (AI साथी)</span>
+        <div className="mb-3 p-5 bg-stone-900/95 backdrop-blur-xl border border-orange-500/40 rounded-3xl shadow-2xl w-80 sm:w-96 text-xs text-stone-200 transition-all animate-float">
+          <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+            <div className="flex items-center space-x-2 font-bold text-orange-400">
+              <div className="p-1.5 rounded-xl bg-orange-500/20 text-orange-400">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <span className="font-serif text-sm text-white">{t('voiceNavActive')} (AI साथी)</span>
             </div>
             <button
               onClick={() => setIsExpanded(false)}
-              className="text-stone-400 hover:text-white p-1"
+              className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-stone-800 transition-colors"
             >
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
 
           {/* Quick Voice Commands */}
-          <div className="mt-2.5">
-            <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1">
+          <div className="mt-3">
+            <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block mb-1.5 font-sans">
               नेविगेशन कमांड्स (Voice Commands):
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -77,7 +79,7 @@ export const VoiceAssistantBar = () => {
                 <span
                   key={idx}
                   onClick={() => speakGuide(item.cmd)}
-                  className="cursor-pointer px-2 py-1 rounded-lg bg-stone-800 border border-stone-700 hover:border-orange-500 text-stone-300 hover:text-white text-[11px] transition-colors"
+                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-stone-800/90 border border-stone-700/80 hover:border-orange-500 hover:bg-orange-950/40 text-stone-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
                 >
                   🗣️ {item.label}
                 </span>
@@ -86,8 +88,8 @@ export const VoiceAssistantBar = () => {
           </div>
 
           {/* Conversational Questions */}
-          <div className="mt-3 pt-2.5 border-t border-stone-800">
-            <span className="text-[10px] uppercase font-bold text-orange-400 tracking-wider block mb-1">
+          <div className="mt-3.5 pt-3 border-t border-stone-800">
+            <span className="text-[10px] uppercase font-bold text-orange-400 tracking-wider block mb-1.5 font-sans">
               पूछें कोई भी सवाल (Ask AI Advisor):
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -95,7 +97,7 @@ export const VoiceAssistantBar = () => {
                 <span
                   key={idx}
                   onClick={() => speakGuide(item.cmd)}
-                  className="cursor-pointer px-2 py-1 rounded-lg bg-orange-950/60 border border-orange-800/50 hover:border-orange-500 text-orange-200 hover:text-white text-[11px] transition-colors"
+                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-orange-950/60 border border-orange-800/60 hover:border-orange-400 hover:bg-orange-900/60 text-orange-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
                 >
                   {item.label}
                 </span>
@@ -105,29 +107,28 @@ export const VoiceAssistantBar = () => {
 
           {/* Live Recognition or AI Reply display */}
           {recognizedText && (
-            <div className="mt-3 p-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 space-y-1">
-              <span className="font-semibold text-[10px] text-orange-400 uppercase tracking-wider block">Recognized Speech:</span>
-              <p className="text-xs text-white">"{recognizedText}"</p>
+            <div className="mt-3 p-3 rounded-2xl bg-stone-950 border border-stone-800 text-stone-200 space-y-1 animate-fade-in">
+              <span className="font-semibold text-[10px] text-orange-400 uppercase tracking-wider block font-sans">Recognized Speech:</span>
+              <p className="text-xs text-white font-medium">"{recognizedText}"</p>
             </div>
           )}
 
           {assistantReply && (
-            <div className="mt-2 p-2.5 rounded-xl bg-orange-950/70 border border-orange-600/40 text-orange-200 space-y-1">
-              <span className="font-bold text-[10px] text-orange-400 uppercase tracking-wider block flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> AI Advisor Reply:
+            <div className="mt-2.5 p-3 rounded-2xl bg-gradient-to-br from-orange-950/80 to-stone-900 border border-orange-600/40 text-orange-200 space-y-1 animate-fade-in shadow-md">
+              <span className="font-bold text-[10px] text-orange-400 uppercase tracking-wider block flex items-center gap-1 font-sans">
+                <Sparkles className="w-3 h-3 text-orange-400" /> AI Advisor Reply:
               </span>
-              <p className="text-xs text-white leading-relaxed">{assistantReply}</p>
+              <p className="text-xs text-white leading-relaxed font-sans">{assistantReply}</p>
             </div>
           )}
         </div>
       )}
 
-
       {/* Floating Action Voice Button */}
       <div className="flex items-center space-x-2">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="bg-stone-800/90 text-stone-300 hover:text-white px-3 py-2 rounded-full border border-stone-700 shadow-lg text-xs font-medium flex items-center space-x-1 backdrop-blur-sm"
+          className="bg-stone-900/90 hover:bg-stone-800 text-stone-300 hover:text-white px-3.5 py-2 rounded-full border border-stone-700/80 shadow-lg text-xs font-semibold flex items-center space-x-1.5 backdrop-blur-md transition-all active:scale-95"
         >
           <span>Voice Guide</span>
           {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
@@ -137,16 +138,16 @@ export const VoiceAssistantBar = () => {
           onClick={startVoiceNavigation}
           className={`relative p-4 rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center ${
             isListening
-              ? 'bg-red-600 text-white ring-4 ring-red-400/50 animate-pulse'
-              : 'bg-gradient-to-r from-orange-600 via-amber-600 to-orange-500 text-white hover:scale-110 shadow-orange-900/50'
+              ? 'bg-red-600 text-white ring-4 ring-red-400/50 animate-pulse scale-105'
+              : 'bg-gradient-to-tr from-orange-600 via-amber-600 to-yellow-500 text-white hover:scale-110 shadow-orange-900/50 glow-saffron'
           }`}
           title="Click to speak a voice command"
         >
           {isListening ? (
             <>
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-500"></span>
               </span>
               <MicOff className="w-6 h-6 animate-bounce" />
             </>

@@ -42,17 +42,17 @@ export const CommunityPage = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8 animate-fade-in pb-28">
       {/* Header */}
-      <div className="space-y-1">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-bold">
-          <Users className="w-3.5 h-3.5 text-orange-600" />
-          <span>Artisan Peer Network & Inspiration</span>
+      <div className="space-y-1.5">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-500/10 dark:bg-orange-500/20 text-orange-700 dark:text-orange-400 border border-orange-500/20 text-xs font-bold tracking-wide font-sans">
+          <Users className="w-3.5 h-3.5" />
+          <span>Artisan Peer Network & Guild Forum</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 font-hindi">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-white font-serif">
           {t('navCommunity')}
         </h2>
-        <p className="text-xs sm:text-sm text-stone-600">
+        <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-sans leading-relaxed">
           Connect with fellow artisans across Dilli Haat, Surajkund Mela, and Shilp Samagam exhibitions. Share techniques, collaborative bulk orders, and heritage stories.
         </p>
       </div>
@@ -60,48 +60,48 @@ export const CommunityPage = () => {
       {/* Feed List */}
       <div className="space-y-6">
         {communityPosts.map((post) => (
-          <div key={post.id} className="bg-white rounded-3xl p-6 border border-stone-200 shadow-sm space-y-4">
+          <div key={post.id} className="bg-white dark:bg-stone-900 rounded-[28px] p-6 sm:p-7 border border-stone-200/80 dark:border-stone-800 shadow-card hover:shadow-elevated transition-all space-y-4">
             {/* Author */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <img src={post.avatar} alt={post.author} className="w-11 h-11 rounded-full object-cover border-2 border-orange-500" />
+              <div className="flex items-center space-x-3.5">
+                <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full object-cover border-2 border-orange-500 shadow-sm" />
                 <div>
-                  <h4 className="font-bold text-sm text-stone-900">{post.author}</h4>
-                  <div className="flex items-center space-x-1 text-xs text-stone-500">
-                    <MapPin className="w-3 h-3 text-orange-600" />
+                  <h4 className="font-extrabold text-sm text-stone-900 dark:text-white font-serif">{post.author}</h4>
+                  <div className="flex items-center space-x-1.5 text-xs text-stone-500 dark:text-stone-400 font-sans">
+                    <MapPin className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
                     <span>{post.cluster}</span>
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-stone-400 font-medium">{post.time}</span>
+              <span className="text-xs text-stone-400 dark:text-stone-500 font-medium font-sans">{post.time}</span>
             </div>
 
             {/* Post Content */}
-            <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-hindi">
+            <p className="text-xs sm:text-sm text-stone-700 dark:text-stone-300 leading-relaxed font-hindi">
               {post.content}
             </p>
 
             {/* Image */}
-            <div className="rounded-2xl overflow-hidden aspect-video bg-stone-100 border border-stone-200">
-              <img src={post.craftImg} alt="Craft post" className="w-full h-full object-cover" />
+            <div className="rounded-2xl overflow-hidden aspect-video bg-stone-100 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 shadow-inner">
+              <img src={post.craftImg} alt="Craft post" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between pt-2 border-t border-stone-100 text-xs text-stone-500 font-semibold">
-              <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-1.5 hover:text-red-600 transition-colors">
-                  <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+            <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400 font-bold font-sans">
+              <div className="flex items-center space-x-5">
+                <button className="flex items-center space-x-1.5 hover:text-rose-600 dark:hover:text-rose-400 transition-colors">
+                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
                   <span>{post.likes} Appreciations</span>
                 </button>
-                <button className="flex items-center space-x-1.5 hover:text-orange-600 transition-colors">
+                <button className="flex items-center space-x-1.5 hover:text-orange-600 dark:hover:text-orange-400 transition-colors">
                   <MessageCircle className="w-4 h-4" />
                   <span>{post.comments} Comments</span>
                 </button>
               </div>
 
-              <button className="flex items-center space-x-1 hover:text-stone-900 transition-colors">
+              <button className="flex items-center space-x-1 hover:text-stone-900 dark:hover:text-white transition-colors">
                 <Share2 className="w-4 h-4" />
-                <span>Share</span>
+                <span>Share Story</span>
               </button>
             </div>
           </div>
