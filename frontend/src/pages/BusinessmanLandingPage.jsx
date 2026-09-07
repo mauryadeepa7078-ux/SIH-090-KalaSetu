@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { api } from '../services/api';
 import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
 import { 
   Building2, 
@@ -26,7 +27,8 @@ import {
   Plus, 
   X,
   Copy,
-  Check
+  Check,
+  PackageCheck
 } from 'lucide-react';
 
 export const BusinessmanLandingPage = () => {
@@ -54,11 +56,11 @@ export const BusinessmanLandingPage = () => {
     gstin: currentUser?.gstin || '07AAAAA0000A1Z5',
     contactPerson: currentUser?.name || 'Rajesh Singhal',
     contactPhone: currentUser?.phone || '+91 98200 11223',
-    quantity: 100,
+    quantity: 50,
     targetPrice: 2200,
     deliveryDate: '2026-10-15',
     destinationCity: 'New Delhi / Export Hub',
-    customNotes: 'Require MoSJE authenticity certificates for each unit with export-grade packaging.'
+    specialTerms: 'Standard GeM 30-day payment term with IndiaPost DNK verified dispatch.'
   });
 
   // Major Indian Craft Clusters
@@ -73,10 +75,9 @@ export const BusinessmanLandingPage = () => {
 
   // Filtered Products for Bulk
   const filteredProducts = products.filter(p => {
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = !searchQuery || 
       (p.title_en && p.title_en.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (p.title_hi && p.title_hi.includes(searchQuery)) ||
-      (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.artisan_name && p.artisan_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (p.artisan_village && p.artisan_village.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCluster = selectedCluster === 'ALL' || 
@@ -95,12 +96,13 @@ export const BusinessmanLandingPage = () => {
     setShowRfqModal(true);
   };
 
-  const handleSubmitRfq = (e) => {
+  const handleSubmitRfq = async (e) => {
     e.preventDefault();
     const poNumber = `PO-GEM-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
     const totalEst = rfqForm.quantity * rfqForm.targetPrice;
     
     const poData = {
+      id: poNumber,
       poNumber,
       productTitle: activeRfqProduct?.title_en || 'Handcrafted Heritage Goods',
       artisanName: activeRfqProduct?.artisan_name || 'Cluster Cooperative Lead',
@@ -118,6 +120,28 @@ export const BusinessmanLandingPage = () => {
     setGeneratedPoData(poData);
     setShowRfqModal(false);
     setShowPoSuccessModal(true);
+
+    // Persist RFQ to backend database for artisan view
+    try {
+      console.log('[BusinessmanLanding] Persisting RFQ to backend database...', poData);
+      await api.createRFQ({
+        id: poNumber,
+        organization: rfqForm.companyName,
+        buyer_name: currentUser?.name || rfqForm.companyName,
+        gstin: rfqForm.gstin,
+        category: activeRfqProduct?.category || 'Heritage Craft',
+        requirements: `${rfqForm.quantity} units of ${activeRfqProduct?.title_en || 'Handicrafts'} needed by ${rfqForm.deliveryDate}. Target rate: ₹${rfqForm.targetPrice}/unit. ${rfqForm.specialTerms || ''}`,
+        quantity: rfqForm.quantity,
+        target_price: rfqForm.targetPrice,
+        status: 'OPEN',
+        location: currentUser?.location || 'New Delhi',
+        inquiry_date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      });
+      console.log('[BusinessmanLanding] RFQ successfully persisted to backend database.');
+    } catch (err) {
+      console.warn('[BusinessmanLanding] Failed to persist RFQ to backend:', err);
+    }
+
     showToast(`RFQ Generated: ${poNumber}`, 'success');
   };
 
@@ -154,11 +178,19 @@ export const BusinessmanLandingPage = () => {
 
             <div className="pt-2 flex flex-wrap gap-3">
               <button
-                onClick={() => setActiveTab('gem')}
+                onClick={() => setActiveTab('businessman-orders')}
                 className="px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-extrabold text-xs sm:text-sm flex items-center space-x-2 shadow-lg shadow-blue-900/40 hover:scale-105 active:scale-95 transition-all min-h-[44px]"
               >
-                <Layers className="w-4 h-4" />
-                <span>Open GeM Tenders & RFQ Board ➔</span>
+                <PackageCheck className="w-4 h-4" />
+                <span>Track B2B Orders & RFQs (थोक ऑर्डर व प्रगति) ➔</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('gem')}
+                className="px-5 py-3 rounded-2xl bg-stone-800 hover:bg-stone-750 text-stone-200 border border-stone-700 font-bold text-xs sm:text-sm flex items-center space-x-2 min-h-[44px] transition-all"
+              >
+                <Layers className="w-4 h-4 text-cyan-400" />
+                <span>GeM Tenders & RFQ Board</span>
               </button>
 
               <button
@@ -572,11 +604,11 @@ export const BusinessmanLandingPage = () => {
               <button
                 onClick={() => {
                   setShowPoSuccessModal(false);
-                  setActiveTab('gem');
+                  setActiveTab('businessman-orders');
                 }}
                 className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center justify-center space-x-1 transition-colors shadow-lg"
               >
-                <span>Track on GeM Board ➔</span>
+                <span>Track in B2B Orders ➔</span>
               </button>
             </div>
           </div>

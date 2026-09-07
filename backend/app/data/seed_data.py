@@ -534,3 +534,54 @@ SEED_RFQS = [
         "requirements": "Festive Diwali gifts for executive partners. Framed Mithila folk art with MoSJE artisan authenticity seal."
     }
 ]
+
+# Simulated Retail Buyer Orders for KalaSetu Marketplace
+SEED_ORDERS: List[Dict[str, Any]] = [
+    {
+        "id": "ORD-2026-9041",
+        "product_id": "prod-101",
+        "product_title": "Handwoven Royal Banarasi Katan Silk Saree with Kadwa Zari",
+        "product_image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+        "artisan_name": "Ram Das Bunkar",
+        "artisan_village": "Kotwa, Varanasi, Uttar Pradesh",
+        "buyer_name": "Priya Sharma",
+        "buyer_phone": "+91 98112 34567",
+        "price": 6800.0,
+        "qty": 1,
+        "total": 6800.0,
+        "order_date": "2 Sep 2026",
+        "status": "SHIPPED",
+        "stage_index": 3,
+        "tracking_id": "DNK-INPOST-882194",
+        "delivery_partner": "IndiaPost Dak Ghar Niryat Kendra",
+        "est_delivery": "9 Sep 2026",
+        "delivery_address": "124 Connaught Place, Central Delhi, New Delhi - 110001",
+        "notes": "Please include gift wrap with MoSJE authenticity certificate.",
+        "gi_tagged": True,
+        "created_at": "2026-09-02T08:30:00Z"
+    },
+    {
+        "id": "ORD-2026-8812",
+        "product_id": "prod-102",
+        "product_title": "Authentic Mithila Kohbar Madhubani Painting on Khadi Sheet",
+        "product_image": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80",
+        "artisan_name": "Sita Devi",
+        "artisan_village": "Ranti, Madhubani, Bihar",
+        "buyer_name": "Ananya Roy",
+        "buyer_phone": "+91 98300 45678",
+        "price": 2400.0,
+        "qty": 1,
+        "total": 2400.0,
+        "order_date": "4 Sep 2026",
+        "status": "CONFIRMED",
+        "stage_index": 1,
+        "tracking_id": "DNK-INPOST-773120",
+        "delivery_partner": "IndiaPost Dak Ghar Niryat Kendra",
+        "est_delivery": "12 Sep 2026",
+        "delivery_address": "Flat 4B, Heritage Enclave, Salt Lake City, Kolkata - 700091",
+        "notes": "Standard secure moisture-proof art tube packaging.",
+        "gi_tagged": True,
+        "created_at": "2026-09-04T11:20:00Z"
+    }
+]
+

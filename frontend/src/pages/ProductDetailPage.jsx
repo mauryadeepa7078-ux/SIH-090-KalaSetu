@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { getProductImage, getCategoryFallbackImage } from '../utils/imageHelper';
+import { CheckoutModal } from '../components/CheckoutModal';
 import { 
   ArrowLeft, 
   Award, 
@@ -40,6 +41,7 @@ export const ProductDetailPage = () => {
 
   const [copied, setCopied] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [isGemPublishing, setIsGemPublishing] = useState(false);
 
   if (!selectedProduct) {
@@ -236,7 +238,7 @@ export const ProductDetailPage = () => {
                 <div className="grid grid-cols-2 gap-3">
                   {/* Buy Now Button */}
                   <button
-                    onClick={handleBuyNow}
+                    onClick={() => setShowCheckoutModal(true)}
                     className="py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-stone-950 font-black text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-xl shadow-amber-900/30 transition-all min-h-[48px]"
                   >
                     <Zap className="w-4 h-4 fill-stone-950 text-stone-950" />
@@ -377,6 +379,14 @@ export const ProductDetailPage = () => {
           </div>
         </div>
       )}
+
+      {/* Interactive Checkout Modal */}
+      <CheckoutModal
+        isOpen={showCheckoutModal}
+        onClose={() => setShowCheckoutModal(false)}
+        product={p}
+        initialQty={1}
+      />
     </div>
   );
 };

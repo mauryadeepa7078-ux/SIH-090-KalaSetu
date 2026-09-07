@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { ProfileDropdown } from './ProfileDropdown';
+import { PwaInstallModal } from './PwaInstallModal';
 import { 
   ShoppingBag, 
   Camera, 
@@ -26,7 +28,9 @@ import {
   Truck,
   Briefcase,
   Layers,
-  ChevronDown
+  ChevronDown,
+  User,
+  Download
 } from 'lucide-react';
 
 export const Navbar = () => {
@@ -44,6 +48,7 @@ export const Navbar = () => {
     setIsMobileFrame, 
     setShowResetModal,
     userRole,
+    currentUser,
     switchRole,
     openOnboarding,
     orders,
@@ -51,6 +56,35 @@ export const Navbar = () => {
   } = useApp();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  // Capture PWA beforeinstallprompt event
+  useEffect(() => {
+    const handleBeforeInstall = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      console.log('[PWA] beforeinstallprompt captured successfully.');
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] User accepted the install prompt');
+        }
+        setDeferredPrompt(null);
+      });
+    } else {
+      setIsPwaModalOpen(true);
+    }
+  };
 
   // 1. Artisan-specific nav items (Strict RBAC: Creator & studio tools only)
   const artisanNavItems = [
@@ -76,6 +110,7 @@ export const Navbar = () => {
   // 3. Businessman-specific nav items (Strict RBAC: B2B, GeM, RFQ, Bulk tenders only)
   const businessmanNavItems = [
     { id: 'businessman-home', label: 'B2B Hub', icon: Briefcase, desc: 'Institutional sourcing & cluster directory' },
+    { id: 'businessman-orders', label: 'B2B & RFQ Tracker', icon: Truck, desc: '6-stage live procurement & tender timeline' },
     { id: 'gem', label: 'GeM & ONDC Tenders', icon: Building2, desc: 'Government & corporate bulk procurement' },
     { id: 'whatsapp', label: 'Cluster Inquiries', icon: MessageCircle, desc: 'Direct cooperative communication' },
     { id: 'community', label: 'Craft Clusters', icon: Users, desc: 'State craft guilds & cluster directory' },
@@ -201,6 +236,44 @@ export const Navbar = () => {
               </select>
             </div>
 
+            {/* Install App Button */}
+            <button
+              onClick={handleInstallClick}
+              title={lang === 'hi' ? 'ऐप इंस्टॉल करें' : 'Install PWA App'}
+              className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-stone-950 font-black text-[11px] shadow-sm transition-all min-h-[32px] active:scale-95"
+            >
+              <Download className="w-3.5 h-3.5 fill-stone-950" />
+              <span className="hidden sm:inline">{lang === 'hi' ? 'ऐप इंस्टॉल करें' : 'Install App'}</span>
+              <span className="sm:hidden">Install</span>
+            </button>
+
+            {/* Profile Avatar & Dropdown Button */}
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                title="User Profile & Settings"
+                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition-all min-h-[32px] ${
+                  userRole === 'artisan'
+                    ? 'bg-orange-600 text-white border-orange-400 shadow-md shadow-orange-950/40'
+                    : userRole === 'businessman'
+                    ? 'bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-950/40'
+                    : 'bg-amber-600 text-stone-950 border-amber-400 shadow-md shadow-amber-950/40'
+                }`}
+              >
+                <User className="w-3.5 h-3.5" />
+                <span className="max-w-[80px] sm:max-w-[120px] truncate">
+                  {currentUser?.name ? currentUser.name.split(' ')[0] : 'Profile'}
+                </span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+
+              {/* Profile Dropdown Component */}
+              <ProfileDropdown 
+                isOpen={isProfileOpen} 
+                onClose={() => setIsProfileOpen(false)} 
+              />
+            </div>
+
             {/* Device frame preview toggle */}
             <button
               onClick={() => setIsMobileFrame(!isMobileFrame)}
@@ -307,6 +380,15 @@ export const Navbar = () => {
         </div>
       </header>
 
+      {/* PWA Install Modal */}
+      <PwaInstallModal
+        isOpen={isPwaModalOpen}
+        onClose={() => setIsPwaModalOpen(false)}
+        onNativeInstall={handleInstallClick}
+        canNativeInstall={!!deferredPrompt}
+        lang={lang}
+      />
+
       {/* Mobile Fullscreen Slide-Over Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/80 backdrop-blur-sm animate-fade-in">
@@ -368,14 +450,36 @@ export const Navbar = () => {
               })}
             </div>
 
-            {/* Reset Demo and Utilities in Drawer */}
+            {/* Mobile Drawer Profile & Utilities */}
             <div className="pt-3 border-t border-stone-800 space-y-2">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleInstallClick();
+                }}
+                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 text-stone-950 font-black text-xs flex items-center justify-center space-x-2 min-h-[48px] shadow-md"
+              >
+                <Download className="w-4 h-4 fill-stone-950" />
+                <span>{lang === 'hi' ? 'KalaSetu ऐप इंस्टॉल करें' : 'Install KalaSetu App'}</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsProfileOpen(true);
+                }}
+                className="w-full py-3 px-4 rounded-2xl bg-stone-800 text-stone-200 border border-stone-700 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
+              >
+                <User className="w-4 h-4 text-orange-400" />
+                <span>{currentUser?.name || 'My Profile'} (प्रोफ़ाइल व खाता)</span>
+              </button>
+
               <button
                 onClick={() => {
                   setIsMobileMenuOpen(false);
                   setShowResetModal(true);
                 }}
-                className="w-full py-3.5 px-4 rounded-2xl bg-stone-800 hover:bg-red-950/60 text-red-400 border border-red-900/40 text-xs font-bold flex items-center justify-center space-x-2 min-h-[48px]"
+                className="w-full py-3 px-4 rounded-2xl bg-stone-800 hover:bg-red-950/60 text-red-400 border border-red-900/40 text-xs font-bold flex items-center justify-center space-x-2 min-h-[44px]"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>{t('resetDemo')}</span>

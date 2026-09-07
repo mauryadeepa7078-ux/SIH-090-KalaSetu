@@ -26,26 +26,37 @@ export const BuyerCartPage = () => {
     showToast 
   } = useApp();
 
+  const [buyerName, setBuyerName] = useState(
+    currentUser?.name || 'Priya Sharma (Retail Buyer)'
+  );
+  const [buyerPhone, setBuyerPhone] = useState(
+    currentUser?.phone || '+91 98112 34567'
+  );
   const [deliveryAddress, setDeliveryAddress] = useState(
     currentUser?.location || '124 Connaught Place, Central Delhi, New Delhi - 110001'
   );
+  const [customNotes, setCustomNotes] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0);
   const shipping = subtotal > 0 ? (subtotal > 2000 ? 0 : 150) : 0;
   const total = subtotal + shipping;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) {
       showToast('Your cart is empty', 'warning');
       return;
     }
 
     setIsCheckingOut(true);
-    // Place order for each item or aggregate
-    cart.forEach(item => {
-      placeOrder(item, item.qty || 1, deliveryAddress);
-    });
+    // Place order for each item
+    for (const item of cart) {
+      await placeOrder(item, item.qty || 1, deliveryAddress, customNotes, {
+        name: buyerName,
+        phone: buyerPhone,
+        address: deliveryAddress
+      });
+    }
 
     cart.forEach(item => removeFromCart(item.id));
     setIsCheckingOut(false);
@@ -157,17 +168,60 @@ export const BuyerCartPage = () => {
               Order Summary
             </h3>
 
-            {/* Delivery Address */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-stone-700 block uppercase tracking-wider">
-                Shipping Address:
-              </label>
-              <textarea
-                rows={2}
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
-              />
+            {/* Buyer Contact & Delivery Details */}
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-stone-700 block uppercase tracking-wider">
+                    Full Name:
+                  </label>
+                  <input
+                    type="text"
+                    value={buyerName}
+                    onChange={(e) => setBuyerName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                    placeholder="Buyer Name"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-stone-700 block uppercase tracking-wider">
+                    Phone Number:
+                  </label>
+                  <input
+                    type="tel"
+                    value={buyerPhone}
+                    onChange={(e) => setBuyerPhone(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                    placeholder="+91 98112 34567"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-stone-700 block uppercase tracking-wider">
+                  Shipping Address (डाक पता):
+                </label>
+                <textarea
+                  rows={2}
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  className="w-full p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                  placeholder="Complete postal address for IndiaPost Speed Post"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold text-stone-700 block uppercase tracking-wider">
+                  Custom Notes for Artisan (वैकल्पिक संदेश):
+                </label>
+                <input
+                  type="text"
+                  value={customNotes}
+                  onChange={(e) => setCustomNotes(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-stone-50 border border-stone-200 text-xs text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                  placeholder="e.g. Gift packaging / Specific color choice"
+                />
+              </div>
             </div>
 
             {/* Pricing breakdown */}

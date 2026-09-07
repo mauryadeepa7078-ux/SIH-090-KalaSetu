@@ -4,6 +4,33 @@ from backend.app.data.db_store import db_store
 
 router = APIRouter(prefix="/api/marketplace", tags=["B2B & Government e-Marketplace (GeM/ONDC)"])
 
+@router.get("/orders")
+def get_orders(artisan_name: Optional[str] = None):
+    """
+    Get retail buyer orders, optionally filtered by artisan name.
+    """
+    return db_store.get_orders(artisan_name)
+
+@router.post("/orders")
+def create_order(order: Dict[str, Any]):
+    """
+    Saves a new retail buyer order to the database.
+    """
+    if not order.get("product_title") and not order.get("product_id"):
+        raise HTTPException(status_code=400, detail="Product title or ID required")
+    saved = db_store.add_order(order)
+    return {"status": "success", "order": saved}
+
+@router.post("/orders/{order_id}/status")
+def update_order_status(order_id: str, status: str, stage_index: Optional[int] = None):
+    """
+    Updates the fulfillment status and milestone stage index of an order.
+    """
+    updated = db_store.update_order_status(order_id, status, stage_index)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return {"status": "success", "order": updated}
+
 @router.get("/rfqs")
 def get_buyer_rfqs():
     """
@@ -11,12 +38,23 @@ def get_buyer_rfqs():
     """
     return db_store.get_rfqs()
 
+@router.post("/rfqs")
+def create_buyer_rfq(rfq: Dict[str, Any]):
+    """
+    Saves a new B2B / GeM bulk inquiry to the database.
+    """
+    if not rfq.get("organization") and not rfq.get("buyer_name"):
+        raise HTTPException(status_code=400, detail="Organization or Buyer Name required")
+    saved = db_store.add_rfq(rfq)
+    return {"status": "success", "rfq": saved}
+
 @router.post("/rfqs/{rfq_id}/status")
-def update_rfq_status(rfq_id: str, status: str):
-    updated = db_store.update_rfq_status(rfq_id, status)
+def update_rfq_status(rfq_id: str, status: str, stage_index: Optional[int] = None):
+    updated = db_store.update_rfq_status(rfq_id, status, stage_index)
     if not updated:
         raise HTTPException(status_code=404, detail="RFQ not found")
     return {"status": "success", "rfq": updated}
+
 
 @router.post("/products/{product_id}/toggle-gem")
 def toggle_gem_publish(product_id: str):

@@ -207,43 +207,86 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Buyer Place Order Helper
-  const placeOrder = (product, qty = 1, address = '') => {
+  // Logout method for Profile dropdown
+  const logout = () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('kalasetu_onboarding_completed');
+      localStorage.removeItem('kalasetu_user');
+    }
+    setHasCompletedOnboarding(false);
+    setShowOnboardingModal(true);
+    showToast('Logged out successfully. Please log in or select your role.', 'info');
+  };
+
+  // Load orders from backend
+  const loadOrders = async () => {
+    try {
+      console.log('[AppContext] Fetching orders from backend...');
+      const backendOrders = await api.getOrders();
+      if (Array.isArray(backendOrders) && backendOrders.length > 0) {
+        setOrders(backendOrders);
+        setSafeStorage('kalasetu_buyer_orders', JSON.stringify(backendOrders));
+      }
+    } catch (e) {
+      console.warn('[AppContext] Failed to load backend orders, using cached:', e);
+    }
+  };
+
+  // Buyer Place Order Helper (Persisting to backend + local)
+  const placeOrder = async (product, qty = 1, address = '', notes = '', customBuyer = null) => {
+    const buyerName = customBuyer?.name || currentUser?.name || 'Priya Sharma (Retail Buyer)';
+    const buyerPhone = customBuyer?.phone || currentUser?.phone || '+91 98112 34567';
+    const deliveryAddr = address || customBuyer?.address || currentUser?.location || '124 Connaught Place, Central Delhi, New Delhi - 110001';
+
     const newOrder = {
       id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
       product_id: product.id,
       product_title: lang === 'hi' && product.title_hi ? product.title_hi : product.title_en,
-      product_image: product.enhanced_image_url || product.original_image_url,
-      artisan_name: product.artisan_name,
-      artisan_village: `${product.artisan_village}, ${product.artisan_state}`,
-      price: product.price,
-      qty: qty,
-      total: product.price * qty,
+      product_image: product.enhanced_image_url || product.original_image_url || product.image,
+      artisan_name: product.artisan_name || 'Master Artisan Ram Das',
+      artisan_village: `${product.artisan_village || 'Varanasi'}, ${product.artisan_state || 'UP'}`,
+      buyer_name: buyerName,
+      buyer_phone: buyerPhone,
+      price: product.price || 2400.0,
+      qty: qty || 1,
+      total: (product.price || 2400.0) * (qty || 1),
       order_date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'PLACED',
       stage_index: 0,
       tracking_id: `DNK-INPOST-${Math.floor(100000 + Math.random() * 900000)}`,
       delivery_partner: 'IndiaPost Dak Ghar Niryat Kendra',
       est_delivery: '5-7 Days',
-      delivery_address: address || currentUser?.location || '124 Connaught Place, Central Delhi, New Delhi - 110001',
+      delivery_address: deliveryAddr,
+      notes: notes || 'Standard safe packaging requested.',
       gi_tagged: product.gi_tagged || false
     };
 
+    // Update local state immediately for instant feedback
     const updated = [newOrder, ...orders];
     setOrders(updated);
     setSafeStorage('kalasetu_buyer_orders', JSON.stringify(updated));
+
+    // Persist to backend database
+    try {
+      console.log('[AppContext] Persisting order to backend database:', newOrder);
+      await api.createOrder(newOrder);
+      console.log('[AppContext] Order successfully persisted to backend database.');
+    } catch (e) {
+      console.warn('[AppContext] Backend order save failed, saved to local cache:', e);
+    }
+
     confetti({ particleCount: 90, spread: 65, origin: { y: 0.7 } });
     showToast(`Order Placed! Tracking ID: ${newOrder.tracking_id}`, 'success');
     setActiveTab('orders');
     return newOrder;
   };
 
-  const addToCart = (product) => {
+  const addToCart = (product, qty = 1) => {
     const exists = cart.find(c => c.id === product.id);
     if (exists) {
-      setCart(cart.map(c => c.id === product.id ? { ...c, qty: c.qty + 1 } : c));
+      setCart(cart.map(c => c.id === product.id ? { ...c, qty: c.qty + qty } : c));
     } else {
-      setCart([...cart, { ...product, qty: 1 }]);
+      setCart([...cart, { ...product, qty: qty }]);
     }
     showToast(`Added "${product.title_en}" to cart!`, 'success');
   };
@@ -266,6 +309,7 @@ export const AppProvider = ({ children }) => {
     setHasCompletedOnboarding(false);
     setShowOnboardingModal(true);
   };
+
 
 
 
@@ -333,6 +377,7 @@ export const AppProvider = ({ children }) => {
     // Initial load
     refreshPendingQueue();
     loadProducts();
+    loadOrders();
 
     return () => {
       window.removeEventListener('online', handleOnline);
@@ -383,22 +428,31 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const updateOrderStatus = (orderId, newStatus, stageIndex = null) => {
+  const updateOrderStatus = async (orderId, newStatus, stageIndex = null) => {
+    const nextStage = stageIndex !== null ? stageIndex : (
+      newStatus === 'CONFIRMED' ? 1 :
+      newStatus === 'PACKED' ? 2 :
+      newStatus === 'SHIPPED' ? 3 :
+      newStatus === 'OUT_FOR_DELIVERY' ? 4 :
+      newStatus === 'DELIVERED' ? 5 : 0
+    );
+
     const updated = orders.map(o => {
       if (o.id === orderId) {
-        const nextStage = stageIndex !== null ? stageIndex : (
-          newStatus === 'CONFIRMED' ? 1 :
-          newStatus === 'PACKED' ? 2 :
-          newStatus === 'SHIPPED' ? 3 :
-          newStatus === 'DELIVERED' ? 5 : o.stage_index
-        );
         return { ...o, status: newStatus, stage_index: nextStage };
       }
       return o;
     });
+
     setOrders(updated);
     setSafeStorage('kalasetu_buyer_orders', JSON.stringify(updated));
     showToast(`Order ${orderId} updated to ${newStatus}`, 'success');
+
+    try {
+      await api.updateOrderStatus(orderId, newStatus, nextStage);
+    } catch (e) {
+      console.warn('[AppContext] Backend order status update error:', e);
+    }
   };
 
 
@@ -518,6 +572,8 @@ export const AppProvider = ({ children }) => {
         completeOnboarding,
         switchRole,
         openOnboarding,
+        logout,
+        loadOrders,
         companionStep,
         setCompanionStep,
         proactiveMessage,

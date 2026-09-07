@@ -12,6 +12,7 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { ArtisanLandingPage } from './pages/ArtisanLandingPage';
 import { BuyerLandingPage } from './pages/BuyerLandingPage';
 import { BusinessmanLandingPage } from './pages/BusinessmanLandingPage';
+import { BusinessmanOrdersPage } from './pages/BusinessmanOrdersPage';
 import { BuyerOrdersPage } from './pages/BuyerOrdersPage';
 import { BuyerCartPage } from './pages/BuyerCartPage';
 import { ArtisanOrdersPage } from './pages/ArtisanOrdersPage';
@@ -42,7 +43,7 @@ const MainContent = () => {
         return <BuyerLandingPage />;
       }
     } else if (userRole === 'businessman') {
-      const businessmanAllowedTabs = ['businessman-home', 'gem', 'detail', 'certificate', 'whatsapp', 'community'];
+      const businessmanAllowedTabs = ['businessman-home', 'businessman-orders', 'gem', 'detail', 'certificate', 'whatsapp', 'community'];
       if (!businessmanAllowedTabs.includes(activeTab)) {
         return <BusinessmanLandingPage />;
       }
@@ -61,6 +62,8 @@ const MainContent = () => {
         return <ArtisanOrdersPage />;
       case 'businessman-home':
         return <BusinessmanLandingPage />;
+      case 'businessman-orders':
+        return <BusinessmanOrdersPage />;
       case 'buyer-market':
       case 'wishlist':
         return <BuyerLandingPage />;

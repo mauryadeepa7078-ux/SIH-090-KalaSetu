@@ -15,18 +15,20 @@ import {
   Calendar, 
   ShieldCheck, 
   Award, 
-  ArrowRight,
-  Send,
-  Boxes,
-  Inbox,
-  Filter,
-  RefreshCw,
-  Sparkles
+  ArrowRight, 
+  Send, 
+  Boxes, 
+  Inbox, 
+  Filter, 
+  RefreshCw, 
+  Sparkles,
+  Phone
 } from 'lucide-react';
 
 export const ArtisanOrdersPage = () => {
   const { 
     orders, 
+    loadOrders,
     updateOrderStatus, 
     lang, 
     t, 
@@ -40,8 +42,19 @@ export const ArtisanOrdersPage = () => {
   const [filterStatus, setFilterStatus] = useState('ALL');
 
   useEffect(() => {
-    loadRfqs();
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    if (loadOrders) {
+      try {
+        await loadOrders();
+      } catch (e) {
+        console.warn('[ArtisanOrders] Failed to load orders:', e);
+      }
+    }
+    await loadRfqs();
+  };
 
   const loadRfqs = async () => {
     setLoadingRfqs(true);
@@ -107,7 +120,7 @@ export const ArtisanOrdersPage = () => {
           </div>
 
           <button
-            onClick={loadRfqs}
+            onClick={loadAllData}
             disabled={loadingRfqs}
             className="self-start sm:self-center px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700 text-xs font-bold flex items-center space-x-1.5 transition-all"
           >
@@ -270,12 +283,23 @@ export const ArtisanOrdersPage = () => {
                       <div className="md:col-span-6 space-y-1.5 p-3 rounded-2xl bg-stone-50 border border-stone-200 text-xs">
                         <div className="flex items-center space-x-1.5 text-stone-800 font-bold">
                           <User className="w-3.5 h-3.5 text-orange-600" />
-                          <span>Buyer: {order.artisan_name ? 'Direct Customer' : 'Priya Sharma (Retail Buyer)'}</span>
+                          <span>Buyer: {order.buyer_name || (order.artisan_name ? 'Direct Customer' : 'Priya Sharma (Retail Buyer)')}</span>
                         </div>
+                        {order.buyer_phone && (
+                          <div className="flex items-center space-x-1.5 text-stone-700 font-medium">
+                            <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Contact: <b>{order.buyer_phone}</b></span>
+                          </div>
+                        )}
                         <div className="flex items-start space-x-1.5 text-stone-600">
                           <MapPin className="w-3.5 h-3.5 text-stone-400 flex-shrink-0 mt-0.5" />
                           <span className="line-clamp-2">{order.delivery_address || '124 Connaught Place, Central Delhi, New Delhi - 110001'}</span>
                         </div>
+                        {order.notes && (
+                          <div className="text-[11px] text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200 leading-snug">
+                            <span className="font-bold">Customer Note:</span> {order.notes}
+                          </div>
+                        )}
                         <div className="flex items-center space-x-1.5 text-stone-500 font-mono text-[11px] pt-1 border-t border-stone-200">
                           <Truck className="w-3.5 h-3.5 text-blue-600" />
                           <span>IndiaPost DNK Tracking: <b>{order.tracking_id || 'DNK-INPOST-882194'}</b></span>

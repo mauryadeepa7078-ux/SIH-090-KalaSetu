@@ -129,6 +129,42 @@ export const api = {
     return res.json();
   },
 
+  // Marketplace & Orders
+  async getOrders(artisanName) {
+    const params = new URLSearchParams();
+    if (artisanName) params.append('artisan_name', artisanName);
+    const url = `${API_BASE}/marketplace/orders${params.toString() ? `?${params.toString()}` : ''}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch orders');
+    return res.json();
+  },
+
+  async createOrder(orderData) {
+    console.log('[API] Creating new order:', orderData);
+    const res = await fetch(`${API_BASE}/marketplace/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+    if (!res.ok) {
+      const err = await res.text().catch(() => '');
+      throw new Error(`Failed to create order: ${err}`);
+    }
+    return res.json();
+  },
+
+  async updateOrderStatus(orderId, status, stageIndex = null) {
+    console.log(`[API] Updating order ${orderId} to status=${status}, stage=${stageIndex}`);
+    const params = new URLSearchParams();
+    params.append('status', status);
+    if (stageIndex !== null) params.append('stage_index', stageIndex);
+    const res = await fetch(`${API_BASE}/marketplace/orders/${orderId}/status?${params.toString()}`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error('Failed to update order status');
+    return res.json();
+  },
+
   // Marketplace & GeM
   async getRFQs() {
     const res = await fetch(`${API_BASE}/marketplace/rfqs`);
@@ -136,8 +172,22 @@ export const api = {
     return res.json();
   },
 
-  async updateRFQStatus(rfqId, status) {
-    const res = await fetch(`${API_BASE}/marketplace/rfqs/${rfqId}/status?status=${encodeURIComponent(status)}`, {
+  async createRFQ(rfqData) {
+    console.log('[API] Creating new RFQ:', rfqData);
+    const res = await fetch(`${API_BASE}/marketplace/rfqs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rfqData)
+    });
+    if (!res.ok) throw new Error('Failed to create RFQ');
+    return res.json();
+  },
+
+  async updateRFQStatus(rfqId, status, stageIndex = null) {
+    const params = new URLSearchParams();
+    params.append('status', status);
+    if (stageIndex !== null) params.append('stage_index', stageIndex);
+    const res = await fetch(`${API_BASE}/marketplace/rfqs/${rfqId}/status?${params.toString()}`, {
       method: 'POST'
     });
     if (!res.ok) throw new Error('Failed to update RFQ status');

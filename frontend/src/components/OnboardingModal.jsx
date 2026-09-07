@@ -628,36 +628,272 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
             </div>
           )}
 
-          {/* STEP 3: REGISTRATION SCREEN WITH VOICE-ASSISTED AUTO-FILL FOR ARTISANS */}
+          {/* STEP 3: REGISTRATION & LOGIN SCREEN (COMBINED AUTH) */}
           {step === 3 && (
             <div className="space-y-4 animate-fade-in">
               
-              {/* 1-Click Instant Demo Credentials Button */}
-              <button
-                onClick={() => handleDemoInstantLogin(selectedRole)}
-                className={`w-full p-3 rounded-2xl border text-xs font-black flex items-center justify-center space-x-2 shadow-sm transition-all ${
-                  selectedRole === 'artisan'
-                    ? 'bg-orange-500/15 border-orange-500/40 hover:bg-orange-500/25 text-orange-300'
-                    : selectedRole === 'businessman'
-                    ? 'bg-blue-500/15 border-blue-500/40 hover:bg-blue-500/25 text-blue-300'
-                    : 'bg-amber-500/15 border-amber-500/40 hover:bg-amber-500/25 text-amber-300'
-                }`}
-              >
-                <Sparkles className="w-4 h-4 animate-pulse" />
-                <span>
-                  {selectedRole === 'artisan'
-                    ? '⚡ 1-Click Instant Demo Artisan Login (Master Bunkar)'
-                    : selectedRole === 'businessman'
-                    ? '⚡ 1-Click Instant Demo Businessman Login (Singhal Exports)'
-                    : '⚡ 1-Click Instant Demo Buyer Login (Priya Sharma)'}
-                </span>
-              </button>
+              {/* Segmented Auth Mode Switcher (Register vs Login) */}
+              <div className="flex rounded-2xl bg-stone-800 p-1 border border-stone-700">
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopVoiceListening();
+                    setAuthMode('register');
+                  }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1.5 ${
+                    authMode === 'register'
+                      ? selectedRole === 'artisan'
+                        ? 'bg-orange-600 text-white shadow-md'
+                        : selectedRole === 'businessman'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-amber-600 text-stone-950 shadow-md'
+                      : 'text-stone-400 hover:text-white'
+                  }`}
+                >
+                  <span>📝 {selectedLang === 'hi' ? 'नया खाता बनाएँ (Register)' : 'New User? Register'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopVoiceListening();
+                    setAuthMode('login');
+                  }}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1.5 ${
+                    authMode === 'login'
+                      ? selectedRole === 'artisan'
+                        ? 'bg-orange-600 text-white shadow-md'
+                        : selectedRole === 'businessman'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-amber-600 text-stone-950 shadow-md'
+                      : 'text-stone-400 hover:text-white'
+                  }`}
+                >
+                  <span>🔑 {selectedLang === 'hi' ? 'पहले से खाता है? लॉगिन करें (Log In)' : 'Already Registered? Log In'}</span>
+                </button>
+              </div>
 
               {/* ========================================================================= */}
-              {/* ARTISAN VOICE-FIRST AUTO-FILL REGISTRATION */}
+              {/* RETURNING USER LOGIN TAB */}
               {/* ========================================================================= */}
-              {selectedRole === 'artisan' && (
+              {authMode === 'login' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="p-3.5 rounded-2xl bg-stone-850 border border-stone-700/80 space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block">
+                      {selectedLang === 'hi' ? 'त्वरित 1-टैप प्रोफाइल चयन (Quick Returning Account)' : 'Select Your Registered Profile (1-Tap Fast Login)'}
+                    </span>
+
+                    {/* Returning Profiles List for Selected Role */}
+                    {selectedRole === 'artisan' && (
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            completeOnboarding('artisan', selectedLang, {
+                              name: 'Master Ram Das Bunkar',
+                              phone: '+91 98765 43210',
+                              role: 'artisan',
+                              craft_type: 'Handloom Pure Silk Weaving',
+                              location: 'Kotwa, Varanasi, Uttar Pradesh',
+                              scheme_id: 'MoSJE-VISH-2026-UP-091'
+                            });
+                          }}
+                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-orange-950/60 border border-stone-700 hover:border-orange-500/80 text-left transition-all flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-600/20 text-orange-400 font-bold flex items-center justify-center">
+                              RB
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-white font-hindi">Master Ram Das Bunkar</h4>
+                              <p className="text-[11px] text-stone-400">Handloom Silk • Kotwa, Varanasi • MoSJE-UP-091</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-orange-400 group-hover:translate-x-1 transition-transform">
+                            Login ➔
+                          </span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            completeOnboarding('artisan', selectedLang, {
+                              name: 'Sita Devi',
+                              phone: '+91 98765 43211',
+                              role: 'artisan',
+                              craft_type: 'Madhubani Painting',
+                              location: 'Ranti, Madhubani, Bihar',
+                              scheme_id: 'MoSJE-VISH-2026-BR-118'
+                            });
+                          }}
+                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-orange-950/60 border border-stone-700 hover:border-orange-500/80 text-left transition-all flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 font-bold flex items-center justify-center">
+                              SD
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-white font-hindi">Sita Devi</h4>
+                              <p className="text-[11px] text-stone-400">Mithila Folk Painting • Ranti, Bihar • MoSJE-BR-118</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-orange-400 group-hover:translate-x-1 transition-transform">
+                            Login ➔
+                          </span>
+                        </button>
+                      </div>
+                    )}
+
+                    {selectedRole === 'buyer' && (
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            completeOnboarding('buyer', selectedLang, {
+                              name: 'Priya Sharma',
+                              phone: '+91 98112 34567',
+                              email: 'priya.sharma@heritagecraft.in',
+                              role: 'buyer',
+                              location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
+                              buyer_type: 'Individual Heritage Collector'
+                            });
+                          }}
+                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/80 text-left transition-all flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 font-bold flex items-center justify-center">
+                              PS
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-white">Priya Sharma</h4>
+                              <p className="text-[11px] text-stone-400">Retail Buyer • Central Delhi - 110001</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform">
+                            Login ➔
+                          </span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            completeOnboarding('buyer', selectedLang, {
+                              name: 'Ananya Roy',
+                              phone: '+91 98300 45678',
+                              email: 'ananya.roy@craftart.in',
+                              role: 'buyer',
+                              location: 'Heritage Enclave, Salt Lake City, Kolkata - 700091',
+                              buyer_type: 'Heritage Connoisseur'
+                            });
+                          }}
+                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/80 text-left transition-all flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-600/20 text-orange-400 font-bold flex items-center justify-center">
+                              AR
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-white">Ananya Roy</h4>
+                              <p className="text-[11px] text-stone-400">Retail Buyer • Salt Lake, Kolkata - 700091</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform">
+                            Login ➔
+                          </span>
+                        </button>
+                      </div>
+                    )}
+
+                    {selectedRole === 'businessman' && (
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            completeOnboarding('businessman', selectedLang, {
+                              name: 'Rajesh Singhal',
+                              company: 'Singhal Crafts Export & Retailers Pvt Ltd',
+                              phone: '+91 98200 11223',
+                              email: 'procurement@singhalcrafts.com',
+                              gstin: '07AAAAA0000A1Z5',
+                              gem_org_id: 'GEM-DL-2026-9912',
+                              role: 'businessman',
+                              location: 'New Delhi / Global Exporter',
+                              procurement_type: 'B2B Wholesale & Government GeM Tenders'
+                            });
+                          }}
+                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-blue-950/60 border border-stone-700 hover:border-blue-500/80 text-left transition-all flex items-center justify-between group"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 font-bold flex items-center justify-center">
+                              RS
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-sm text-white">Rajesh Singhal (Singhal Exports)</h4>
+                              <p className="text-[11px] text-stone-400">GSTIN: 07AAAAA0000A1Z5 • GeM ID: GEM-DL-2026</p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-blue-400 group-hover:translate-x-1 transition-transform">
+                            Login ➔
+                          </span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Direct Phone / ID Sign-In */}
+                  <div className="space-y-2.5 p-4 rounded-2xl bg-stone-850 border border-stone-700">
+                    <label className="text-xs font-bold text-stone-300 block">
+                      {selectedLang === 'hi' 
+                        ? (selectedRole === 'artisan' ? 'पंजीकृत मोबाइल नंबर या विश्वकर्मा ID से लॉगिन करें:' : 'पंजीकृत मोबाइल नंबर या ईमेल दर्ज करें:') 
+                        : 'Or Log In with Registered Phone / ID:'}
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder={selectedRole === 'artisan' ? '+91 98765 43210' : (selectedRole === 'businessman' ? '07AAAAA0000A1Z5' : '+91 98112 34567')}
+                        defaultValue={selectedRole === 'artisan' ? artisanForm.phone : (selectedRole === 'businessman' ? businessmanForm.phone : buyerForm.phone)}
+                        className="flex-1 p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                      />
+                      <button
+                        onClick={() => handleDemoInstantLogin(selectedRole)}
+                        className={`px-4 py-2.5 rounded-xl text-xs font-extrabold shadow-md ${
+                          selectedRole === 'artisan' ? 'bg-orange-600 hover:bg-orange-500 text-white' :
+                          selectedRole === 'businessman' ? 'bg-blue-600 hover:bg-blue-500 text-white' :
+                          'bg-amber-600 hover:bg-amber-500 text-stone-950'
+                        }`}
+                      >
+                        {selectedLang === 'hi' ? 'लॉगिन ➔' : 'Sign In ➔'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ========================================================================= */}
+              {/* NEW USER REGISTRATION TAB */}
+              {/* ========================================================================= */}
+              {authMode === 'register' && (
                 <div className="space-y-4">
+                  {/* 1-Click Instant Demo Credentials Button */}
+                  <button
+                    onClick={() => handleDemoInstantLogin(selectedRole)}
+                    className={`w-full p-3 rounded-2xl border text-xs font-black flex items-center justify-center space-x-2 shadow-sm transition-all ${
+                      selectedRole === 'artisan'
+                        ? 'bg-orange-500/15 border-orange-500/40 hover:bg-orange-500/25 text-orange-300'
+                        : selectedRole === 'businessman'
+                        ? 'bg-blue-500/15 border-blue-500/40 hover:bg-blue-500/25 text-blue-300'
+                        : 'bg-amber-500/15 border-amber-500/40 hover:bg-amber-500/25 text-amber-300'
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <span>
+                      {selectedRole === 'artisan'
+                        ? '⚡ 1-Click Instant Demo Artisan Login (Master Bunkar)'
+                        : selectedRole === 'businessman'
+                        ? '⚡ 1-Click Instant Demo Businessman Login (Singhal Exports)'
+                        : '⚡ 1-Click Instant Demo Buyer Login (Priya Sharma)'}
+                    </span>
+                  </button>
+
+                  {/* ========================================================================= */}
+                  {/* ARTISAN VOICE-FIRST AUTO-FILL REGISTRATION */}
+                  {/* ========================================================================= */}
+                  {selectedRole === 'artisan' && (
+                    <div className="space-y-4">
                   
                   {/* Interactive Voice Assistant Question Box */}
                   <div className="p-4 rounded-3xl bg-gradient-to-br from-orange-950/80 via-stone-850 to-stone-900 border-2 border-orange-500/60 shadow-xl relative overflow-hidden">
@@ -1042,8 +1278,8 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                 </div>
               )}
 
-              {/* Submit & Enter Portal Button */}
-              <div className="pt-2 space-y-2">
+              {/* Submit Registration Button */}
+              <div className="pt-2">
                 <button
                   onClick={() => handleFinish()}
                   className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center space-x-2 ${
@@ -1057,35 +1293,38 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                   <CheckCircle2 className="w-4 h-4" />
                   <span>
                     {selectedRole === 'artisan'
-                      ? (selectedLang === 'hi' ? 'पुष्टि करें व कारीगर AI स्टूडियो में प्रवेश करें ➔' : 'Confirm & Enter Artisan AI Studio ➔')
+                      ? (selectedLang === 'hi' ? 'कारीगर पंजीकरण पूरा करें व AI स्टूडियो खोलें ➔' : 'Complete Registration & Open AI Studio ➔')
                       : selectedRole === 'businessman'
-                      ? (selectedLang === 'hi' ? 'संस्थागत GeM व B2B पोर्टल में प्रवेश करें ➔' : 'Enter Institutional B2B & GeM Portal ➔')
-                      : (selectedLang === 'hi' ? 'शिल्प बाज़ार में प्रवेश करें ➔' : 'Explore Heritage Marketplace ➔')}
+                      ? (selectedLang === 'hi' ? 'संस्थागत GeM व B2B पोर्टल में प्रवेश करें ➔' : 'Complete B2B Registration & Enter Portal ➔')
+                      : (selectedLang === 'hi' ? 'पंजीकरण पूरा करें व बाज़ार देखें ➔' : 'Complete Registration & Explore ➔')}
                   </span>
                 </button>
-
-                <div className="flex justify-between items-center pt-2">
-                  <button
-                    onClick={() => { stopVoiceListening(); setStep(2); }}
-                    className="text-xs text-stone-400 hover:text-white font-semibold underline"
-                  >
-                    ← {selectedLang === 'hi' ? 'भूमिका बदलें' : 'Change Role'}
-                  </button>
-                  <button
-                    onClick={() => { stopVoiceListening(); setStep(1); }}
-                    className="text-xs text-stone-400 hover:text-white font-semibold underline"
-                  >
-                    {selectedLang === 'hi' ? 'भाषा बदलें' : 'Change Language'}
-                  </button>
-                </div>
               </div>
-
             </div>
           )}
 
+          {/* Change Role / Language footer links */}
+          <div className="flex justify-between items-center pt-3 border-t border-stone-800/60">
+            <button
+              onClick={() => { stopVoiceListening(); setStep(2); }}
+              className="text-xs text-stone-400 hover:text-white font-semibold underline"
+            >
+              ← {selectedLang === 'hi' ? 'भूमिका बदलें' : 'Change Role'}
+            </button>
+            <button
+              onClick={() => { stopVoiceListening(); setStep(1); }}
+              className="text-xs text-stone-400 hover:text-white font-semibold underline"
+            >
+              {selectedLang === 'hi' ? 'भाषा बदलें' : 'Change Language'}
+            </button>
+          </div>
+
         </div>
-      </div>
+      )}
+
     </div>
+  </div>
+</div>
   );
 };
 
