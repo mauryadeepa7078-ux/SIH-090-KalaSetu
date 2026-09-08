@@ -7,10 +7,10 @@ export const DeviceFrameToggle = ({ children }) => {
 
   const activeMode = isMobileFrame 
     ? (screenDevice === 'responsive' ? 'android' : screenDevice)
-    : screenDevice;
+    : (screenDevice || 'responsive');
 
   // Standard Full-Screen Responsive View for Laptop, Tablets & Real Mobile Devices
-  if (activeMode === 'responsive') {
+  if (!isMobileFrame || activeMode === 'responsive') {
     return (
       <main className="flex-1 w-full min-h-[calc(100dvh-72px)] pb-24 lg:pb-12 transition-all duration-200">
         {children}

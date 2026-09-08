@@ -14,8 +14,8 @@ export const speechService = {
   },
 
   // Check and request microphone permission
-  async requestMicrophonePermission() {
-    console.log('[SpeechService] Requesting microphone permission...');
+  async requestMicrophonePermission(releaseImmediately = false) {
+    console.log('[SpeechService] Requesting microphone permission...', { releaseImmediately });
     try {
       if (typeof navigator === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Microphone mediaDevices API not supported');
@@ -32,6 +32,12 @@ export const speechService = {
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       console.log('[SpeechService] Microphone access granted successfully! Audio tracks:', stream.getAudioTracks().length);
+      
+      if (releaseImmediately) {
+        // Free hardware mic immediately so Web Speech API is not locked
+        stream.getTracks().forEach(track => track.stop());
+        return null;
+      }
       return stream;
     } catch (err) {
       console.warn('[SpeechService] Microphone permission error:', err);
@@ -50,8 +56,10 @@ export const speechService = {
 
       console.log(`[SpeechService] Initializing SpeechRecognition instance (Language: ${lang})...`);
       const recognition = new SpeechRecognition();
-      recognition.continuous = true; // Keep listening continuously while speaking
-      recognition.interimResults = true; // Emit real-time interim speech chunks
+      
+      const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      recognition.continuous = !isMobile; // Mobile browsers require single-utterance/resilient mode
+      recognition.interimResults = true;
       recognition.maxAlternatives = 1;
       recognition.lang = lang;
 

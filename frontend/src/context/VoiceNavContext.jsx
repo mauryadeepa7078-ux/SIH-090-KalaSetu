@@ -27,9 +27,16 @@ export const VoiceNavProvider = ({ children }) => {
       return;
     }
 
-    // Request microphone permission first
+    // Trigger haptic vibration
     try {
-      await speechService.requestMicrophonePermission();
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(40);
+      }
+    } catch (e) {}
+
+    // Request microphone permission first (release immediately so Web Speech API is not locked on mobile)
+    try {
+      await speechService.requestMicrophonePermission(true);
     } catch (e) {
       showToast('Microphone permission needed for Voice Navigation.', 'error');
       return;

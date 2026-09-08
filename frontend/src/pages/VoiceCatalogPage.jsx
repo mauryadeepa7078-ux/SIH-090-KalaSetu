@@ -84,42 +84,76 @@ export const VoiceCatalogPage = () => {
     console.log('[VoiceCatalogPage] startRecording called.');
     setTranscript('');
     transcriptRef.current = '';
+    audioChunksRef.current = [];
 
-    // 1. Request Microphone Permission
+    // Trigger haptic vibration on mobile phone if available
     try {
-      const stream = await speechService.requestMicrophonePermission();
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(40);
+      }
+    } catch (e) {}
+
+    // 1. Request Microphone Stream for MediaRecorder (guaranteed audio capture on all mobile phones)
+    try {
+      const stream = await speechService.requestMicrophonePermission(false);
       mediaStreamRef.current = stream;
       setMicPermissionState('granted');
       console.log('[VoiceCatalogPage] Microphone stream acquired.');
 
-      // Setup MediaRecorder for audio blob creation
-      if (typeof MediaRecorder !== 'undefined') {
+      if (typeof MediaRecorder !== 'undefined' && stream) {
         try {
-          audioChunksRef.current = [];
           const recorder = new MediaRecorder(stream);
           recorder.ondataavailable = (e) => {
-            if (e.data.size > 0) audioChunksRef.current.push(e.data);
+            if (e.data && e.data.size > 0) {
+              audioChunksRef.current.push(e.data);
+            }
           };
-          recorder.onstop = () => {
+
+          recorder.onstop = async () => {
             const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             setRecordedAudioBlob(blob);
             console.log('[VoiceCatalogPage] MediaRecorder stopped. Blob size:', blob.size);
+
+            // If SpeechRecognition failed to capture text (common on mobile browsers), immediately use Whisper!
+            const currentCaptured = transcriptRef.current.trim();
+            if (!currentCaptured && blob.size > 0) {
+              console.log('[VoiceCatalogPage] No live STT text, uploading audio blob to backend Whisper AI...');
+              setIsGenerating(true);
+              showToast('Processing speech via Whisper AI engine...', 'info');
+              try {
+                const whisperRes = await api.transcribeVoice(blob);
+                if (whisperRes && whisperRes.transcription) {
+                  console.log('[VoiceCatalogPage] Whisper AI transcription:', whisperRes.transcription);
+                  setTranscript(whisperRes.transcription);
+                  transcriptRef.current = whisperRes.transcription;
+                  handleGenerateCatalog(whisperRes.transcription);
+                } else {
+                  handleGenerateCatalog('पारंपरिक हस्तनिर्मित भारतीय शिल्प उत्पाद');
+                }
+              } catch (wErr) {
+                console.warn('[VoiceCatalogPage] Whisper fallback notice:', wErr);
+                handleGenerateCatalog('पारंपरिक हस्तनिर्मित भारतीय शिल्प उत्पाद');
+              }
+            } else if (currentCaptured) {
+              handleGenerateCatalog(currentCaptured);
+            }
           };
-          recorder.start(100); // 100ms timeslices
+
+          recorder.start(100); // 100ms chunks
           mediaRecorderRef.current = recorder;
           console.log('[VoiceCatalogPage] MediaRecorder started.');
         } catch (recErr) {
-          console.warn('[VoiceCatalogPage] MediaRecorder init error (will continue with STT):', recErr);
+          console.warn('[VoiceCatalogPage] MediaRecorder notice:', recErr);
         }
       }
     } catch (permErr) {
       console.error('[VoiceCatalogPage] Microphone permission denied:', permErr);
       setMicPermissionState('denied');
-      showToast('Microphone access denied. Please allow microphone permissions in your browser.', 'error');
+      showToast('Microphone access denied. Please allow microphone permissions in your phone browser.', 'error');
       return;
     }
 
-    // 2. Start Speech Recognition
+    // 2. Start Web Speech Recognition (for live interactive typing effect on supported browsers)
     const recLang = lang.startsWith('hi') ? 'hi-IN' : (lang.startsWith('ta') ? 'ta-IN' : (lang.startsWith('bn') ? 'bn-IN' : (lang.startsWith('bho') ? 'hi-IN' : 'en-IN')));
     console.log('[VoiceCatalogPage] Starting SpeechRecognizer with language:', recLang);
 
@@ -131,22 +165,16 @@ export const VoiceCatalogPage = () => {
         setTranscript(res.current);
       },
       (err) => {
-        console.error('[VoiceCatalogPage] Speech recognition error event:', err);
+        console.warn('[VoiceCatalogPage] Speech recognition notice:', err?.error || err);
         if (err.error === 'not-allowed') {
           setMicPermissionState('denied');
-          showToast('Microphone permission blocked. Please enable it in browser settings.', 'error');
-        } else if (err.error === 'no-speech') {
-          console.log('[VoiceCatalogPage] No speech detected in chunk. Continuing listening...');
         }
       },
       (finalText) => {
         console.log('[VoiceCatalogPage] Recognition ended. Final text:', finalText);
-        setIsRecording(false);
       },
       () => {
         console.log('[VoiceCatalogPage] Recognizer started listening successfully.');
-        setIsRecording(true);
-        showToast('🎙️ Listening... Speak naturally about your craft!', 'info');
       }
     );
 
@@ -155,17 +183,17 @@ export const VoiceCatalogPage = () => {
         recognizer.start();
         recognizerInstanceRef.current = recognizer;
       } catch (startErr) {
-        console.error('[VoiceCatalogPage] Failed to start recognizer instance:', startErr);
-        setIsRecording(false);
+        console.warn('[VoiceCatalogPage] Native STT start notice (MediaRecorder active):', startErr);
       }
-    } else {
-      setIsRecording(true);
-      showToast('Listening to microphone audio...', 'info');
     }
+
+    setIsRecording(true);
+    showToast('🎙️ Listening... Speak naturally about your craft!', 'info');
   };
 
   const stopRecording = async () => {
     console.log('[VoiceCatalogPage] stopRecording called. Current transcript:', transcriptRef.current);
+    setIsRecording(false);
 
     // Stop speech recognition
     if (recognizerInstanceRef.current) {
@@ -177,7 +205,7 @@ export const VoiceCatalogPage = () => {
       recognizerInstanceRef.current = null;
     }
 
-    // Stop MediaRecorder
+    // Stop MediaRecorder (triggers onstop handler above)
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
         mediaRecorderRef.current.stop();
@@ -192,35 +220,12 @@ export const VoiceCatalogPage = () => {
       mediaStreamRef.current = null;
     }
 
-    setIsRecording(false);
-    showToast('Voice captured! Processing AI bilingual catalog...', 'info');
+    showToast('Voice captured! Generating AI bilingual catalog...', 'info');
 
-    const capturedText = transcriptRef.current || transcript;
-    console.log('[VoiceCatalogPage] Final captured text to process:', capturedText);
-
-    // If client STT captured text, immediately generate catalog with it
-    if (capturedText.trim()) {
+    // If client STT already captured text, trigger catalog generation immediately
+    const capturedText = transcriptRef.current.trim();
+    if (capturedText) {
       handleGenerateCatalog(capturedText);
-    } else if (recordedAudioBlob) {
-      // Fallback: send audio blob to backend Whisper endpoint
-      console.log('[VoiceCatalogPage] Sending audio blob to backend Whisper endpoint...');
-      setIsGenerating(true);
-      try {
-        const whisperRes = await api.transcribeVoice(recordedAudioBlob);
-        if (whisperRes.transcription) {
-          console.log('[VoiceCatalogPage] Backend Whisper transcription received:', whisperRes.transcription);
-          setTranscript(whisperRes.transcription);
-          transcriptRef.current = whisperRes.transcription;
-          handleGenerateCatalog(whisperRes.transcription);
-        } else {
-          handleGenerateCatalog('पारंपरिक हस्तनिर्मित भारतीय शिल्प उत्पाद');
-        }
-      } catch (wErr) {
-        console.warn('[VoiceCatalogPage] Whisper fallback error:', wErr);
-        handleGenerateCatalog('पारंपरिक हस्तनिर्मित भारतीय शिल्प उत्पाद');
-      }
-    } else {
-      handleGenerateCatalog('पारंपरिक हस्तनिर्मित भारतीय शिल्प उत्पाद');
     }
   };
 

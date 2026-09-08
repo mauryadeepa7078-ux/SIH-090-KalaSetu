@@ -89,7 +89,7 @@ export const WhatsAppSimulator = () => {
     }
 
     try {
-      await speechService.requestMicrophonePermission();
+      await speechService.requestMicrophonePermission(true);
     } catch (e) {
       showToast('Microphone permission required for voice notes.', 'error');
       return;
