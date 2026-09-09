@@ -236,7 +236,10 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 transition-colors duration-200">
+      <header 
+        className="sticky top-0 z-40 bg-white/95 dark:bg-stone-900/95 backdrop-blur-md border-b border-stone-200/80 dark:border-stone-800/80 transition-colors duration-200"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         
         {/* Top Utility Bar */}
         <div className="bg-stone-100/80 dark:bg-stone-950/80 border-b border-stone-200 dark:border-stone-800/60 px-4 sm:px-6 py-1.5 flex items-center justify-between text-xs text-stone-600 dark:text-stone-300 transition-colors">

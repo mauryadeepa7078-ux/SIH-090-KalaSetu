@@ -32,10 +32,23 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .then((reg) => {
         console.log('[PWA] ServiceWorker successfully registered with scope:', reg.scope);
+        // Periodically check for updates every 30 minutes
+        setInterval(() => {
+          reg.update().catch(() => {});
+        }, 30 * 60 * 1000);
       })
       .catch((err) => {
         console.warn('[PWA] ServiceWorker registration encountered issue:', err);
       });
+  });
+
+  // Automatically check for update whenever user switches back to the app / unlocks phone
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.update().catch(() => {});
+      });
+    }
   });
 }
 

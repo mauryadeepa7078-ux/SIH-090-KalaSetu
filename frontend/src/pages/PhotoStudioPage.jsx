@@ -300,7 +300,11 @@ export const PhotoStudioPage = () => {
           enhanced_image_url: displayImg
         }));
 
-        showToast('Photo standardized to ultra-sharp e-commerce studio format!', 'success');
+        if (res.data.salient_object_detected === false) {
+          showToast('Notice: Complex background detected. Applied adaptive lighting & tone balance.', 'info');
+        } else {
+          showToast('Photo standardized to clean e-commerce studio format with background removed!', 'success');
+        }
 
         // Proactive AI Guide prompt
         const promptText = lang === 'hi' || lang === 'bho'
@@ -314,15 +318,12 @@ export const PhotoStudioPage = () => {
         throw new Error('Invalid response data structure from photo studio');
       }
     } catch (err) {
-      console.error('[PHOTO-STUDIO-ERROR] AI Photo Studio processing notice:', err);
-      showToast('Photo Studio notice: Using enhanced studio preview.', 'info');
+      console.error('[PHOTO-STUDIO-ERROR] AI Photo Studio processing error:', err);
+      showToast(`Photo Studio notice: ${err.message || 'Could not process background removal'}. Please retry or select another photo.`, 'warning');
       const fallback = fallbackPreview || rawPreview;
-      setStudioResult(fallback);
-      setActiveDraft(prev => ({
-        ...prev,
-        original_image_url: fallback,
-        enhanced_image_url: fallback
-      }));
+      if (fallback) {
+        setStudioResult(fallback);
+      }
     } finally {
       setIsProcessing(false);
     }

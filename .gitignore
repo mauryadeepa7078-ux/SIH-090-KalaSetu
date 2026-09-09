@@ -34,3 +34,4 @@ backend/app/static/qr_codes/*
 Thumbs.db
 .vscode/
 .idea/
+.vercel

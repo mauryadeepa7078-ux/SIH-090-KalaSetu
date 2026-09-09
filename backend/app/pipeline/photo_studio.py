@@ -14,11 +14,24 @@ except Exception as e:
     print(f"[WARN] cv2 import notice: {e}. Pure PIL mode active.")
     CV2_AVAILABLE = False
 
+REMBG_SESSION = None
+REMBG_AVAILABLE = False
+
 try:
-    from rembg import remove as rembg_remove
+    import rembg
+    try:
+        # Pre-warm lightweight u2netp session for fast sub-second inference
+        REMBG_SESSION = rembg.new_session("u2netp")
+        print("[PHOTO-STUDIO] rembg U2-Net Portable session initialized successfully.")
+    except Exception as sess_err:
+        try:
+            REMBG_SESSION = rembg.new_session("u2net")
+            print("[PHOTO-STUDIO] rembg standard U2-Net session initialized.")
+        except Exception as standard_err:
+            print(f"[WARN] rembg session init notice: {standard_err}. Default rembg mode active.")
     REMBG_AVAILABLE = True
 except Exception as e:
-    print(f"[WARN] rembg import notice: {e}. GrabCut segmentation enabled.")
+    print(f"[WARN] rembg import notice: {e}. Multi-stage GrabCut segmentation active.")
     REMBG_AVAILABLE = False
 
 
@@ -71,7 +84,7 @@ def apply_opencv_enhancements(
             enhanced_rgb = cv2.cvtColor(enhanced_bgr, cv2.COLOR_BGR2RGB)
             result_pil = Image.fromarray(enhanced_rgb)
         except Exception as err:
-            print(f"[WARN] OpenCV enhancement fallback: {err}")
+            print(f"[WARN] OpenCV enhancement notice: {err}")
 
     # Pure PIL AutoContrast Polish
     result_pil = ImageOps.autocontrast(result_pil.convert('RGB'), cutoff=0.5)
@@ -113,41 +126,87 @@ def refine_alpha_edges(rgba_img: Image.Image) -> Image.Image:
 
 def remove_background_grabcut(pil_img: Image.Image) -> Image.Image:
     """
-    High-fidelity OpenCV GrabCut segmentation fallback.
-    Extracts foreground craft without converting product pixels to black/white or threshold artifacts.
+    OpenCV GrabCut foreground isolation with adaptive rectangular seed.
     """
-    if CV2_AVAILABLE:
+    if not CV2_AVAILABLE:
+        return pil_img.convert("RGBA")
+
+    try:
+        img_rgb = pil_img.convert('RGB')
+        img_np = np.array(img_rgb)
+        h, w = img_np.shape[:2]
+
+        img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        
+        mask = np.zeros((h, w), np.uint8)
+        bgd_model = np.zeros((1, 65), np.float64)
+        fgd_model = np.zeros((1, 65), np.float64)
+
+        # Margin around edges where background is guaranteed
+        margin_x = max(8, int(w * 0.05))
+        margin_y = max(8, int(h * 0.05))
+        rect = (margin_x, margin_y, w - 2 * margin_x, h - 2 * margin_y)
+
+        cv2.grabCut(img_bgr, mask, rect, bgd_model, fgd_model, 5, cv2.GC_INIT_WITH_RECT)
+        fg_mask = np.where((mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD), 255, 0).astype('uint8')
+        
+        # Morphological close to bridge internal craft holes
+        kernel = np.ones((5, 5), np.uint8)
+        fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+        fg_mask = cv2.GaussianBlur(fg_mask, (5, 5), 0)
+        
+        img_rgba = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2BGRA)
+        img_rgba[:, :, 3] = fg_mask
+        pil_res = Image.fromarray(cv2.cvtColor(img_rgba, cv2.COLOR_BGRA2RGBA))
+        return refine_alpha_edges(pil_res)
+    except Exception as e:
+        print(f"[WARN] Grabcut notice: {e}")
+        return pil_img.convert("RGBA")
+
+
+def remove_background_multistage(pil_img: Image.Image) -> tuple[Image.Image, str, float]:
+    """
+    Multi-stage AI salient object detection & background removal:
+    Stage 1: rembg (U2-Net / U2-Net Portable deep learning salient object detection)
+    Stage 2: OpenCV GrabCut with adaptive color GMM foreground extraction
+    Returns (rgba_image, method_used, foreground_pixel_percentage)
+    """
+    # 1. Try rembg first
+    if REMBG_AVAILABLE:
         try:
-            img_rgb = pil_img.convert('RGB')
-            img_np = np.array(img_rgb)
-            h, w = img_np.shape[:2]
+            print("[PHOTO-STUDIO] Stage 1: Running rembg U2-Net deep learning segmentation...")
+            import rembg
+            if REMBG_SESSION is not None:
+                processed_rgba = rembg.remove(pil_img, session=REMBG_SESSION)
+            else:
+                processed_rgba = rembg.remove(pil_img)
 
-            img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
-            
-            mask = np.zeros((h, w), np.uint8)
-            bgd_model = np.zeros((1, 65), np.float64)
-            fgd_model = np.zeros((1, 65), np.float64)
+            if processed_rgba.mode == 'RGBA':
+                alpha_np = np.array(processed_rgba.split()[3])
+                fg_ratio = (np.count_nonzero(alpha_np > 15) / float(alpha_np.size)) * 100.0
+                print(f"[PHOTO-STUDIO] rembg U2-Net result: foreground ratio={fg_ratio:.1f}%")
 
-            margin_x = max(6, int(w * 0.04))
-            margin_y = max(6, int(h * 0.04))
-            rect = (margin_x, margin_y, w - 2 * margin_x, h - 2 * margin_y)
-
-            cv2.grabCut(img_bgr, mask, rect, bgd_model, fgd_model, 4, cv2.GC_INIT_WITH_RECT)
-            fg_mask = np.where((mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD), 255, 0).astype('uint8')
-            
-            # Smooth mask edges cleanly
-            fg_mask = cv2.GaussianBlur(fg_mask, (5, 5), 0)
-            
-            img_rgba = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2BGRA)
-            img_rgba[:, :, 3] = fg_mask
-            pil_res = Image.fromarray(cv2.cvtColor(img_rgba, cv2.COLOR_BGRA2RGBA))
-            return refine_alpha_edges(pil_res)
+                # If rembg detected a valid object (between 2% and 98% of total pixels)
+                if 2.0 <= fg_ratio <= 98.0:
+                    processed_rgba = refine_alpha_edges(processed_rgba)
+                    return processed_rgba, "rembg_u2net", fg_ratio
+                else:
+                    print(f"[PHOTO-STUDIO] rembg foreground ratio {fg_ratio:.1f}% is out of salient bounds, checking GrabCut...")
         except Exception as e:
-            print(f"[WARN] Grabcut segmentation notice: {e}")
+            print(f"[PHOTO-STUDIO] rembg execution notice: {e}")
 
-    # Pure PIL Alpha Mask fallback
-    img_rgba = pil_img.convert("RGBA")
-    return img_rgba
+    # 2. Stage 2: OpenCV GrabCut
+    print("[PHOTO-STUDIO] Stage 2: Running OpenCV GrabCut adaptive foreground isolation...")
+    grabcut_rgba = remove_background_grabcut(pil_img)
+    if grabcut_rgba.mode == 'RGBA':
+        alpha_np = np.array(grabcut_rgba.split()[3])
+        fg_ratio = (np.count_nonzero(alpha_np > 15) / float(alpha_np.size)) * 100.0
+        print(f"[PHOTO-STUDIO] GrabCut result: foreground ratio={fg_ratio:.1f}%")
+        if 2.0 <= fg_ratio <= 98.0:
+            return grabcut_rgba, "opencv_grabcut", fg_ratio
+
+    # 3. Fallback: return image with alpha channel
+    return pil_img.convert("RGBA"), "fallback_passthrough", 100.0
 
 
 def standardize_ecommerce_format(
@@ -168,7 +227,7 @@ def standardize_ecommerce_format(
     # Scale while maintaining aspect ratio
     max_dim = int(target_size * (1.0 - (pad_percent * 2)))
     w, h = cropped.size
-    scaling_ratio = min(max_dim / w, max_dim / h)
+    scaling_ratio = min(max_dim / float(w), max_dim / float(h))
     new_w, new_h = max(1, int(w * scaling_ratio)), max(1, int(h * scaling_ratio))
     resized_obj = cropped.resize((new_w, new_h), Image.Resampling.LANCZOS)
     resized_obj = refine_alpha_edges(resized_obj)
@@ -201,12 +260,12 @@ def process_artisan_photo(
     add_shadow: bool = False
 ) -> dict:
     """
-    Full pipeline: Ingest image -> OpenCV CLAHE & White-Balance -> Background removal -> 1:1 pure white studio standardize.
+    Full pipeline: Ingest image -> OpenCV CLAHE & White-Balance -> Multi-stage background removal -> 1:1 pure white studio standardize.
     """
     raw_img = Image.open(io.BytesIO(image_bytes))
     raw_img = ImageOps.exif_transpose(raw_img) # Fix phone camera orientation
     
-    # Optimize: Standardize size to max 1200x1200
+    # Standardize maximum processing dimension to 1200x1200 for sub-second precision
     max_side = 1200
     if max(raw_img.width, raw_img.height) > max_side:
         raw_img.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
@@ -232,17 +291,14 @@ def process_artisan_photo(
             sharpness_factor=sharpness
         )
 
-    # 2. Background Removal
+    # 2. Multi-Stage AI Background Removal
+    model_used = "none"
+    fg_ratio = 100.0
+    salient_detected = True
+
     if remove_bg:
-        if REMBG_AVAILABLE:
-            try:
-                processed_rgba = rembg_remove(processed_img)
-                processed_rgba = refine_alpha_edges(processed_rgba)
-            except Exception as e:
-                print(f"[WARN] rembg processing notice: {e}, using GrabCut fallback.")
-                processed_rgba = remove_background_grabcut(processed_img)
-        else:
-            processed_rgba = remove_background_grabcut(processed_img)
+        processed_rgba, model_used, fg_ratio = remove_background_multistage(processed_img)
+        salient_detected = (model_used != "fallback_passthrough")
     else:
         processed_rgba = processed_img.convert("RGBA")
 
@@ -271,7 +327,7 @@ def process_artisan_photo(
     raw_b64 = base64.b64encode(buffered_raw.getvalue()).decode('utf-8')
     raw_data_uri = f"data:image/jpeg;base64,{raw_b64}"
 
-    print(f"[PHOTO-STUDIO] Processed photo: ID={img_id}, dimensions={final_img.width}x{final_img.height}, bg_removed={remove_bg}, enhanced={apply_enhancement}")
+    print(f"[PHOTO-STUDIO] Processed photo: ID={img_id}, size={final_img.width}x{final_img.height}, method={model_used}, fg_ratio={fg_ratio:.1f}%, bg_removed={remove_bg}")
 
     return {
         "original_image_url": f"/static/uploads/{original_filename}",
@@ -281,7 +337,11 @@ def process_artisan_photo(
         "width": final_img.width,
         "height": final_img.height,
         "bg_removed": remove_bg,
-        "enhanced": apply_enhancement
+        "enhanced": apply_enhancement,
+        "salient_object_detected": salient_detected,
+        "model_used": model_used,
+        "foreground_ratio": round(fg_ratio, 1)
     }
+
 
 
