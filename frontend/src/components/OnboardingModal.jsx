@@ -65,7 +65,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
   // Step 1: Speak Hindi greeting automatically on mount
   useEffect(() => {
     if (showOnboardingModal && step === 1) {
-      const greeting = "नमस्ते! शिल्पसेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?";
+      const greeting = "नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?";
       const timer = setTimeout(() => {
         try {
           speechService.speak(greeting, 'hi');
@@ -359,7 +359,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
   const replayAudio = () => {
     if (step === 1) {
-      speechService.speak("नमस्ते! शिल्पसेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?", 'hi');
+      speechService.speak("नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?", 'hi');
     } else if (step === 2) {
       const promptText = getTranslation(selectedLang, 'onboarding3RolePrompt') || 
         "नमस्ते! क्या आप कारीगर/विक्रेता हैं, व्यक्तिगत खरीदार हैं, या थोक व्यापारी हैं?";

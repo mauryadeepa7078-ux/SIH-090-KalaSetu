@@ -1,6 +1,6 @@
 export const translations = {
   hi: {
-    appName: "शिल्पसेतु",
+    appName: "कलासेतु",
     appSub: "कारीगरों के लिए AI वर्चुअल बिजनेस मैनेजर",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय एवं अधिकारिता मंत्रालय",
     navHome: "कैटलॉग",
@@ -108,9 +108,9 @@ export const translations = {
     voiceNavHint: "बोलें: 'नया उत्पाद', 'बिक्री देखें', 'मूल्य जांचें', 'GeM पोर्टल', 'सिंक करें'",
 
     // Update 1 & 3: Onboarding & Split Experience
-    welcomeTitle: "शिल्पसेतु में आपका स्वागत है",
+    welcomeTitle: "कलासेतु में आपका स्वागत है",
     welcomeSub: "भारतीय कारीगरों एवं खरीदारों के लिए AI मंच",
-    onboardingAudioGreeting: "नमस्ते! शिल्पसेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?",
+    onboardingAudioGreeting: "नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?",
     onboardingRolePrompt: "नमस्ते! आप विक्रेता/कारीगर हैं या खरीदार/व्यापारी?",
     chooseLanguage: "अपनी भाषा चुनें (Choose Language)",
     chooseRole: "आपकी भूमिका क्या है? (Select Role)",
@@ -354,7 +354,7 @@ export const translations = {
   },
 
   bho: {
-    appName: "शिल्पसेतु (KalaSetu)",
+    appName: "कलासेतु (KalaSetu)",
     appSub: "कारीगर भाई लोगन खातिर AI बिज़नेस मैनेजर",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय मंत्रालय",
     roleArtisan: "कारीगर / विक्रेता (Artisan)",
@@ -542,7 +542,7 @@ export const translations = {
   },
 
   mai: {
-    appName: "शिल्पसेतु (KalaSetu)",
+    appName: "कलासेतु (KalaSetu)",
     appSub: "कारीगर, ग्राहक आ व्यापारीक लेल AI मंच",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय मंत्रालय",
     roleArtisan: "कारीगर / विक्रेता (Artisan)",

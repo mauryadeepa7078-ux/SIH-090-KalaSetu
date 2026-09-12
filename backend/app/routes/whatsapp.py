@@ -49,7 +49,7 @@ async def twilio_whatsapp_webhook(
 
     # Prepare TwiML XML Response
     bot_reply = (
-        f"🙏 *नमस्ते! शिल्पसेतु (KalaSetu) AI बिज़नेस मैनेजर में आपका स्वागत है.*\n\n"
+        f"🙏 *नमस्ते! कलासेतु (KalaSetu) AI बिज़नेस मैनेजर में आपका स्वागत है.*\n\n"
         f"✅ *उत्पाद सूची तैयार (Listing Created):*\n"
         f"📌 *शीर्षक:* {catalog_res.title_hi}\n"
         f"🏷️ *श्रेणी:* {catalog_res.suggested_category}\n"
@@ -186,7 +186,7 @@ async def simulate_whatsapp_conversation(req: WhatsAppSimulationRequest):
             {
                 "sender": "bot",
                 "text": (
-                    f"🙏 *नमस्ते! मैं आपका शिल्पसेतु (KalaSetu) AI बिज़नेस मैनेजर हूँ.*\n\n"
+                    f"🙏 *नमस्ते! मैं आपका कलासेतु (KalaSetu) AI बिज़नेस मैनेजर हूँ.*\n\n"
                     f"मैं आपकी इन कामों में मदद कर सकता हूँ:\n"
                     f"1. 📷 फोटो का बैकग्राउंड हटाकर ई-कॉमर्स जैसा बनाना\n"
                     f"2. 🎙️ बोलकर हिंदी व अंग्रेजी में कैटलॉग बनाना\n"
@@ -294,7 +294,7 @@ async def simulate_whatsapp_conversation(req: WhatsAppSimulationRequest):
         },
         {
             "sender": "bot",
-            "text": f"✅ यह उत्पाद आपके शिल्पसेतु कैटलॉग में जुड़ गया है! आप इसे 1-क्लिक में GeM व ONDC पर भी लाइव कर सकते हैं। 🚀",
+            "text": f"✅ यह उत्पाद आपके कलासेतु कैटलॉग में जुड़ गया है! आप इसे 1-क्लिक में GeM व ONDC पर भी लाइव कर सकते हैं। 🚀",
             "time": "Just now"
         }
     ]

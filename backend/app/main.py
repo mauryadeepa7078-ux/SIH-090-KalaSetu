@@ -17,7 +17,7 @@ from backend.app.config import STATIC_DIR
 from backend.app.routes import ai, products, whatsapp, marketplace, analytics
 
 app = FastAPI(
-    title="KalaSetu (शिल्पसेतु) - AI Virtual Business Manager Backend",
+    title="KalaSetu (कलासेतु) - AI Virtual Business Manager Backend",
     description="Smart India Hackathon 2026 (SIH26090) - MoSJE Heritage & Culture AI Backend API",
     version="1.0.0"
 )
@@ -44,7 +44,7 @@ app.include_router(analytics.router)
 @app.get("/")
 def root_endpoint():
     return {
-        "app": "KalaSetu (शिल्पसेतु) AI Virtual Business Manager",
+        "app": "KalaSetu (कलासेतु) AI Virtual Business Manager",
         "sih_problem_id": "SIH26090",
         "ministry": "Ministry of Social Justice and Empowerment (MoSJE)",
         "theme": "Heritage & Culture",
