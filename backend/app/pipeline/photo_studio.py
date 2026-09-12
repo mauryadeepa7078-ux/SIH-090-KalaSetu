@@ -14,25 +14,36 @@ except Exception as e:
     print(f"[WARN] cv2 import notice: {e}. Pure PIL mode active.")
     CV2_AVAILABLE = False
 
-REMBG_SESSION = None
-REMBG_AVAILABLE = False
+_REMBG_SESSION = None
+_REMBG_INITIALIZED = False
 
-try:
-    import rembg
+def get_rembg_session():
+    """
+    Lazy initializes the rembg U2-Net session upon the first request
+    to prevent blocking server startup or exceeding health-check timeouts.
+    """
+    global _REMBG_SESSION, _REMBG_INITIALIZED
+    if _REMBG_INITIALIZED:
+        return _REMBG_SESSION
+
+    _REMBG_INITIALIZED = True
     try:
-        # Pre-warm lightweight u2netp session for fast sub-second inference
-        REMBG_SESSION = rembg.new_session("u2netp")
-        print("[PHOTO-STUDIO] rembg U2-Net Portable session initialized successfully.")
-    except Exception as sess_err:
+        import rembg
         try:
-            REMBG_SESSION = rembg.new_session("u2net")
-            print("[PHOTO-STUDIO] rembg standard U2-Net session initialized.")
-        except Exception as standard_err:
-            print(f"[WARN] rembg session init notice: {standard_err}. Default rembg mode active.")
-    REMBG_AVAILABLE = True
-except Exception as e:
-    print(f"[WARN] rembg import notice: {e}. Multi-stage GrabCut segmentation active.")
-    REMBG_AVAILABLE = False
+            _REMBG_SESSION = rembg.new_session("u2netp")
+            print("[PHOTO-STUDIO] Lazy-initialized rembg U2-Net Portable session.")
+        except Exception:
+            try:
+                _REMBG_SESSION = rembg.new_session("u2net")
+                print("[PHOTO-STUDIO] Lazy-initialized rembg standard U2-Net session.")
+            except Exception as e:
+                print(f"[WARN] rembg session error: {e}")
+                _REMBG_SESSION = None
+    except Exception as e:
+        print(f"[WARN] rembg module import notice: {e}")
+        _REMBG_SESSION = None
+
+    return _REMBG_SESSION
 
 
 def apply_opencv_enhancements(
@@ -172,28 +183,28 @@ def remove_background_multistage(pil_img: Image.Image) -> tuple[Image.Image, str
     Returns (rgba_image, method_used, foreground_pixel_percentage)
     """
     # 1. Try rembg first
-    if REMBG_AVAILABLE:
-        try:
-            print("[PHOTO-STUDIO] Stage 1: Running rembg U2-Net deep learning segmentation...")
-            import rembg
-            if REMBG_SESSION is not None:
-                processed_rgba = rembg.remove(pil_img, session=REMBG_SESSION)
+    try:
+        import rembg
+        session = get_rembg_session()
+        print("[PHOTO-STUDIO] Stage 1: Running rembg U2-Net deep learning segmentation...")
+        if session is not None:
+            processed_rgba = rembg.remove(pil_img, session=session)
+        else:
+            processed_rgba = rembg.remove(pil_img)
+
+        if processed_rgba.mode == 'RGBA':
+            alpha_np = np.array(processed_rgba.split()[3])
+            fg_ratio = (np.count_nonzero(alpha_np > 15) / float(alpha_np.size)) * 100.0
+            print(f"[PHOTO-STUDIO] rembg U2-Net result: foreground ratio={fg_ratio:.1f}%")
+
+            # If rembg detected a valid object (between 2% and 98% of total pixels)
+            if 2.0 <= fg_ratio <= 98.0:
+                processed_rgba = refine_alpha_edges(processed_rgba)
+                return processed_rgba, "rembg_u2net", fg_ratio
             else:
-                processed_rgba = rembg.remove(pil_img)
-
-            if processed_rgba.mode == 'RGBA':
-                alpha_np = np.array(processed_rgba.split()[3])
-                fg_ratio = (np.count_nonzero(alpha_np > 15) / float(alpha_np.size)) * 100.0
-                print(f"[PHOTO-STUDIO] rembg U2-Net result: foreground ratio={fg_ratio:.1f}%")
-
-                # If rembg detected a valid object (between 2% and 98% of total pixels)
-                if 2.0 <= fg_ratio <= 98.0:
-                    processed_rgba = refine_alpha_edges(processed_rgba)
-                    return processed_rgba, "rembg_u2net", fg_ratio
-                else:
-                    print(f"[PHOTO-STUDIO] rembg foreground ratio {fg_ratio:.1f}% is out of salient bounds, checking GrabCut...")
-        except Exception as e:
-            print(f"[PHOTO-STUDIO] rembg execution notice: {e}")
+                print(f"[PHOTO-STUDIO] rembg foreground ratio {fg_ratio:.1f}% is out of salient bounds, checking GrabCut...")
+    except Exception as e:
+        print(f"[PHOTO-STUDIO] rembg execution notice: {e}")
 
     # 2. Stage 2: OpenCV GrabCut
     print("[PHOTO-STUDIO] Stage 2: Running OpenCV GrabCut adaptive foreground isolation...")
