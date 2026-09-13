@@ -480,12 +480,18 @@ export const AppProvider = ({ children }) => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Initial load
+    // Initial load & cloud backend proactive warm-up
+    api.pingHealth();
+    const keepAliveInterval = setInterval(() => {
+      api.pingHealth();
+    }, 8 * 60 * 1000); // Keep Render awake every 8 minutes
+
     refreshPendingQueue();
     loadProducts();
     loadOrders();
 
     return () => {
+      clearInterval(keepAliveInterval);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };

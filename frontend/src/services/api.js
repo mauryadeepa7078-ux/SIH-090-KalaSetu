@@ -83,11 +83,28 @@ export const api = {
     return res.json();
   },
 
+  // Cloud Backend Warm-Up & Keep-Alive
+  async pingHealth() {
+    try {
+      const healthUrl = `${API_BASE.replace(/\/api$/, '')}/api/health`;
+      console.log(`[API] Waking up/pinging backend: ${healthUrl}`);
+      const res = await fetch(healthUrl, { method: 'GET', cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        console.log('[API] Backend warm-up ping successful:', data);
+        return data;
+      }
+    } catch (e) {
+      console.warn('[API] Backend warm-up ping failed (server may still be starting):', e.message);
+    }
+    return null;
+  },
+
   // AI Pipeline
   async processPhotoStudio(formData) {
     console.log(`[API] [PHOTO-STUDIO] Sending photo to ${API_BASE}/ai/photo-studio...`);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 75000); // 75s timeout for cold start safety
     try {
       const res = await fetch(`${API_BASE}/ai/photo-studio`, {
         method: 'POST',
@@ -107,7 +124,7 @@ export const api = {
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') {
-        throw new Error('Photo Studio request timed out. Please retry.');
+        throw new Error('Photo Studio request timed out after 75s. Please retry.');
       }
       throw err;
     }

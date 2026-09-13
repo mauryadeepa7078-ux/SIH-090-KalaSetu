@@ -156,8 +156,8 @@ export const PhotoStudioPage = () => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [rawPreview, setRawPreview] = useState(activeDraft.original_image_url || null);
-  const [studioResult, setStudioResult] = useState(activeDraft.enhanced_image_url || null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processStep, setProcessStep] = useState(0);
   const [processingError, setProcessingError] = useState(null);
   
   // Active Preset
@@ -318,9 +318,14 @@ export const PhotoStudioPage = () => {
     }
 
     setIsProcessing(true);
+    setProcessStep(0);
     setProcessingError(null);
     console.log('[PHOTO-STUDIO] [STEP 2: SENT FOR ENHANCEMENT] Sending image to backend AI Photo Studio endpoint with parameters:', { b, c, v, s, sh, style });
-    showToast(lang === 'hi' ? 'AI फोटो स्टूडियो: कारीगरी के बारीक डिज़ाइन व रंग निखारे जा रहे हैं...' : 'AI Photo Studio: Refining micro-textures & isolating craft background...', 'info');
+    showToast(lang === 'hi' ? 'AI फोटो स्टूडियो: कारीगरी के बारीक डिज़ाइन व रंग निखारे जा रहे हैं...' : 'AI Photo Studio: Isolating craft foreground & optimizing micro-textures...', 'info');
+
+    const stepInterval = setInterval(() => {
+      setProcessStep(prev => prev + 1);
+    }, 3500);
 
     try {
       let readyFile = fileToProcess;
@@ -414,7 +419,9 @@ export const PhotoStudioPage = () => {
         }));
       }
     } finally {
+      clearInterval(stepInterval);
       setIsProcessing(false);
+      setProcessStep(0);
     }
   };
 
@@ -552,12 +559,16 @@ export const PhotoStudioPage = () => {
                   <div className="w-20 h-20 border-4 border-amber-200 dark:border-amber-900/50 border-t-amber-600 rounded-full animate-spin"></div>
                   <Sparkles className="w-8 h-8 text-amber-600 absolute inset-0 m-auto animate-pulse" />
                 </div>
-                <div>
+                <div className="space-y-1">
                   <p className="text-base font-extrabold text-stone-900 dark:text-stone-100 font-serif">
-                    Enhancing Craft Photography...
+                    {processStep === 0
+                      ? (lang === 'hi' ? 'AI फोटो स्टूडियो: कारीगरी के बारीक डिज़ाइन व रंग निखारे जा रहे हैं...' : 'AI Photo Studio: Isolating craft foreground & optimizing micro-textures...')
+                      : processStep === 1
+                      ? (lang === 'hi' ? 'क्लाउड सर्वर से संपर्क कर रहे हैं व रंग संतुलन लागू किया जा रहा है...' : 'Connecting to AI Cloud Studio & applying CLAHE dynamic range...')
+                      : (lang === 'hi' ? 'स्टूडियो लाइटिंग व सॉफ्ट कांटेक्ट शैडो तैयार की जा रही है...' : 'Finalizing edge defringing, studio lighting & contact shadow...')}
                   </p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 max-w-sm mx-auto">
-                    U2-Net Edge Defringing • Multi-band Unsharp Mask (USM) • CLAHE Tone Balance • Studio Contact Shadow
+                  <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto">
+                    OpenCV GrabCut Pro • Multi-band Unsharp Mask (USM) • CLAHE Tone Balance • Studio Contact Shadow
                   </p>
                 </div>
               </div>
