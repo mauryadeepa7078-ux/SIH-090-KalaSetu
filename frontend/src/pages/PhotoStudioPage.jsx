@@ -156,6 +156,7 @@ export const PhotoStudioPage = () => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [rawPreview, setRawPreview] = useState(activeDraft.original_image_url || null);
+  const [studioResult, setStudioResult] = useState(activeDraft.enhanced_image_url || null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processStep, setProcessStep] = useState(0);
   const [processingError, setProcessingError] = useState(null);
