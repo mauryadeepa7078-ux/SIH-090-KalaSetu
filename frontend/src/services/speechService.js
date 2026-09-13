@@ -1,10 +1,44 @@
 // Comprehensive Speech Recognition & Synthesis Service with Safe Guards
 
 export const speechService = {
+  // Voice toggle state
+  isVoiceEnabled: true,
+
+  getVoiceEnabled() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const val = localStorage.getItem('craftx_voice_enabled') || localStorage.getItem('kalasetu_voice_enabled');
+        if (val !== null) return val === 'true';
+      }
+    } catch (e) {}
+    return true; // default enabled
+  },
+
+  setVoiceEnabled(enabled) {
+    this.isVoiceEnabled = !!enabled;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('craftx_voice_enabled', this.isVoiceEnabled.toString());
+        localStorage.setItem('kalasetu_voice_enabled', this.isVoiceEnabled.toString());
+      }
+    } catch (e) {}
+    if (!this.isVoiceEnabled) {
+      this.cancelSpeech();
+    }
+  },
+
+  cancelSpeech() {
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (e) {}
+  },
+
   // Check browser speech recognition support
   isSpeechRecognitionSupported() {
     try {
-      if (typeof window === 'undefined') return false;
+      if (typeof window !== 'undefined') return false;
       const supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
       console.log('[SpeechService] Speech recognition supported in browser:', supported);
       return !!supported;
@@ -47,6 +81,10 @@ export const speechService = {
 
   createRecognizer(lang = 'hi-IN', onResult, onError, onEnd, onStart) {
     try {
+      if (!this.getVoiceEnabled()) {
+        console.log('[SpeechService] Voice is disabled by user setting. Recognizer not initialized.');
+        return null;
+      }
       if (typeof window === 'undefined') return null;
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -159,6 +197,10 @@ export const speechService = {
   // Text-To-Speech audio prompt synthesizer
   speak(text, lang = 'hi') {
     try {
+      if (!this.getVoiceEnabled()) {
+        console.log('[SpeechService TTS] Voice guidance is disabled by user. Skipping speech.');
+        return;
+      }
       if (typeof window === 'undefined' || !('speechSynthesis' in window) || !window.speechSynthesis) {
         console.warn('[SpeechService TTS] SpeechSynthesis API not supported.');
         return;

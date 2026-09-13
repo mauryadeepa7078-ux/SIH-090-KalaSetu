@@ -24,7 +24,8 @@ async def ai_photo_studio(
     contrast: float = Form(1.22),
     vibrance: float = Form(1.25),
     sharpness: float = Form(1.45),
-    add_shadow: bool = Form(True)
+    add_shadow: bool = Form(True),
+    bg_style: str = Form("white")
 ):
     """
     Core Feature 1: AI Photo Studio
@@ -32,7 +33,7 @@ async def ai_photo_studio(
     - Multi-band Unsharp Mask (USM), CLAHE dynamic range, HSV saturation booster
     - Standardized 1:1 luxury e-commerce studio format with soft ambient contact shadow
     """
-    print(f"[BACKEND-API] POST /api/ai/photo-studio received: filename='{file.filename}', content_type='{file.content_type}', remove_bg={remove_bg}, standardize={standardize}, add_shadow={add_shadow}")
+    print(f"[BACKEND-API] POST /api/ai/photo-studio received: filename='{file.filename}', content_type='{file.content_type}', remove_bg={remove_bg}, standardize={standardize}, add_shadow={add_shadow}, bg_style={bg_style}")
     try:
         image_bytes = await file.read()
         if not image_bytes:
@@ -49,7 +50,8 @@ async def ai_photo_studio(
             contrast=contrast,
             vibrance=vibrance,
             sharpness=sharpness,
-            add_shadow=add_shadow
+            add_shadow=add_shadow,
+            bg_style=bg_style
         )
         print(f"[BACKEND-API] AI Photo Studio completed successfully. Enhanced image URL: {result.get('enhanced_image_url')}")
         return {

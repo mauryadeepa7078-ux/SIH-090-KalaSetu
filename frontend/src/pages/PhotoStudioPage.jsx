@@ -77,6 +77,13 @@ const compressImageForAI = (file, maxDim = 1200) => {
   });
 };
 
+const BG_STYLES = [
+  { id: 'white', name: 'Studio White', color: '#FFFFFF', desc: '100% Crisp White for E-Commerce / GeM' },
+  { id: 'warm_cream', name: 'Warm Silk', color: '#FAF6EE', desc: 'Warm ivory background for Handloom & Zari' },
+  { id: 'marble_podium', name: 'Marble Podium', color: '#F1F1F4', desc: 'Subtle pedestal podium for Brass & Clay' },
+  { id: 'luxury_slate', name: 'Luxury Slate', color: '#27272A', desc: 'Charcoal contrast for Silver & Stone' },
+];
+
 const STUDIO_PRESETS = [
   {
     id: 'studio_pro',
@@ -143,6 +150,7 @@ export const PhotoStudioPage = () => {
   const [removeBg, setRemoveBg] = useState(true);
   const [applyEnhancement, setApplyEnhancement] = useState(true);
   const [standardize, setStandardize] = useState(true);
+  const [bgStyle, setBgStyle] = useState('white');
   const [brightness, setBrightness] = useState(1.08);
   const [contrast, setContrast] = useState(1.22);
   const [vibrance, setVibrance] = useState(1.25);
@@ -178,7 +186,8 @@ export const PhotoStudioPage = () => {
         preset.contrast, 
         preset.vibrance, 
         preset.sharpness, 
-        preset.addShadow
+        preset.addShadow,
+        bgStyle
       );
     }
   };
@@ -252,7 +261,8 @@ export const PhotoStudioPage = () => {
     c = contrast,
     v = vibrance,
     s = sharpness,
-    sh = addShadow
+    sh = addShadow,
+    style = bgStyle
   ) => {
     if (!fileToProcess && !fallbackPreview) {
       showToast('Please select or capture a photo first.', 'warning');
@@ -260,7 +270,7 @@ export const PhotoStudioPage = () => {
     }
 
     setIsProcessing(true);
-    console.log('[PHOTO-STUDIO] [STEP 2: SENT FOR ENHANCEMENT] Sending image to backend AI Photo Studio endpoint with parameters:', { b, c, v, s, sh });
+    console.log('[PHOTO-STUDIO] [STEP 2: SENT FOR ENHANCEMENT] Sending image to backend AI Photo Studio endpoint with parameters:', { b, c, v, s, sh, style });
     showToast('AI Photo Studio: Refining micro-textures & isolating craft background...', 'info');
 
     try {
@@ -282,6 +292,7 @@ export const PhotoStudioPage = () => {
       formData.append('vibrance', v.toString());
       formData.append('sharpness', s.toString());
       formData.append('add_shadow', sh.toString());
+      formData.append('bg_style', style || 'white');
 
       const res = await api.processPhotoStudio(formData);
       console.log('[PHOTO-STUDIO] [STEP 3: ENHANCED IMAGE RECEIVED] Backend AI response:', res);
@@ -693,7 +704,7 @@ export const PhotoStudioPage = () => {
                   Ambient Contact Drop Shadow
                 </span>
                 <span className="text-[11px] text-stone-500 dark:text-stone-400">
-                  Adds realistic 3D depth and grounding on white canvas
+                  Adds realistic 3D depth and grounding on canvas
                 </span>
               </div>
               <input
@@ -702,6 +713,48 @@ export const PhotoStudioPage = () => {
                 onChange={(e) => setAddShadow(e.target.checked)}
                 className="w-5 h-5 accent-amber-600 cursor-pointer rounded"
               />
+            </div>
+
+            {/* Studio Background Theme Selector */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-xs font-semibold text-stone-700 dark:text-stone-300">
+                <span className="flex items-center space-x-1.5">
+                  <Layers className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Studio Background Theme</span>
+                </span>
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">{bgStyle}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {BG_STYLES.map((bg) => {
+                  const isBgActive = bgStyle === bg.id;
+                  return (
+                    <button
+                      key={bg.id}
+                      type="button"
+                      onClick={() => {
+                        setBgStyle(bg.id);
+                        if (selectedFile || rawPreview) {
+                          processImageWithAI(selectedFile, rawPreview, brightness, contrast, vibrance, sharpness, addShadow, bg.id);
+                        }
+                      }}
+                      className={`p-2.5 rounded-xl border text-left flex items-center space-x-2.5 transition-all ${
+                        isBgActive
+                          ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30 shadow-sm'
+                          : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950/60 hover:border-amber-400/50'
+                      }`}
+                    >
+                      <span
+                        className="w-4 h-4 rounded-full border border-stone-300 dark:border-stone-600 flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: bg.color }}
+                      />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-stone-900 dark:text-white block truncate">{bg.name}</span>
+                        <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">{bg.desc}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Dynamic Range & Texture Sliders */}
@@ -803,7 +856,7 @@ export const PhotoStudioPage = () => {
             {/* Re-Apply Action */}
             {(selectedFile || rawPreview) && (
               <button
-                onClick={() => processImageWithAI(selectedFile, rawPreview, brightness, contrast, vibrance, sharpness, addShadow)}
+                onClick={() => processImageWithAI(selectedFile, rawPreview, brightness, contrast, vibrance, sharpness, addShadow, bgStyle)}
                 disabled={isProcessing}
                 className="w-full py-2.5 rounded-xl bg-stone-900 dark:bg-stone-800 hover:bg-stone-800 dark:hover:bg-stone-700 text-white text-xs font-black flex items-center justify-center space-x-2 transition-all shadow-sm"
               >

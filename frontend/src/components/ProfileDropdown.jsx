@@ -13,6 +13,8 @@ import {
   RefreshCw, 
   X, 
   Sparkles,
+  Volume2,
+  VolumeX,
   ChevronRight
 } from 'lucide-react';
 
@@ -24,7 +26,9 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
     logout, 
     openOnboarding, 
     lang, 
-    t 
+    t,
+    voiceEnabled,
+    toggleVoice
   } = useApp();
 
   if (!isOpen) return null;
@@ -36,7 +40,7 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
   };
 
   const getInitials = (name) => {
-    if (!name) return 'KS';
+    if (!name) return 'CX';
     const parts = name.trim().split(' ');
     if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     return name.slice(0, 2).toUpperCase();
@@ -114,6 +118,30 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Voice Assistant Toggle Option */}
+      <div className="flex items-center justify-between p-2.5 rounded-2xl bg-stone-50 dark:bg-stone-950/70 border border-stone-200 dark:border-stone-800 text-xs font-semibold font-sans">
+        <div className="flex items-center space-x-2">
+          {voiceEnabled ? (
+            <Volume2 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          ) : (
+            <VolumeX className="w-4 h-4 text-stone-400" />
+          )}
+          <span className="text-stone-800 dark:text-stone-200">
+            {lang === 'hi' ? 'आवाज़ सहायक (Voice Assistant)' : 'Voice Assistant'}
+          </span>
+        </div>
+        <button
+          onClick={toggleVoice}
+          className={`px-3 py-1 rounded-xl text-[10px] font-extrabold transition-all ${
+            voiceEnabled 
+              ? 'bg-amber-600 text-white shadow-sm' 
+              : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+          }`}
+        >
+          {voiceEnabled ? (lang === 'hi' ? 'चालू (ON)' : 'ON') : (lang === 'hi' ? 'बंद (OFF)' : 'OFF')}
+        </button>
       </div>
 
       {/* Switch Role Quick Actions */}

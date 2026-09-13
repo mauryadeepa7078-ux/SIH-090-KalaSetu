@@ -107,16 +107,9 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     setStep(3);
 
     // Update default username placeholder for selected role
-    if (role === 'artisan') {
-      setRegUsername('bunkar_ramdas');
-      setLoginIdentifier('bunkar_ramdas');
-    } else if (role === 'businessman') {
-      setRegUsername('singhal_exports');
-      setLoginIdentifier('singhal_exports');
-    } else {
-      setRegUsername('priya_sharma');
-      setLoginIdentifier('priya_sharma');
-    }
+    // Form fields start blank for fresh user onboarding
+    setRegUsername('');
+    setLoginIdentifier('');
 
     let promptText = "";
     if (role === 'artisan') {
@@ -138,19 +131,19 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     }, 250);
   };
 
-  // Form State for Login / Register / Forgot Password (UPDATE 4)
+  // Form State for Login / Register / Forgot Password
   const [authMode, setAuthMode] = useState('register'); // 'register' | 'login' | 'forgot_password'
   
   // Registration Credentials State
-  const [regUsername, setRegUsername] = useState('bunkar_ramdas');
-  const [regPassword, setRegPassword] = useState('craft123');
-  const [regConfirmPassword, setRegConfirmPassword] = useState('craft123');
+  const [regUsername, setRegUsername] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [authError, setAuthError] = useState('');
 
   // Login Credentials State
-  const [loginIdentifier, setLoginIdentifier] = useState('bunkar_ramdas');
-  const [loginPassword, setLoginPassword] = useState('craft123');
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Forgot Password State
@@ -166,44 +159,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
       const data = localStorage.getItem('craftx_user_accounts') || localStorage.getItem('kalasetu_user_accounts');
       if (data) return JSON.parse(data);
     } catch (e) {}
-    return [
-      {
-        username: 'bunkar_ramdas',
-        password: 'craft123',
-        role: 'artisan',
-        lang: 'hi',
-        name: 'Master Ram Das Bunkar',
-        phone: '+91 98765 43210',
-        craft_type: 'Handloom Pure Silk Weaving',
-        location: 'Kotwa, Varanasi, Uttar Pradesh',
-        scheme_id: 'MoSJE-VISH-2026-UP-091'
-      },
-      {
-        username: 'priya_sharma',
-        password: 'buyer123',
-        role: 'buyer',
-        lang: 'en',
-        name: 'Priya Sharma',
-        phone: '+91 98112 34567',
-        email: 'priya.sharma@heritagecraft.in',
-        location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-        buyer_type: 'Individual Heritage Collector'
-      },
-      {
-        username: 'singhal_exports',
-        password: 'b2b123',
-        role: 'businessman',
-        lang: 'en',
-        name: 'Rajesh Singhal',
-        company: 'Singhal Crafts Export & Retailers Pvt Ltd',
-        phone: '+91 98200 11223',
-        email: 'procurement@singhalcrafts.com',
-        gstin: '07AAAAA0000A1Z5',
-        gem_org_id: 'GEM-DL-2026-9912',
-        location: 'New Delhi & Global Exporter',
-        procurement_type: 'B2B Wholesale & Government GeM Tenders'
-      }
-    ];
+    return [];
   };
 
   const saveAccount = (account) => {
@@ -220,34 +176,34 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
   // Artisan Form Data
   const [artisanForm, setArtisanForm] = useState({
-    name: 'Master Ram Das Bunkar',
-    craft_type: 'Handloom Pure Silk Weaving',
-    village: 'Kotwa, Varanasi',
-    state: 'Uttar Pradesh',
-    phone: '+91 98765 43210',
-    scheme_id: 'MoSJE-VISH-2026-UP-091'
+    name: '',
+    craft_type: '',
+    village: '',
+    state: '',
+    phone: '',
+    scheme_id: ''
   });
 
   // Buyer Form Data
   const [buyerForm, setBuyerForm] = useState({
-    name: 'Priya Sharma',
-    phone: '+91 98112 34567',
-    email: 'priya.sharma@heritagecraft.in',
-    location: '124 Connaught Place, Central Delhi, New Delhi',
-    pincode: '110001',
+    name: '',
+    phone: '',
+    email: '',
+    location: '',
+    pincode: '',
     buyer_type: 'Individual Heritage Collector'
   });
 
   // Businessman Form Data
   const [businessmanForm, setBusinessmanForm] = useState({
-    name: 'Rajesh Singhal',
-    company: 'Singhal Crafts Export & Retailers Pvt Ltd',
-    phone: '+91 98200 11223',
-    email: 'procurement@singhalcrafts.com',
-    gstin: '07AAAAA0000A1Z5',
-    gem_org_id: 'GEM-DL-2026-9912',
+    name: '',
+    company: '',
+    phone: '',
+    email: '',
+    gstin: '',
+    gem_org_id: '',
     procurement_type: 'B2B Wholesale & Government GeM Tenders',
-    city: 'New Delhi / Global Exporter'
+    city: ''
   });
 
   // =========================================================================
@@ -413,39 +369,42 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
     if (!userDetails) {
       if (finalRole === 'artisan') {
+        const uName = (artisanForm.name || '').trim() || (regUsername ? `@${regUsername}` : 'Artisan');
         userDetails = {
-          username: regUsername || 'bunkar_ramdas',
+          username: regUsername || `artisan_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'craft123',
-          name: artisanForm.name || 'Master Ram Das Bunkar',
-          phone: artisanForm.phone || '+91 98765 43210',
+          name: uName,
+          phone: artisanForm.phone || '',
           role: 'artisan',
-          craft_type: artisanForm.craft_type || 'Handloom Pure Silk Weaving',
-          location: `${artisanForm.village || 'Kotwa, Varanasi'}, ${artisanForm.state || 'Uttar Pradesh'}`,
-          scheme_id: artisanForm.scheme_id || 'MoSJE-VISH-2026-UP-091'
+          craft_type: artisanForm.craft_type || 'Handicrafts',
+          location: [artisanForm.village, artisanForm.state].filter(Boolean).join(', ') || 'India',
+          scheme_id: artisanForm.scheme_id || `MoSJE-VISH-2026-${Math.floor(100 + Math.random() * 900)}`
         };
       } else if (finalRole === 'businessman') {
+        const uName = (businessmanForm.name || '').trim() || (businessmanForm.company || '').trim() || 'Institutional Buyer';
         userDetails = {
-          username: regUsername || 'singhal_exports',
+          username: regUsername || `buyer_b2b_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'b2b123',
-          name: businessmanForm.name || 'Rajesh Singhal',
-          company: businessmanForm.company || 'Singhal Crafts Export & Retailers Pvt Ltd',
-          phone: businessmanForm.phone || '+91 98200 11223',
-          email: businessmanForm.email || 'procurement@singhalcrafts.com',
-          gstin: businessmanForm.gstin || '07AAAAA0000A1Z5',
-          gem_org_id: businessmanForm.gem_org_id || 'GEM-DL-2026-9912',
+          name: uName,
+          company: businessmanForm.company || '',
+          phone: businessmanForm.phone || '',
+          email: businessmanForm.email || '',
+          gstin: businessmanForm.gstin || '',
+          gem_org_id: businessmanForm.gem_org_id || '',
           role: 'businessman',
-          location: businessmanForm.city || 'New Delhi / Global Exporter',
+          location: businessmanForm.city || 'India',
           procurement_type: businessmanForm.procurement_type || 'B2B Wholesale & Government GeM Tenders'
         };
       } else {
+        const uName = (buyerForm.name || '').trim() || 'Heritage Collector';
         userDetails = {
-          username: regUsername || 'priya_sharma',
+          username: regUsername || `buyer_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'buyer123',
-          name: buyerForm.name || 'Priya Sharma',
-          phone: buyerForm.phone || '+91 98112 34567',
-          email: buyerForm.email || 'priya.sharma@heritagecraft.in',
+          name: uName,
+          phone: buyerForm.phone || '',
+          email: buyerForm.email || '',
           role: 'buyer',
-          location: `${buyerForm.location || '124 Connaught Place, Central Delhi'} - ${buyerForm.pincode || '110001'}`,
+          location: [buyerForm.location, buyerForm.pincode].filter(Boolean).join(' - ') || 'India',
           buyer_type: buyerForm.buyer_type || 'Individual Heritage Collector'
         };
       }
@@ -453,11 +412,6 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
     saveAccount(userDetails);
     completeOnboarding(finalRole, selectedLang, userDetails);
-  };
-
-  const handleDemoInstantLogin = (role) => {
-    stopVoiceListening();
-    handleFinish(role);
   };
 
   const handleManualLogin = (e) => {
@@ -633,7 +587,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
               {/* Close Button (Only in modal overlay mode) */}
               {!isFullScreen && (
                 <button
-                  onClick={() => handleDemoInstantLogin('artisan')}
+                  onClick={() => handleFinish(selectedRole)}
                   className="p-2.5 rounded-full bg-stone-950/20 hover:bg-stone-950/40 text-stone-950 transition-colors flex items-center justify-center text-xs font-bold"
                   title="Close Modal"
                 >
@@ -908,187 +862,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
               )}
 
               {/* ========================================================================= */}
-              {/* RETURNING USER LOGIN TAB */}
+              {/* USER LOGIN TAB */}
               {/* ========================================================================= */}
               {authMode === 'login' && (
                 <div className="space-y-4 animate-fade-in">
-                  <div className="p-3.5 rounded-2xl bg-stone-850 border border-stone-700/80 space-y-2">
-                    <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block">
-                      {selectedLang === 'hi' ? 'त्वरित 1-टैप प्रोफाइल चयन (Quick Returning Account)' : 'Select Your Registered Profile (1-Tap Fast Login)'}
-                    </span>
-
-                    {/* Returning Profiles List for Selected Role */}
-                    {selectedRole === 'artisan' && (
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => {
-                            completeOnboarding('artisan', selectedLang, {
-                              username: 'bunkar_ramdas',
-                              name: 'Master Ram Das Bunkar',
-                              phone: '+91 98765 43210',
-                              role: 'artisan',
-                              craft_type: 'Handloom Pure Silk Weaving',
-                              location: 'Kotwa, Varanasi, Uttar Pradesh',
-                              scheme_id: 'MoSJE-VISH-2026-UP-091'
-                            });
-                          }}
-                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-orange-950/60 border border-stone-700 hover:border-orange-500/80 text-left transition-all flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange-600/20 text-orange-400 font-bold flex items-center justify-center">
-                              RB
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-1.5">
-                                <h4 className="font-bold text-sm text-white font-hindi">Master Ram Das Bunkar</h4>
-                                <span className="text-[10px] text-stone-400 font-mono">@bunkar_ramdas</span>
-                              </div>
-                              <p className="text-[11px] text-stone-400">Handloom Silk • Kotwa, Varanasi • MoSJE-UP-091</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-orange-400 group-hover:translate-x-1 transition-transform">
-                            Login ➔
-                          </span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            completeOnboarding('artisan', selectedLang, {
-                              username: 'sita_devi',
-                              name: 'Sita Devi',
-                              phone: '+91 98765 43211',
-                              role: 'artisan',
-                              craft_type: 'Madhubani Painting',
-                              location: 'Ranti, Madhubani, Bihar',
-                              scheme_id: 'MoSJE-VISH-2026-BR-118'
-                            });
-                          }}
-                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-orange-950/60 border border-stone-700 hover:border-orange-500/80 text-left transition-all flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 font-bold flex items-center justify-center">
-                              SD
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-1.5">
-                                <h4 className="font-bold text-sm text-white font-hindi">Sita Devi</h4>
-                                <span className="text-[10px] text-stone-400 font-mono">@sita_devi</span>
-                              </div>
-                              <p className="text-[11px] text-stone-400">Mithila Folk Painting • Ranti, Bihar • MoSJE-BR-118</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-orange-400 group-hover:translate-x-1 transition-transform">
-                            Login ➔
-                          </span>
-                        </button>
-                      </div>
-                    )}
-
-                    {selectedRole === 'buyer' && (
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => {
-                            completeOnboarding('buyer', selectedLang, {
-                              username: 'priya_sharma',
-                              name: 'Priya Sharma',
-                              phone: '+91 98112 34567',
-                              email: 'priya.sharma@heritagecraft.in',
-                              role: 'buyer',
-                              location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-                              buyer_type: 'Individual Heritage Collector'
-                            });
-                          }}
-                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/80 text-left transition-all flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-amber-600/20 text-amber-400 font-bold flex items-center justify-center">
-                              PS
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-1.5">
-                                <h4 className="font-bold text-sm text-white">Priya Sharma</h4>
-                                <span className="text-[10px] text-stone-400 font-mono">@priya_sharma</span>
-                              </div>
-                              <p className="text-[11px] text-stone-400">Retail Buyer • Central Delhi - 110001</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform">
-                            Login ➔
-                          </span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            completeOnboarding('buyer', selectedLang, {
-                              username: 'ananya_roy',
-                              name: 'Ananya Roy',
-                              phone: '+91 98300 45678',
-                              email: 'ananya.roy@craftart.in',
-                              role: 'buyer',
-                              location: 'Heritage Enclave, Salt Lake City, Kolkata - 700091',
-                              buyer_type: 'Heritage Connoisseur'
-                            });
-                          }}
-                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-amber-950/60 border border-stone-700 hover:border-amber-500/80 text-left transition-all flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-orange-600/20 text-orange-400 font-bold flex items-center justify-center">
-                              AR
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-1.5">
-                                <h4 className="font-bold text-sm text-white">Ananya Roy</h4>
-                                <span className="text-[10px] text-stone-400 font-mono">@ananya_roy</span>
-                              </div>
-                              <p className="text-[11px] text-stone-400">Retail Buyer • Salt Lake, Kolkata - 700091</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-amber-400 group-hover:translate-x-1 transition-transform">
-                            Login ➔
-                          </span>
-                        </button>
-                      </div>
-                    )}
-
-                    {selectedRole === 'businessman' && (
-                      <div className="space-y-2">
-                        <button
-                          onClick={() => {
-                            completeOnboarding('businessman', selectedLang, {
-                              username: 'singhal_exports',
-                              name: 'Rajesh Singhal',
-                              company: 'Singhal Crafts Export & Retailers Pvt Ltd',
-                              phone: '+91 98200 11223',
-                              email: 'procurement@singhalcrafts.com',
-                              gstin: '07AAAAA0000A1Z5',
-                              gem_org_id: 'GEM-DL-2026-9912',
-                              role: 'businessman',
-                              location: 'New Delhi / Global Exporter',
-                              procurement_type: 'B2B Wholesale & Government GeM Tenders'
-                            });
-                          }}
-                          className="w-full p-3 rounded-2xl bg-stone-800 hover:bg-blue-950/60 border border-stone-700 hover:border-blue-500/80 text-left transition-all flex items-center justify-between group"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 font-bold flex items-center justify-center">
-                              RS
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-1.5">
-                                <h4 className="font-bold text-sm text-white">Rajesh Singhal</h4>
-                                <span className="text-[10px] text-stone-400 font-mono">@singhal_exports</span>
-                              </div>
-                              <p className="text-[11px] text-stone-400">GSTIN: 07AAAAA0000A1Z5 • GeM ID: GEM-DL-2026</p>
-                            </div>
-                          </div>
-                          <span className="text-xs font-bold text-blue-400 group-hover:translate-x-1 transition-transform">
-                            Login ➔
-                          </span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Manual Username & Password Sign-In */}
                   <form onSubmit={handleManualLogin} className="space-y-3 p-4 rounded-2xl bg-stone-850 border border-stone-700">
                     <label className="text-xs font-bold text-stone-300 block">
@@ -1099,7 +876,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                       <div className="relative">
                         <input
                           type="text"
-                          placeholder={selectedRole === 'artisan' ? 'Username (e.g. bunkar_ramdas or phone)' : (selectedRole === 'businessman' ? 'Username (e.g. singhal_exports)' : 'Username (e.g. priya_sharma)')}
+                          placeholder={selectedRole === 'artisan' ? (selectedLang === 'hi' ? 'यूजरनेम या मोबाइल नंबर' : 'Username or Phone') : (selectedRole === 'businessman' ? (selectedLang === 'hi' ? 'यूजरनेम या ईमेल' : 'Username or Email') : (selectedLang === 'hi' ? 'यूजरनेम या फोन' : 'Username or Phone'))}
                           value={loginIdentifier}
                           onChange={(e) => setLoginIdentifier(e.target.value)}
                           className="w-full p-2.5 pl-9 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
@@ -1110,7 +887,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                       <div className="relative">
                         <input
                           type={showLoginPassword ? 'text' : 'password'}
-                          placeholder="Password (पासवर्ड)"
+                          placeholder={selectedLang === 'hi' ? 'पासवर्ड (Password)' : 'Password'}
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           className="w-full p-2.5 pl-9 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
@@ -1154,7 +931,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
               )}
 
               {/* ========================================================================= */}
-              {/* FORGOT PASSWORD TAB (UPDATE 4) */}
+              {/* FORGOT PASSWORD TAB */}
               {/* ========================================================================= */}
               {authMode === 'forgot_password' && (
                 <div className="space-y-4 animate-fade-in">
@@ -1187,7 +964,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. bunkar_ramdas or +91 98765 43210"
+                          placeholder="e.g. username or +91 98765 43210"
                           value={forgotIdentifier}
                           onChange={(e) => setForgotIdentifier(e.target.value)}
                           className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
@@ -1244,31 +1021,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
               )}
 
               {/* ========================================================================= */}
-              {/* NEW USER REGISTRATION TAB (UPDATE 4: USERNAME + PASSWORDS) */}
+              {/* NEW USER REGISTRATION TAB */}
               {/* ========================================================================= */}
               {authMode === 'register' && (
                 <div className="space-y-4">
-                  {/* 1-Click Instant Demo Credentials Button */}
-                  <button
-                    onClick={() => handleDemoInstantLogin(selectedRole)}
-                    className={`w-full p-3 rounded-2xl border text-xs font-black flex items-center justify-center space-x-2 shadow-sm transition-all ${
-                      selectedRole === 'artisan'
-                        ? 'bg-orange-500/15 border-orange-500/40 hover:bg-orange-500/25 text-orange-300'
-                        : selectedRole === 'businessman'
-                        ? 'bg-blue-500/15 border-blue-500/40 hover:bg-blue-500/25 text-blue-300'
-                        : 'bg-amber-500/15 border-amber-500/40 hover:bg-amber-500/25 text-amber-300'
-                    }`}
-                  >
-                    <Sparkles className="w-4 h-4 animate-pulse" />
-                    <span>
-                      {selectedRole === 'artisan'
-                        ? '⚡ 1-Click Instant Demo Artisan Login (Master Bunkar)'
-                        : selectedRole === 'businessman'
-                        ? '⚡ 1-Click Instant Demo Businessman Login (Singhal Exports)'
-                        : '⚡ 1-Click Instant Demo Buyer Login (Priya Sharma)'}
-                    </span>
-                  </button>
-
                   {/* USERNAME & PASSWORD AUTH SETUP CARD (ALL 3 ROLES) */}
                   <div className="p-3.5 rounded-2xl bg-stone-850 border border-stone-700/80 space-y-2.5">
                     <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block flex items-center space-x-1.5">

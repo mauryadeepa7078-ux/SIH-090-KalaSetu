@@ -223,11 +223,13 @@ def remove_background_multistage(pil_img: Image.Image) -> tuple[Image.Image, str
 def standardize_ecommerce_format(
     rgba_img: Image.Image, 
     target_size: int = 1000, 
-    pad_percent: float = 0.08
+    pad_percent: float = 0.08,
+    add_shadow: bool = True,
+    bg_style: str = "white"
 ) -> Image.Image:
     """
-    Places the foreground craft on a crisp pure white studio canvas,
-    centered and padded with a standardized 1:1 square aspect ratio.
+    Places the isolated foreground craft on a standardized 1:1 square luxury studio canvas
+    with realistic contact drop shadow and category-tailored background themes.
     """
     bbox = rgba_img.getbbox()
     if bbox:
@@ -243,14 +245,47 @@ def standardize_ecommerce_format(
     resized_obj = cropped.resize((new_w, new_h), Image.Resampling.LANCZOS)
     resized_obj = refine_alpha_edges(resized_obj)
 
-    # Create solid pure white studio background
-    studio_bg = Image.new("RGBA", (target_size, target_size), (255, 255, 255, 255))
+    # Determine Studio Background Canvas
+    bg_style_clean = (bg_style or "white").lower().strip()
+    if bg_style_clean in ("warm_cream", "silk", "textile"):
+        bg_rgb = (250, 248, 245) # Soft warm mulberry silk studio tint
+    elif bg_style_clean in ("marble_podium", "pottery", "marble"):
+        bg_rgb = (244, 245, 247) # Minimal studio stone podium
+    elif bg_style_clean in ("luxury_slate", "dark", "brass", "jewelry"):
+        bg_rgb = (28, 25, 23)    # Luxury dark royal slate backdrop
+    else:
+        bg_rgb = (255, 255, 255)  # 100% Pure White GeM / Amazon standard
+
+    studio_bg = Image.new("RGBA", (target_size, target_size), (*bg_rgb, 255))
     
     # Calculate center placement
     offset_x = (target_size - new_w) // 2
     offset_y = (target_size - new_h) // 2
 
-    # Paste isolated product cleanly
+    # Render Grounding Contact Drop Shadow
+    if add_shadow and resized_obj.mode == 'RGBA':
+        try:
+            shadow_w = int(new_w * 0.78)
+            shadow_h = max(8, int(new_h * 0.10))
+            shadow_layer = Image.new("RGBA", (target_size, target_size), (0, 0, 0, 0))
+            sdraw = ImageDraw.Draw(shadow_layer)
+            
+            sx1 = offset_x + (new_w - shadow_w) // 2
+            sy1 = offset_y + new_h - int(shadow_h * 0.55)
+            sx2 = sx1 + shadow_w
+            sy2 = sy1 + shadow_h
+            
+            # Shadow opacity adapted to background brightness
+            shadow_opacity = 40 if bg_style_clean in ("luxury_slate", "dark") else 75
+            sdraw.ellipse([sx1, sy1, sx2, sy2], fill=(0, 0, 0, shadow_opacity))
+            
+            # Gaussian blur for soft natural grounding
+            shadow_blurred = shadow_layer.filter(ImageFilter.GaussianBlur(radius=16))
+            studio_bg.paste(shadow_blurred, (0, 0), mask=shadow_blurred.split()[3])
+        except Exception as shadow_err:
+            print(f"[WARN] Shadow rendering notice: {shadow_err}")
+
+    # Paste isolated craft product cleanly
     if resized_obj.mode == 'RGBA':
         studio_bg.paste(resized_obj, (offset_x, offset_y), mask=resized_obj.split()[3])
     else:
@@ -264,14 +299,15 @@ def process_artisan_photo(
     remove_bg: bool = True,
     apply_enhancement: bool = True,
     standardize: bool = True,
-    brightness: float = 1.06,
-    contrast: float = 1.18,
-    vibrance: float = 1.15,
-    sharpness: float = 1.25,
-    add_shadow: bool = False
+    brightness: float = 1.08,
+    contrast: float = 1.22,
+    vibrance: float = 1.25,
+    sharpness: float = 1.45,
+    add_shadow: bool = True,
+    bg_style: str = "white"
 ) -> dict:
     """
-    Full pipeline: Ingest image -> OpenCV CLAHE & White-Balance -> Multi-stage background removal -> 1:1 pure white studio standardize.
+    Full pipeline: Ingest image -> OpenCV CLAHE & White-Balance -> Multi-stage background removal -> 1:1 luxury studio standardization with contact shadow.
     """
     raw_img = Image.open(io.BytesIO(image_bytes))
     raw_img = ImageOps.exif_transpose(raw_img) # Fix phone camera orientation
@@ -313,9 +349,15 @@ def process_artisan_photo(
     else:
         processed_rgba = processed_img.convert("RGBA")
 
-    # 3. E-commerce studio standardization (1:1 square, centered, crisp white background)
+    # 3. E-commerce studio standardization (1:1 square, centered, crisp white/custom background + soft contact shadow)
     if standardize:
-        final_img = standardize_ecommerce_format(processed_rgba)
+        final_img = standardize_ecommerce_format(
+            processed_rgba, 
+            target_size=1200, 
+            pad_percent=0.08, 
+            add_shadow=add_shadow, 
+            bg_style=bg_style
+        )
     else:
         bg = Image.new("RGB", processed_rgba.size, (255, 255, 255))
         if processed_rgba.mode == 'RGBA':
@@ -338,7 +380,7 @@ def process_artisan_photo(
     raw_b64 = base64.b64encode(buffered_raw.getvalue()).decode('utf-8')
     raw_data_uri = f"data:image/jpeg;base64,{raw_b64}"
 
-    print(f"[PHOTO-STUDIO] Processed photo: ID={img_id}, size={final_img.width}x{final_img.height}, method={model_used}, fg_ratio={fg_ratio:.1f}%, bg_removed={remove_bg}")
+    print(f"[PHOTO-STUDIO] Processed photo: ID={img_id}, size={final_img.width}x{final_img.height}, method={model_used}, fg_ratio={fg_ratio:.1f}%, bg_removed={remove_bg}, bg_style={bg_style}")
 
     return {
         "original_image_url": f"/static/uploads/{original_filename}",
@@ -351,7 +393,8 @@ def process_artisan_photo(
         "enhanced": apply_enhancement,
         "salient_object_detected": salient_detected,
         "model_used": model_used,
-        "foreground_ratio": round(fg_ratio, 1)
+        "foreground_ratio": round(fg_ratio, 1),
+        "bg_style": bg_style
     }
 
 

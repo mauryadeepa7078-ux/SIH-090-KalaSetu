@@ -126,14 +126,14 @@ export const translations = {
     buyerModeBadge: "खरीदार मार्केटप्लेस (Buyer)",
     changeRoleBtn: "भूमिका बदलें (Switch Role)",
 
-    // Update 1: Artisan Minimal Landing Page
+    // Artisan Landing Page
     artisanWelcomeTitle: "नमस्ते कारीगर साथी!",
     artisanWelcomeSub: "AI आपका वर्चुअल बिजनेस मैनेजर है — 1 मिनट में उत्पाद ऑनलाइन लाएं",
-    btnPhotoLo: "📷 Photo Lo (फोटो लें)",
-    btnPhotoLoSub: "AI बैकग्राउंड हटाएगा और लाइटिंग सुधारेगा",
-    btnBolkarBatao: "🎙️ Bolkar Batao (बोलकर बताओ)",
-    btnBolkarBataoSub: "अपनी भाषा में बोलें, AI हिंदी-अंग्रेजी कैटलॉग बनाएगा",
-    quickTools: "अन्य उपयोगी टूल्स (Quick Tools)",
+    btnPhotoLo: "📷 उत्पाद की फोटो खींचें",
+    btnPhotoLoSub: "AI बैकग्राउंड हटाकर पेशेवर 1:1 ई-कॉमर्स स्टूडियो बनाएगा",
+    btnBolkarBatao: "🎙️ बोलकर विवरण दर्ज करें",
+    btnBolkarBataoSub: "अपनी भाषा में बोलें — AI हिंदी व अंग्रेजी दोनों में कैटलॉग तैयार करेगा",
+    quickTools: "अन्य उपयोगी सुविधाएं",
 
     // Update 2: Proactive AI Guide
     companionGreetingVoice: "नमस्ते! चलिए शुरू करते हैं। सबसे पहले अपने उत्पाद की एक अच्छी फोटो खींचिए या गैलरी से चुनिए।",
@@ -284,14 +284,14 @@ export const translations = {
     buyerModeBadge: "Buyer Marketplace",
     changeRoleBtn: "Switch Role",
 
-    // Update 1: Artisan Minimal Landing Page
+    // Artisan Landing Page
     artisanWelcomeTitle: "Namaste, Artisan Partner!",
     artisanWelcomeSub: "AI is your virtual business manager — publish products online in 1 minute",
-    btnPhotoLo: "📷 Photo Lo (Take Photo)",
-    btnPhotoLoSub: "AI removes background clutter and enhances lighting automatically",
-    btnBolkarBatao: "🎙️ Bolkar Batao (Speak & Describe)",
-    btnBolkarBataoSub: "Speak naturally in regional language — AI creates Hindi & English catalog",
-    quickTools: "Secondary Management Tools",
+    btnPhotoLo: "📷 Capture Craft Photo",
+    btnPhotoLoSub: "AI removes background clutter and standardizes studio lighting",
+    btnBolkarBatao: "🎙️ Speak to Describe",
+    btnBolkarBataoSub: "Speak naturally in your language — AI generates bilingual Hindi & English catalog",
+    quickTools: "Management & Business Tools",
 
     // Update 2: Proactive AI Guide
     companionGreetingVoice: "Namaste! Let's get started. First, take a clear photo of your craft or choose one from your gallery.",

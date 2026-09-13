@@ -33,6 +33,8 @@ import {
   Download,
   Sun,
   Moon,
+  Volume2,
+  VolumeX,
   FileCheck,
   PackageCheck,
   SlidersHorizontal
@@ -60,7 +62,9 @@ export const Navbar = () => {
     orders,
     cart,
     theme,
-    toggleTheme
+    toggleTheme,
+    voiceEnabled,
+    toggleVoice
   } = useApp();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -72,6 +76,11 @@ export const Navbar = () => {
   );
 
   const moreMenuRef = useRef(null);
+
+  const handleMobileNavClick = (tabId) => {
+    setActiveTab(tabId);
+    setIsMobileMenuOpen(false);
+  };
 
   // Close More Menu on click outside
   useEffect(() => {
@@ -322,6 +331,24 @@ export const Navbar = () => {
                 <Sun className="w-3.5 h-3.5 text-amber-400 rotate-0 hover:rotate-45 transition-transform" />
               ) : (
                 <Moon className="w-3.5 h-3.5 text-stone-700" />
+              )}
+            </button>
+
+            {/* Voice Assistant Enable / Disable Toggle Button */}
+            <button
+              onClick={() => toggleVoice()}
+              title={voiceEnabled ? (lang === 'hi' ? 'आवाज़ सहायक चालू है (बंद करने के लिए क्लिक करें)' : 'Voice Assistant Enabled (Click to Disable)') : (lang === 'hi' ? 'आवाज़ सहायक बंद है (चालू करने के लिए क्लिक करें)' : 'Voice Assistant Disabled (Click to Enable)')}
+              aria-label="Toggle Voice Assistant"
+              className={`p-1.5 rounded-xl border transition-all min-h-[30px] flex items-center justify-center shadow-sm hover:scale-105 active:scale-95 ${
+                voiceEnabled 
+                  ? 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/40' 
+                  : 'bg-stone-200/80 dark:bg-stone-800 text-stone-400 dark:text-stone-500 border-stone-300/80 dark:border-stone-700'
+              }`}
+            >
+              {voiceEnabled ? (
+                <Volume2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              ) : (
+                <VolumeX className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />
               )}
             </button>
 

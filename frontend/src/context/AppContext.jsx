@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations } from '../services/translations';
 import { api } from '../services/api';
 import { offlineStorage } from '../services/offlineStorage';
+import { speechService } from '../services/speechService';
 import confetti from 'canvas-confetti';
 
 const AppContext = createContext();
@@ -58,18 +59,32 @@ export const AppProvider = ({ children }) => {
   const [lang, setLangState] = useState(storedLang); // Default Hindi
   const [userRole, setUserRole] = useState(storedRole); // 'artisan' | 'buyer' | 'businessman'
   const [currentUser, setCurrentUser] = useState(storedUser || {
-    name: storedRole === 'artisan' ? 'Ram Das Bunkar' : (storedRole === 'businessman' ? 'Rajesh Singhal' : 'Priya Sharma'),
-    phone: storedRole === 'artisan' ? '+91 98765 43210' : (storedRole === 'businessman' ? '+91 98200 11223' : '+91 98112 34567'),
+    name: storedRole === 'artisan' ? 'Master Artisan' : (storedRole === 'businessman' ? 'Institutional Buyer' : 'Heritage Collector'),
+    phone: '',
     role: storedRole,
-    location: storedRole === 'artisan' ? 'Kotwa, Varanasi, Uttar Pradesh' : (storedRole === 'businessman' ? 'New Delhi & Global Exporter' : 'Connaught Place, New Delhi - 110001'),
-    craft_type: 'Handloom Silk Weaving',
-    scheme_id: 'MoSJE-VISH-2026-UP-091',
-    company: storedRole === 'businessman' ? 'Singhal Crafts Export & Retailers Pvt Ltd' : undefined,
-    gstin: storedRole === 'businessman' ? '07AAAAA0000A1Z5' : undefined,
-    gem_org_id: storedRole === 'businessman' ? 'GEM-DL-2026-9912' : undefined
+    location: '',
+    craft_type: '',
+    scheme_id: '',
+    company: undefined,
+    gstin: undefined,
+    gem_org_id: undefined
   });
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(storedOnboarded);
   const [showOnboardingModal, setShowOnboardingModal] = useState(!storedOnboarded);
+
+  // Voice Enabled State (Toggle Option)
+  const [voiceEnabled, setVoiceEnabledState] = useState(() => speechService.getVoiceEnabled());
+
+  const setVoiceEnabled = (enabled) => {
+    const val = !!enabled;
+    setVoiceEnabledState(val);
+    speechService.setVoiceEnabled(val);
+    showToast(val ? (storedLang === 'hi' ? '🔊 आवाज़ सहायक चालू है' : '🔊 Voice Assistant Enabled') : (storedLang === 'hi' ? '🔇 आवाज़ सहायक बंद है' : '🔇 Voice Assistant Disabled'), 'info');
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled(!voiceEnabled);
+  };
 
   // Initial Seed Buyer Orders with payment metadata
   const initialOrders = [
@@ -670,7 +685,10 @@ export const AppProvider = ({ children }) => {
         proactiveMessage,
         setProactiveMessage,
         theme,
-        toggleTheme
+        toggleTheme,
+        voiceEnabled,
+        setVoiceEnabled,
+        toggleVoice
       }}
     >
       {children}
