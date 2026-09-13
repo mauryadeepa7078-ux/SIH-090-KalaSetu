@@ -279,6 +279,11 @@ export const ArtisanOrdersPage = () => {
                           <div className="text-xs font-black text-orange-600 dark:text-orange-400 font-sans">
                             Total Payout: ₹{(order.total || (order.price * (order.qty || 1))).toLocaleString('en-IN')}
                           </div>
+                          <div className="flex items-center space-x-1.5 pt-0.5 font-sans">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 font-bold">
+                              💳 {order.payment_method || 'UPI'} ({order.payment_status || 'PAID'})
+                            </span>
+                          </div>
                         </div>
                       </div>
 

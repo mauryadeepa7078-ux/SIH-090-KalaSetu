@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kalasetu-v2.1';
+const CACHE_NAME = 'craftx-v3.0';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

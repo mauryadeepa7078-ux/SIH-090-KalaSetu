@@ -1,4 +1,4 @@
-# 🏺 KalaSetu (कलासेतु)
+# 🏺 CraftX (क्राफ्टएक्स)
 ### AI-Driven Market Linkage & Smart Cataloging Virtual Business Manager for Artisans
 **Smart India Hackathon 2026** | **Problem Statement ID:** `SIH26090`  
 **Ministry:** Ministry of Social Justice and Empowerment (MoSJE) | **Theme:** Heritage & Culture
@@ -8,7 +8,7 @@
 ## 📖 Executive Summary
 Marginalized artisans, weavers, and rural micro-entrepreneurs receive periodic exposure through physical fairs (Dilli Haat, Surajkund Mela, Shilp Samagam) but lack continuous digital sales channels due to low digital literacy, language barriers, and lack of skills for professional product photography, pricing, and cataloging.
 
-**KalaSetu (कलासेतु)** acts as an autonomous **AI Virtual Business Manager** enabling artisans to digitize products, generate studio-grade e-commerce assets, create bilingual listings in their native dialects, obtain fair dynamic pricing, and link directly to B2B government e-marketplaces (GeM & ONDC) and WhatsApp.
+**CraftX (क्राफ्टएक्स)** acts as an autonomous **AI Virtual Business Manager** enabling artisans to digitize products, generate studio-grade e-commerce assets, create bilingual listings in their native dialects, obtain fair dynamic pricing, and link directly to B2B government e-marketplaces (GeM & ONDC) and WhatsApp.
 
 ---
 

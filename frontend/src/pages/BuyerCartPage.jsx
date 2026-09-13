@@ -8,9 +8,13 @@ import {
   ShieldCheck, 
   Award, 
   Truck, 
-  ChevronRight,
-  Plus,
-  Minus
+  ChevronRight, 
+  Plus, 
+  Minus,
+  Smartphone,
+  Banknote,
+  CreditCard,
+  Lock
 } from 'lucide-react';
 
 export const BuyerCartPage = () => {
@@ -36,6 +40,8 @@ export const BuyerCartPage = () => {
     currentUser?.location || '124 Connaught Place, Central Delhi, New Delhi - 110001'
   );
   const [customNotes, setCustomNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('UPI'); // 'UPI' | 'COD' | 'CARD'
+  const [upiId, setUpiId] = useState('priya.craft@okhdfcbank');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const subtotal = cart.reduce((acc, item) => acc + (item.price * (item.qty || 1)), 0);
@@ -49,12 +55,25 @@ export const BuyerCartPage = () => {
     }
 
     setIsCheckingOut(true);
+    const payLabel = paymentMethod === 'UPI' ? 'UPI' : (paymentMethod === 'COD' ? 'Cash on Delivery' : 'Credit / Debit Card');
+    const payStatus = paymentMethod === 'COD' ? 'Pending — Pay on Delivery' : 'PAID (Verified)';
+
     // Place order for each item
     for (const item of cart) {
+      const payTxn = paymentMethod === 'UPI'
+        ? `UPI-TXN-2026-${Math.floor(1000 + Math.random() * 9000)}`
+        : paymentMethod === 'COD'
+        ? `COD-INPOST-2026-${Math.floor(1000 + Math.random() * 9000)}`
+        : `CARD-TXN-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
       await placeOrder(item, item.qty || 1, deliveryAddress, customNotes, {
         name: buyerName,
         phone: buyerPhone,
         address: deliveryAddress
+      }, {
+        payment_method: payLabel,
+        payment_status: payStatus,
+        payment_txn_id: payTxn
       });
     }
 
@@ -221,6 +240,54 @@ export const BuyerCartPage = () => {
                   className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans transition-colors"
                   placeholder="e.g. Gift packaging / Specific color choice"
                 />
+              </div>
+
+              {/* Payment Method Selector */}
+              <div className="space-y-2 pt-2 border-t border-stone-200 dark:border-stone-800">
+                <label className="text-[11px] font-bold text-stone-700 dark:text-stone-300 block uppercase tracking-wider flex items-center space-x-1">
+                  <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  <span>Payment Method (भुगतान विकल्प):</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('UPI')}
+                    className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center space-y-1 ${
+                      paymentMethod === 'UPI'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-900 dark:text-amber-300 font-bold shadow-sm'
+                        : 'bg-stone-50 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                    }`}
+                  >
+                    <Smartphone className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="text-[11px]">UPI</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('COD')}
+                    className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center space-y-1 ${
+                      paymentMethod === 'COD'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-900 dark:text-amber-300 font-bold shadow-sm'
+                        : 'bg-stone-50 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                    }`}
+                  >
+                    <Banknote className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-[11px]">Cash on Del.</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('CARD')}
+                    className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center space-y-1 ${
+                      paymentMethod === 'CARD'
+                        ? 'bg-amber-500/20 border-amber-500 text-amber-900 dark:text-amber-300 font-bold shadow-sm'
+                        : 'bg-stone-50 dark:bg-stone-800/80 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                    }`}
+                  >
+                    <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-[11px]">Cards</span>
+                  </button>
+                </div>
               </div>
             </div>
 

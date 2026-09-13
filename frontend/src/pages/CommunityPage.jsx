@@ -12,7 +12,7 @@ export const CommunityPage = () => {
       cluster: 'Varanasi Weavers SHG, Uttar Pradesh',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
       time: '2 hours ago',
-      content: 'Just completed 25 Kadwa Zari sarees for the upcoming Shilp Samagam 2026! Using the KalaSetu AI Photo Studio made our e-commerce listings look 10x more premium. Thank you MoSJE!',
+      content: 'Just completed 25 Kadwa Zari sarees for the upcoming Shilp Samagam 2026! Using the CraftX AI Photo Studio made our e-commerce listings look 10x more premium. Thank you MoSJE!',
       craftImg: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
       likes: 48,
       comments: 12

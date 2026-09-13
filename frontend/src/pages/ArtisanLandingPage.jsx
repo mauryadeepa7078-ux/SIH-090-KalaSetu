@@ -136,8 +136,8 @@ export const ArtisanLandingPage = () => {
 
             <p className="text-xs sm:text-sm text-orange-50 font-sans leading-relaxed">
               {lang === 'hi' 
-                ? 'कलासेतु AI आपका पर्सनल बिजनेस मैनेजर है — सिर्फ 1 फोटो या बोलकर अपना उत्पाद ऑनलाइन लाइव करें।' 
-                : 'KalaSetu AI is your virtual studio — snap a photo or speak to digitize and sell your handcrafted treasures.'}
+                ? 'क्राफ्टएक्स AI आपका पर्सनल बिजनेस मैनेजर है — सिर्फ 1 फोटो या बोलकर अपना उत्पाद ऑनलाइन लाइव करें।' 
+                : 'CraftX AI is your virtual studio — snap a photo or speak to digitize and sell your handcrafted treasures.'}
             </p>
           </div>
 

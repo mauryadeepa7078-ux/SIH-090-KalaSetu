@@ -32,7 +32,7 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
             </div>
             <div>
               <h3 className="text-base font-bold text-white font-serif">
-                {lang === 'hi' ? 'KalaSetu ऐप इंस्टॉल करें' : 'Install KalaSetu App'}
+                {lang === 'hi' ? 'CraftX (क्राफ्टएक्स) ऐप इंस्टॉल करें' : 'Install CraftX App'}
               </h3>
               <p className="text-[11px] text-stone-400 font-sans">
                 {lang === 'hi' ? 'ऑफलाइन सहायता व 1-टैप फास्ट एक्सेस' : 'Offline support & 1-tap fast home screen access'}
@@ -68,8 +68,8 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
             </h4>
             <p className="text-xs text-stone-300 font-sans">
               {lang === 'hi'
-                ? 'KalaSetu आपके डिवाइस की होम स्क्रीन पर स्टैंडअलोन मोड में सक्रिय है।'
-                : 'KalaSetu is already installed and running as a standalone PWA on your device.'}
+                ? 'CraftX आपके डिवाइस की होम स्क्रीन पर स्टैंडअलोन मोड में सक्रिय है।'
+                : 'CraftX is already installed and running as a standalone PWA on your device.'}
             </p>
           </div>
         ) : canNativeInstall ? (
@@ -77,7 +77,7 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
             <p className="text-xs text-stone-300 font-sans">
               {lang === 'hi'
                 ? 'अपने फोन या कंप्यूटर पर ऐप इंस्टॉल करने के लिए नीचे दिए गए बटन पर टैप करें।'
-                : 'Click the button below to install KalaSetu directly to your home screen or desktop.'}
+                : 'Click the button below to install CraftX directly to your home screen or desktop.'}
             </p>
             <button
               onClick={() => {
@@ -124,8 +124,8 @@ export const PwaInstallModal = ({ isOpen, onClose, onNativeInstall, canNativeIns
             </span>
             <p className="leading-relaxed font-sans">
               {lang === 'hi'
-                ? 'अपने ब्राउज़र के एड्रेस बार में दाईं ओर दिए गए "Install" या "ऐप जोड़ें" आइकन (⤓) पर क्लिक करें, या मेनू (⋮) खोलकर "Install KalaSetu" चुनें।'
-                : 'Click the install icon (⤓) on the right side of your browser address bar, or open the browser menu (⋮) and select "Install KalaSetu".'}
+                ? 'अपने ब्राउज़र के एड्रेस बार में दाईं ओर दिए गए "Install" या "ऐप जोड़ें" आइकन (⤓) पर क्लिक करें, या मेनू (⋮) खोलकर "Install CraftX" चुनें।'
+                : 'Click the install icon (⤓) on the right side of your browser address bar, or open the browser menu (⋮) and select "Install CraftX".'}
             </p>
           </div>
         )}

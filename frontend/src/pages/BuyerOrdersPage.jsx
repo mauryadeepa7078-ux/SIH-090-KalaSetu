@@ -169,8 +169,8 @@ export const BuyerOrdersPage = () => {
                           <span className="font-black text-stone-900 dark:text-white">
                             ₹{ord.total?.toLocaleString('en-IN')}
                           </span>
-                          <span className="text-[11px] font-medium">
-                            {ord.artisan_name}
+                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-bold border border-stone-200 dark:border-stone-700">
+                            💳 {ord.payment_method || 'UPI'}
                           </span>
                         </div>
                       </div>
@@ -203,12 +203,22 @@ export const BuyerOrdersPage = () => {
 
                 <div className="text-right">
                   <span className="text-[10px] uppercase font-bold text-stone-400 dark:text-stone-500 tracking-wider block font-sans">
-                    Estimated Delivery
+                    Payment & Status
                   </span>
-                  <span className="text-sm font-black text-amber-700 dark:text-amber-400 flex items-center justify-end space-x-1 font-sans">
-                    <Calendar className="w-3.5 h-3.5 mr-1" />
-                    {selectedOrder.est_delivery}
-                  </span>
+                  <div className="flex items-center justify-end space-x-1.5 mt-0.5 font-sans">
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold border ${
+                      selectedOrder.payment_status?.includes('PAID') 
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30' 
+                        : 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30'
+                    }`}>
+                      {selectedOrder.payment_method || 'UPI'} • {selectedOrder.payment_status || 'PAID'}
+                    </span>
+                  </div>
+                  {selectedOrder.payment_txn_id && (
+                    <span className="text-[9px] font-mono text-stone-400 block mt-0.5">
+                      Txn: {selectedOrder.payment_txn_id}
+                    </span>
+                  )}
                 </div>
               </div>
 

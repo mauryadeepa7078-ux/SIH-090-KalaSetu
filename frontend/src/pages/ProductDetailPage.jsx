@@ -94,7 +94,7 @@ export const ProductDetailPage = () => {
     `🏛️ MoSJE Scheme ID: ${p.mosje_scheme_id || 'MoSJE-VISH-2026'}\n` +
     `💰 Price: ₹${p.price?.toLocaleString('en-IN')}\n\n` +
     `🌿 Direct from artisan to you. 100% genuine with digital authenticity certificate.\n\n` +
-    `#VocalForLocal #IndianHandicrafts #${(p.category || 'Handicraft').replace(/\s+/g, '')} #MoSJE #GIProduct #ArtisanHeritage #KalaSetu`;
+    `#VocalForLocal #IndianHandicrafts #${(p.category || 'Handicraft').replace(/\s+/g, '')} #MoSJE #GIProduct #ArtisanHeritage #CraftX`;
 
   const handleCopyCaption = () => {
     navigator.clipboard.writeText(socialPostCaption);

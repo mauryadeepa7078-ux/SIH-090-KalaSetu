@@ -44,7 +44,7 @@ def _generate_catalog_with_llm(raw_text: str, category: str = None, artisan_name
     Calls Gemini API with structured prompt for bilingual e-commerce cataloging.
     """
     prompt = f"""
-You are an expert e-commerce catalog specialist and Indian cultural heritage expert for the Ministry of Social Justice & Empowerment (MoSJE) KalaSetu platform.
+You are an expert e-commerce catalog specialist and Indian cultural heritage expert for the Ministry of Social Justice & Empowerment (MoSJE) CraftX platform.
 Convert this raw artisan voice description into a high-converting, professional e-commerce product listing in BOTH English and Hindi.
 
 Artisan Raw Description: "{raw_text}"
@@ -238,7 +238,7 @@ def answer_artisan_question(req: AssistantChatRequest) -> AssistantChatResponse:
             )
 
             system_prompt = f"""
-You are "KalaSetu Mitra" (कलासेतु मित्र) — a helpful, warm {role_desc} under the Ministry of Social Justice and Empowerment (MoSJE).
+You are "CraftX Mitra" (क्राफ्टएक्स मित्र) — a helpful, warm {role_desc} under the Ministry of Social Justice and Empowerment (MoSJE).
 
 User Role: {role}
 User's Language: {'Hindi (हिंदी)' if is_hindi else 'English'}

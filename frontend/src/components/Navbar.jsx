@@ -104,7 +104,7 @@ export const Navbar = () => {
     };
 
     const handleAppInstalled = () => {
-      console.log('[PWA Navbar] KalaSetu app installed.');
+      console.log('[PWA Navbar] CraftX app installed.');
       setDeferredPrompt(null);
       if (typeof window !== 'undefined') window.deferredPwaPrompt = null;
     };
@@ -129,7 +129,7 @@ export const Navbar = () => {
         const choiceResult = await promptEvent.userChoice;
         console.log('[PWA Navbar] User choice outcome:', choiceResult.outcome);
         if (choiceResult.outcome === 'accepted') {
-          console.log('[PWA Navbar] User accepted the KalaSetu app install.');
+          console.log('[PWA Navbar] User accepted the CraftX app install.');
         }
         setDeferredPrompt(null);
         if (typeof window !== 'undefined') window.deferredPwaPrompt = null;
@@ -682,7 +682,7 @@ export const Navbar = () => {
                 className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-orange-600 to-amber-600 text-stone-950 font-black text-xs flex items-center justify-center space-x-2 min-h-[48px] shadow-md"
               >
                 <Download className="w-4 h-4 fill-stone-950" />
-                <span>{lang === 'hi' ? 'KalaSetu ऐप इंस्टॉल करें' : 'Install KalaSetu App'}</span>
+                <span>{lang === 'hi' ? 'CraftX (क्राफ्टएक्स) ऐप इंस्टॉल करें' : 'Install CraftX App'}</span>
               </button>
 
               <button

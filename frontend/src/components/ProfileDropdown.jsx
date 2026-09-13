@@ -52,7 +52,7 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
           </div>
           <div>
             <h4 className="font-extrabold text-sm sm:text-base text-stone-900 dark:text-white font-serif line-clamp-1">
-              {currentUser?.name || 'KalaSetu User'}
+              {currentUser?.name || 'CraftX User'}
             </h4>
             <div className="flex items-center space-x-1.5 mt-0.5 font-sans">
               <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold border bg-stone-100 dark:bg-black/40 ${

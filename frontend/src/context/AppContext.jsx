@@ -29,14 +29,26 @@ const setSafeStorage = (key, val) => {
   }
 };
 
+export const ROLE_ALLOWED_TABS = {
+  artisan: ['artisan-home', 'artisan-orders', 'camera', 'voice', 'pricing', 'catalog', 'detail', 'certificate', 'whatsapp', 'analytics', 'community'],
+  buyer: ['buyer-market', 'detail', 'cart', 'orders', 'wishlist', 'certificate', 'community'],
+  businessman: ['businessman-home', 'businessman-orders', 'gem', 'detail', 'certificate', 'whatsapp', 'community']
+};
+
+export const ROLE_DEFAULT_TAB = {
+  artisan: 'artisan-home',
+  buyer: 'buyer-market',
+  businessman: 'businessman-home'
+};
+
 export const AppProvider = ({ children }) => {
   // Stored preferences with safe fallbacks
-  const storedLang = getSafeStorage('kalasetu_lang', 'hi');
-  const storedRole = getSafeStorage('kalasetu_role', 'artisan');
-  const storedOnboarded = getSafeStorage('kalasetu_onboarding_completed', 'false') === 'true';
+  const storedLang = getSafeStorage('craftx_lang', getSafeStorage('kalasetu_lang', 'hi'));
+  const storedRole = getSafeStorage('craftx_role', getSafeStorage('kalasetu_role', 'artisan'));
+  const storedOnboarded = getSafeStorage('craftx_onboarding_completed', getSafeStorage('kalasetu_onboarding_completed', 'false')) === 'true';
   const storedUser = (() => {
     try {
-      const u = getSafeStorage('kalasetu_user', null);
+      const u = getSafeStorage('craftx_user', getSafeStorage('kalasetu_user', null));
       return u ? JSON.parse(u) : null;
     } catch (e) {
       return null;
@@ -59,7 +71,7 @@ export const AppProvider = ({ children }) => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(storedOnboarded);
   const [showOnboardingModal, setShowOnboardingModal] = useState(!storedOnboarded);
 
-  // Initial Seed Buyer Orders
+  // Initial Seed Buyer Orders with payment metadata
   const initialOrders = [
     {
       id: 'ORD-2026-9041',
@@ -78,7 +90,10 @@ export const AppProvider = ({ children }) => {
       delivery_partner: 'IndiaPost Dak Ghar Niryat Kendra',
       est_delivery: '9 Sep 2026',
       delivery_address: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-      gi_tagged: true
+      gi_tagged: true,
+      payment_method: 'UPI',
+      payment_status: 'PAID (Verified)',
+      payment_txn_id: 'UPI-TXN-2026-9041'
     },
     {
       id: 'ORD-2026-8812',
@@ -97,13 +112,16 @@ export const AppProvider = ({ children }) => {
       delivery_partner: 'IndiaPost Dak Ghar Niryat Kendra',
       est_delivery: '12 Sep 2026',
       delivery_address: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-      gi_tagged: true
+      gi_tagged: true,
+      payment_method: 'Cash on Delivery',
+      payment_status: 'Pending — Pay on Delivery',
+      payment_txn_id: 'COD-INPOST-2026-8812'
     }
   ];
 
   const storedOrders = (() => {
     try {
-      const o = getSafeStorage('kalasetu_buyer_orders', null);
+      const o = getSafeStorage('craftx_buyer_orders', getSafeStorage('kalasetu_buyer_orders', null));
       return o ? JSON.parse(o) : initialOrders;
     } catch (e) {
       return initialOrders;
@@ -154,10 +172,23 @@ export const AppProvider = ({ children }) => {
     showToast(nextTheme === 'dark' ? '🌙 Dark Mode Activated' : '☀️ Light Mode Activated', 'info');
   };
 
-  // Active tab routing based on role (3 Roles)
-  const [activeTab, setActiveTab] = useState(
+  // Active tab routing based on role with durable Role Guard
+  const [activeTab, setActiveTabState] = useState(
     storedRole === 'artisan' ? 'artisan-home' : (storedRole === 'businessman' ? 'businessman-home' : 'buyer-market')
   );
+
+  const setActiveTab = (tab) => {
+    const allowed = ROLE_ALLOWED_TABS[userRole] || ROLE_ALLOWED_TABS.artisan;
+    if (!allowed.includes(tab)) {
+      console.warn(`[RoleGuard] Tab '${tab}' is not accessible for role '${userRole}'. Redirecting to default home.`);
+      const defaultTab = ROLE_DEFAULT_TAB[userRole] || 'artisan-home';
+      setActiveTabState(defaultTab);
+      showToast(`Access Restricted: Redirected to ${userRole} home.`, 'warning');
+      return;
+    }
+    setActiveTabState(tab);
+  };
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -174,6 +205,7 @@ export const AppProvider = ({ children }) => {
 
   const setLang = (newLang) => {
     setLangState(newLang);
+    setSafeStorage('craftx_lang', newLang);
     setSafeStorage('kalasetu_lang', newLang);
   };
 
@@ -218,32 +250,33 @@ export const AppProvider = ({ children }) => {
     setHasCompletedOnboarding(true);
     setShowOnboardingModal(false);
     
-    setSafeStorage('kalasetu_lang', finalLang);
-    setSafeStorage('kalasetu_role', finalRole);
-    setSafeStorage('kalasetu_onboarding_completed', 'true');
-    setSafeStorage('kalasetu_user', JSON.stringify(finalUser));
+    setSafeStorage('craftx_lang', finalLang);
+    setSafeStorage('craftx_role', finalRole);
+    setSafeStorage('craftx_onboarding_completed', 'true');
+    setSafeStorage('craftx_user', JSON.stringify(finalUser));
 
     if (finalRole === 'artisan') {
-      setActiveTab('artisan-home');
+      setActiveTabState('artisan-home');
     } else if (finalRole === 'businessman') {
-      setActiveTab('businessman-home');
+      setActiveTabState('businessman-home');
     } else {
-      setActiveTab('buyer-market');
+      setActiveTabState('buyer-market');
     }
   };
 
   const switchRole = (newRole) => {
     const roleToSet = newRole || 'artisan';
     setUserRole(roleToSet);
+    setSafeStorage('craftx_role', roleToSet);
     setSafeStorage('kalasetu_role', roleToSet);
     if (roleToSet === 'artisan') {
-      setActiveTab('artisan-home');
+      setActiveTabState('artisan-home');
       showToast('Switched to Artisan / Seller Portal (कारीगर मोड)', 'info');
     } else if (roleToSet === 'businessman') {
-      setActiveTab('businessman-home');
+      setActiveTabState('businessman-home');
       showToast('Switched to Institutional & GeM Procurement Portal (संस्थागत खरीद)', 'info');
     } else {
-      setActiveTab('buyer-market');
+      setActiveTabState('buyer-market');
       showToast('Switched to Consumer Buyer Marketplace (खरीदार बाज़ार)', 'info');
     }
   };
@@ -251,6 +284,8 @@ export const AppProvider = ({ children }) => {
   // Logout method for Profile dropdown
   const logout = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('craftx_onboarding_completed');
+      localStorage.removeItem('craftx_user');
       localStorage.removeItem('kalasetu_onboarding_completed');
       localStorage.removeItem('kalasetu_user');
     }
@@ -266,7 +301,7 @@ export const AppProvider = ({ children }) => {
       const backendOrders = await api.getOrders();
       if (Array.isArray(backendOrders) && backendOrders.length > 0) {
         setOrders(backendOrders);
-        setSafeStorage('kalasetu_buyer_orders', JSON.stringify(backendOrders));
+        setSafeStorage('craftx_buyer_orders', JSON.stringify(backendOrders));
       }
     } catch (e) {
       console.warn('[AppContext] Failed to load backend orders, using cached:', e);
@@ -274,10 +309,20 @@ export const AppProvider = ({ children }) => {
   };
 
   // Buyer Place Order Helper (Persisting to backend + local)
-  const placeOrder = async (product, qty = 1, address = '', notes = '', customBuyer = null) => {
+  const placeOrder = async (product, qty = 1, address = '', notes = '', customBuyer = null, paymentDetails = null) => {
     const buyerName = customBuyer?.name || currentUser?.name || 'Priya Sharma (Retail Buyer)';
     const buyerPhone = customBuyer?.phone || currentUser?.phone || '+91 98112 34567';
     const deliveryAddr = address || customBuyer?.address || currentUser?.location || '124 Connaught Place, Central Delhi, New Delhi - 110001';
+
+    const payMethod = paymentDetails?.payment_method || 'UPI';
+    const payStatus = paymentDetails?.payment_status || (payMethod === 'Cash on Delivery' ? 'Pending — Pay on Delivery' : 'PAID (Verified)');
+    const payTxnId = paymentDetails?.payment_txn_id || (
+      payMethod === 'UPI' 
+        ? `UPI-TXN-2026-${Math.floor(1000 + Math.random() * 9000)}` 
+        : (payMethod === 'Cash on Delivery' 
+            ? `COD-INPOST-2026-${Math.floor(1000 + Math.random() * 9000)}` 
+            : `CARD-TXN-2026-${Math.floor(1000 + Math.random() * 9000)}`)
+    );
 
     const newOrder = {
       id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -299,13 +344,16 @@ export const AppProvider = ({ children }) => {
       est_delivery: '5-7 Days',
       delivery_address: deliveryAddr,
       notes: notes || 'Standard safe packaging requested.',
-      gi_tagged: product.gi_tagged || false
+      gi_tagged: product.gi_tagged || false,
+      payment_method: payMethod,
+      payment_status: payStatus,
+      payment_txn_id: payTxnId
     };
 
     // Update local state immediately for instant feedback
     const updated = [newOrder, ...orders];
     setOrders(updated);
-    setSafeStorage('kalasetu_buyer_orders', JSON.stringify(updated));
+    setSafeStorage('craftx_buyer_orders', JSON.stringify(updated));
 
     // Persist to backend database
     try {

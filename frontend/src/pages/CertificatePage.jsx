@@ -110,7 +110,7 @@ export const CertificatePage = () => {
             Digital Certificate of Craft Authenticity
           </h1>
           <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-400 font-medium font-sans">
-            Theme: Heritage & Culture • KalaSetu Decentralized Artisan Provenance Registry
+            Theme: Heritage & Culture • CraftX Decentralized Artisan Provenance Registry
           </p>
           <p className="text-xs font-mono font-bold text-orange-700 dark:text-orange-400">
             Certificate ID: {certData?.certificate_id || 'CERT-MoSJE-2026-VISH-090'}
@@ -168,7 +168,7 @@ export const CertificatePage = () => {
                 alt="Verification QR"
                 className="w-full h-full object-contain"
                 onError={(e) => {
-                  e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://kalasetu.mosje.gov.in";
+                  e.target.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://craftx.mosje.gov.in";
                 }}
               />
             </div>

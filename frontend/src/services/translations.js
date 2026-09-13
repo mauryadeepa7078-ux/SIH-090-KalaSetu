@@ -1,6 +1,6 @@
 export const translations = {
   hi: {
-    appName: "कलासेतु",
+    appName: "क्राफ्टएक्स (CraftX)",
     appSub: "कारीगरों के लिए AI वर्चुअल बिजनेस मैनेजर",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय एवं अधिकारिता मंत्रालय",
     navHome: "कैटलॉग",
@@ -108,9 +108,9 @@ export const translations = {
     voiceNavHint: "बोलें: 'नया उत्पाद', 'बिक्री देखें', 'मूल्य जांचें', 'GeM पोर्टल', 'सिंक करें'",
 
     // Update 1 & 3: Onboarding & Split Experience
-    welcomeTitle: "कलासेतु में आपका स्वागत है",
+    welcomeTitle: "क्राफ्टएक्स (CraftX) में आपका स्वागत है",
     welcomeSub: "भारतीय कारीगरों एवं खरीदारों के लिए AI मंच",
-    onboardingAudioGreeting: "नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?",
+    onboardingAudioGreeting: "नमस्ते! क्राफ्टएक्स में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?",
     onboardingRolePrompt: "नमस्ते! आप विक्रेता/कारीगर हैं या खरीदार/व्यापारी?",
     chooseLanguage: "अपनी भाषा चुनें (Choose Language)",
     chooseRole: "आपकी भूमिका क्या है? (Select Role)",
@@ -158,7 +158,7 @@ export const translations = {
 
 
   en: {
-    appName: "KalaSetu",
+    appName: "CraftX",
     appSub: "AI Virtual Business Manager for Artisans",
     sihBadge: "SIH 2026 • Ministry of Social Justice & Empowerment (MoSJE)",
     navHome: "Catalog",
@@ -201,27 +201,27 @@ export const translations = {
 
     // Photo studio
     cameraTitle: "AI Photo Studio",
-    cameraSubtitle: "Transform simple phone snaps into standardized professional e-commerce studio assets",
-    capturePhoto: "Take Camera Photo",
+    cameraSubtitle: "Transform casual phone photos into clean, studio-lit e-commerce assets",
+    capturePhoto: "Take Photo (Camera)",
     uploadPhoto: "Upload from Gallery",
-    removeBgLabel: "Remove Background (rembg AI)",
-    enhanceLightingLabel: "Auto Lighting & CLAHE (OpenCV)",
-    standardizeLabel: "E-Commerce 1:1 Studio Canvas",
+    removeBgLabel: "Studio Background Isolation (rembg AI)",
+    enhanceLightingLabel: "Auto Lighting & Color (OpenCV CLAHE)",
+    standardizeLabel: "Standardize 1:1 Clean Studio Canvas",
     originalPhoto: "Original Photo",
     aiEnhanced: "AI Studio Result",
-    processingImage: "AI Photo Studio is processing...",
+    processingImage: "AI Photo Studio is processing image...",
     proceedToVoice: "Add Voice Description ➔",
     
     // Voice Catalog
-    voiceTitle: "Multilingual Voice-to-Catalog",
-    voiceSubtitle: "Speak naturally in your regional language — AI creates polished, SEO-ready listings in English & Hindi",
+    voiceTitle: "Voice-to-Bilingual Catalog",
+    voiceSubtitle: "Speak naturally about your craft in any Indian language — AI generates English & Hindi listings",
     startRecording: "Start Speaking",
     stopRecording: "Stop Recording",
-    listening: "Listening... Please describe your craft",
-    audioRecorded: "Voice Note Recorded!",
-    speakHint: "Example: 'This is a pure handwoven Banarasi silk saree with gold zari work, made over 4 days.'",
-    generateListing: "Generate AI Catalog",
-    generating: "Generating bilingual listing...",
+    listening: "Listening... Please speak",
+    audioRecorded: "Audio Recorded!",
+    speakHint: "E.g. 'This is a handmade Banarasi silk saree with gold zari motifs crafted over 4 days.'",
+    generateListing: "Generate AI Listing",
+    generating: "AI generating bilingual listing...",
     bilingualEditor: "Bilingual Listing Review",
     titleHindi: "Hindi Title",
     titleEnglish: "English Title",
@@ -230,33 +230,33 @@ export const translations = {
     heritageStoryHindi: "Heritage Story (Hindi)",
     heritageStoryEnglish: "Heritage Story (English)",
     categoryLabel: "Craft Category",
-    materialLabel: "Materials",
+    materialLabel: "Material",
     dimensionsLabel: "Dimensions",
     careLabel: "Care Instructions",
     proceedToPricing: "Proceed to Pricing ➔",
     
     // Pricing
     pricingTitle: "Dynamic Smart Pricing Assistant",
-    pricingSubtitle: "Scikit-Learn ML regression model calculates fair, profitable market prices with explainable breakdown",
+    pricingSubtitle: "ML-driven fair market value suggestions based on authentic craftsmanship metrics",
     materialCostLabel: "Raw Material Cost (₹)",
     hoursSpentLabel: "Artisan Labor (Hours)",
     artisanSkillLabel: "Artisan Skill Tier",
     apprentice: "Apprentice",
     skilled: "Skilled Artisan",
     masterArtisan: "Master Artisan",
-    dimensionsGrade: "Product Size",
-    giTaggedCheck: "GI Tag Certified Heritage Craft?",
-    calculatePriceBtn: "Calculate AI Price",
-    recommendedPrice: "Recommended Selling Price",
-    priceRange: "Fair Market Range",
-    whyThisPrice: "Why this Price? (Cost Breakdown)",
-    saveAndPublish: "Save & Publish Product",
+    dimensionsGrade: "Product Dimensions Grade",
+    giTaggedCheck: "GI Certified Heritage Craft",
+    calculatePriceBtn: "Calculate Fair Market Price",
+    recommendedPrice: "Recommended Fair Price",
+    priceRange: "Fair Value Range",
+    whyThisPrice: "Explainable Cost Breakdown",
+    saveAndPublish: "Save & Publish Listing",
     
     // Certificate
-    certificateTitle: "Digital Craft Authenticity Certificate",
-    certificateSub: "Verified by Ministry of Social Justice & Empowerment (MoSJE)",
-    scanToVerify: "Scan QR code to verify provenance",
-    artisanName: "Artisan Master",
+    certificateTitle: "Digital Provenance & Craft Certificate",
+    certificateSub: "Ministry of Social Justice & Empowerment (MoSJE) Verified Authenticity",
+    scanToVerify: "Scan QR to verify blockchain registry",
+    artisanName: "Master Artisan Name",
     originHub: "Heritage Craft Hub",
     lineage: "Hereditary Lineage",
     years: "Years",
@@ -266,9 +266,9 @@ export const translations = {
     voiceNavHint: "Say: 'Add product', 'Check sales', 'Check price', 'GeM portal', 'Sync items'",
 
     // Update 1 & 3: Onboarding & Split Experience
-    welcomeTitle: "Welcome to KalaSetu",
+    welcomeTitle: "Welcome to CraftX",
     welcomeSub: "AI Platform for Indian Artisans & Direct Buyers",
-    onboardingAudioGreeting: "Namaste! Welcome to KalaSetu. Which language would you prefer to speak in?",
+    onboardingAudioGreeting: "Namaste! Welcome to CraftX. Which language would you prefer to speak in?",
     onboardingRolePrompt: "Are you a Seller/Artisan or a Buyer/Business?",
     chooseLanguage: "Choose Language",
     chooseRole: "Select Your Role",
@@ -316,7 +316,7 @@ export const translations = {
 
 
   ta: {
-    appName: "கலாசேது (KalaSetu)",
+    appName: "கிராஃப்ட்எக்ஸ் (CraftX)",
     appSub: "கைவினைஞர்களுக்கான AI வணிக மேலாளர்",
     sihBadge: "SIH 2026 • MoSJE அமைச்சகம்",
     roleArtisan: "கைவினைஞர் / விற்பனையாளர் (Artisan)",
@@ -348,51 +348,31 @@ export const translations = {
     offlineMode: "ஆஃப்லைன் முறை செயலில் உள்ளது",
     cameraTitle: "AI போட்டோ ஸ்டுடியோ",
     voiceTitle: "குரல் வழி மின்வணிகப் பட்டியல்",
-    pricingTitle: "டைனமிக் ஸ்மார்ட் விலை உதவியாளர்",
+    pricingTitle: "டைனமிக் ஸ்மார்ட் விலை",
     recommendedPrice: "பரிந்துரைக்கப்பட்ட விலை",
-    certificateTitle: "டிஜிட்டல் நம்பகத்தன்மை சான்றிதழ்"
+    certificateTitle: "டிஜிட்டல் சான்றிதழ்"
   },
 
   bho: {
-    appName: "कलासेतु (KalaSetu)",
-    appSub: "कारीगर भाई लोगन खातिर AI बिज़नेस मैनेजर",
+    appName: "क्राफ्टएक्स (CraftX)",
+    appSub: "कारीगर, खरीदार आ ब्यापारी खातिर AI मंच",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय मंत्रालय",
-    roleArtisan: "कारीगर / विक्रेता (Artisan)",
-    roleArtisanDesc: "फोटो खींच के आ बोल के AI कैटलॉग आ सही दाम तय करीं।",
-    roleBuyer: "ग्राहक / खरीदार (Buyer)",
-    roleBuyerDesc: "सीधे कारीगरन से असली GI कलाकृति आ हस्तशिल्प खरीदीं।",
+    roleArtisan: "कारीगर / बिक्रेता (Artisan)",
+    roleArtisanDesc: "फोटो खींच के, बोल के AI कैटलॉग आ उचित दाम तय करे के बा।",
+    roleBuyer: "खुदरा खरीदार (Buyer)",
+    roleBuyerDesc: "कारीगरन से सोझे असली GI हस्तशिल्प खरीदे के बा।",
     roleBusinessman: "थोक व्यापारी / GeM B2B (Businessman)",
-    roleBusinessmanDesc: "GeM आ ONDC के माध्यम से थोक खरीदारी आ सरकारी टेंडर पाईं।",
-    onboarding3RolePrompt: "प्रणाम! का रउआ कारीगर/विक्रेता बानी, ग्राहक बानी, या थोक व्यापारी बानी?",
-    voiceRegStepName: "रउआ पूरा नाम का ह?",
-    voiceRegStepCraft: "रउआ कवन शिल्प चाहे हस्तकला बनावेनी?",
-    voiceRegStepLocation: "रउआ गाँव, शहर आ राज्य कवन ह?",
-    voiceRegStepPhone: "रउआ मोबाइल नंबर का ह?",
-    voiceRegConfirm: "बहुत बढ़िया! हम रउआ प्रोफ़ाइल सेव कर रहल बानी, का ई सही बा?",
-    navHome: "सामान सूची",
-    navPhotoStudio: "AI फोटो स्टूडियो",
-    navVoiceCatalog: "आवाज से लिस्टिंग",
-    navPricing: "सही दाम",
-    navGeM: "GeM सरकारी बाजार",
-    navWhatsApp: "व्हाट्सएप बॉट",
-    navAnalytics: "कमाई के हिसाब",
-    navCommunity: "कारीगर समाज",
-    newListing: "नया सामान जोड़ीं",
-    syncStatus: "सिंक स्थिति",
-    synced: "सिंक भइल",
-    pendingSync: "सिंक बाकी बा",
-    syncNow: "अबहीं सिंक करीं",
-    resetDemo: "डेमो रीसेट करीं",
-    offlineMode: "बिना नेट के काम चालू बा",
+    roleBusinessmanDesc: "GeM आ ONDC से थोक में खरीदारी आ टेंडर हासिल करे के बा।",
+    onboarding3RolePrompt: "प्रणाम! रउवा कारीगर/बिक्रेता बानी, खरीदार बानी कि ब्यापारी बानी?",
     cameraTitle: "AI फोटो स्टूडियो",
-    voiceTitle: "आवाज से सामान के लिस्ट बनाईं",
-    pricingTitle: "स्मार्ट दाम सहायक",
+    voiceTitle: "बोल के कैटलॉग बनाईं",
+    pricingTitle: "डायनामिक स्मार्ट भाव सहायक",
     recommendedPrice: "उचित बिक्री भाव",
     certificateTitle: "डिजिटल असली प्रमाण पत्र"
   },
 
   bn: {
-    appName: "শিল্পসেতু (KalaSetu)",
+    appName: "ক্রাফ্টএক্স (CraftX)",
     appSub: "কারিগর, ক্রেতা এবং ব্যবসায়ীদের জন্য AI প্ল্যাটফর্ম",
     sihBadge: "SIH 2026 • MoSJE সামাজিক ন্যায় মন্ত্রণালয়",
     navHome: "ক্যাটালগ",
@@ -425,7 +405,7 @@ export const translations = {
   },
 
   mr: {
-    appName: "शिल्पसेतू (KalaSetu)",
+    appName: "क्राफ्टएक्स (CraftX)",
     appSub: "कारागीर, ग्राहक आणि व्यावसायिकांसाठी AI प्लॅटफॉर्म",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय मंत्रालय",
     roleArtisan: "कारागीर / विक्रेता (Artisan)",
@@ -438,7 +418,7 @@ export const translations = {
   },
 
   te: {
-    appName: "కళాసేతు (KalaSetu)",
+    appName: "క్రాఫ్ట్‌ఎక్స్ (CraftX)",
     appSub: "చేతివృత్తుల వారు, కొనుగోలుదారులు మరియు వ్యాపారుల కోసం AI వేదిక",
     sihBadge: "SIH 2026 • MoSJE సామాజిక న్యాయ మంత్రిత్వ శాఖ",
     roleArtisan: "కళాకారుడు / విక్రేత (Artisan)",
@@ -451,7 +431,7 @@ export const translations = {
   },
 
   gu: {
-    appName: "કલાસેતુ (KalaSetu)",
+    appName: "ક્રાફ્ટએક્સ (CraftX)",
     appSub: "કારીગરો, ગ્રાહકો અને વેપારીઓ માટે AI પ્લેટફોર્મ",
     sihBadge: "SIH 2026 • MoSJE સામાજિક ન્યાય મંત્રાલય",
     roleArtisan: "કારીગર / વેચનાર (Artisan)",
@@ -464,7 +444,7 @@ export const translations = {
   },
 
   kn: {
-    appName: "ಕಲಾసేತು (KalaSetu)",
+    appName: "ಕ್ರಾಫ್ಟ್‌ಎಕ್ಸ್ (CraftX)",
     appSub: "ಕುಶಲಕರ್ಮಿಗಳು, ಗ್ರಾಹಕರು ಮತ್ತು ಉದ್ಯಮಿಗಳಿಗಾಗಿ AI ವೇದಿಕೆ",
     sihBadge: "SIH 2026 • MoSJE ಸಾಮಾಜಿಕ ನ್ಯಾಯ ಸಚಿವಾಲಯ",
     roleArtisan: "ಕುಶಲಕರ್ಮಿ / ಮಾರಾಟಗಾರ (Artisan)",
@@ -477,7 +457,7 @@ export const translations = {
   },
 
   ml: {
-    appName: "കലാസേതു (KalaSetu)",
+    appName: "ക്രാഫ്റ്റ്എക്സ് (CraftX)",
     appSub: "കരകൗശല വിദഗ്ദ്ധർ, ഉപഭോക്താക്കൾ, ബിസിനസുകാർ എന്നിവർക്കായുള്ള AI പ്ലാറ്റ്ഫോം",
     sihBadge: "SIH 2026 • MoSJE സാമൂഹ്യനീതി മന്ത്രാലയം",
     roleArtisan: "കരകൗശല വിദഗ്ദ്ധൻ / വിൽപ്പനക്കാരൻ (Artisan)",
@@ -490,7 +470,7 @@ export const translations = {
   },
 
   or: {
-    appName: "କଳାସେତୁ (KalaSetu)",
+    appName: "କ୍ରାଫ୍ଟଏକ୍ସ (CraftX)",
     appSub: "କାରିଗର, ଗ୍ରାହକ ଏବଂ ବ୍ୟବସାୟୀଙ୍କ ପାଇଁ AI ପ୍ଲାଟଫର୍ମ",
     sihBadge: "SIH 2026 • MoSJE ସାମାଜିକ ନ୍ୟାୟ ମନ୍ତ୍ରଣାଳୟ",
     roleArtisan: "କାରିଗର / ବିକ୍ରେତା (Artisan)",
@@ -503,7 +483,7 @@ export const translations = {
   },
 
   pa: {
-    appName: "ਕਲਾਸੇਤੂ (KalaSetu)",
+    appName: "ਕ੍ਰਾਫਟਐਕਸ (CraftX)",
     appSub: "ਕਾਰੀਗਰਾਂ, ਖਰੀਦਦਾਰਾਂ ਅਤੇ ਵਪਾਰੀਆਂ ਲਈ AI ਪਲੇਟਫਾਰਮ",
     sihBadge: "SIH 2026 • MoSJE ਸਮਾਜਿਕ ਨਿਆਂ ਮੰਤਰਾਲਾ",
     roleArtisan: "ਕਾਰੀਗਰ / ਵਿਕਰੇਤਾ (Artisan)",
@@ -516,7 +496,7 @@ export const translations = {
   },
 
   as: {
-    appName: "কলাসেতু (KalaSetu)",
+    appName: "ক্ৰাফ্টএক্স (CraftX)",
     appSub: "কাৰিকৰ, ক্ৰেতা আৰু ব্যৱসায়ীৰ বাবে AI মঞ্চ",
     sihBadge: "SIH 2026 • MoSJE সামাজিক ন্যায় মন্ত্ৰালয়",
     roleArtisan: "কাৰিকৰ / বিক্ৰেতা (Artisan)",
@@ -529,7 +509,7 @@ export const translations = {
   },
 
   ur: {
-    appName: "کلا سیتو (KalaSetu)",
+    appName: "کرافٹ ایکس (CraftX)",
     appSub: "دستکاروں، خریداروں اور تاجروں کے لیے AI پلیٹ فارم",
     sihBadge: "SIH 2026 • MoSJE وزارت برائے سماجی انصاف",
     roleArtisan: "دستکار / بیچنے والا (Artisan)",
@@ -542,7 +522,7 @@ export const translations = {
   },
 
   mai: {
-    appName: "कलासेतु (KalaSetu)",
+    appName: "क्राफ्टएक्स (CraftX)",
     appSub: "कारीगर, ग्राहक आ व्यापारीक लेल AI मंच",
     sihBadge: "SIH 2026 • MoSJE सामाजिक न्याय मंत्रालय",
     roleArtisan: "कारीगर / विक्रेता (Artisan)",

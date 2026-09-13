@@ -12,8 +12,8 @@ import {
   Building2,
   CheckCircle2, 
   ArrowRight,
-  ShieldCheck,
-  UserCheck,
+  ShieldCheck, 
+  UserCheck, 
   Briefcase,
   Layers,
   FileCheck,
@@ -26,7 +26,12 @@ import {
   MapPin,
   User,
   Mail,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
+  AlertCircle
 } from 'lucide-react';
 
 export const OnboardingModal = ({ isFullScreen = false }) => {
@@ -65,7 +70,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
   // Step 1: Speak Hindi greeting automatically on mount
   useEffect(() => {
     if (showOnboardingModal && step === 1) {
-      const greeting = "नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?";
+      const greeting = "नमस्ते! क्राफ्टएक्स में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?";
       const timer = setTimeout(() => {
         try {
           speechService.speak(greeting, 'hi');
@@ -101,18 +106,30 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     setSelectedRole(role);
     setStep(3);
 
+    // Update default username placeholder for selected role
+    if (role === 'artisan') {
+      setRegUsername('bunkar_ramdas');
+      setLoginIdentifier('bunkar_ramdas');
+    } else if (role === 'businessman') {
+      setRegUsername('singhal_exports');
+      setLoginIdentifier('singhal_exports');
+    } else {
+      setRegUsername('priya_sharma');
+      setLoginIdentifier('priya_sharma');
+    }
+
     let promptText = "";
     if (role === 'artisan') {
       promptText = getTranslation(selectedLang, 'voiceRegStepName') || 
         "नमस्ते कारीगर साथी! आपका पूरा नाम क्या है? बोलकर बताइए।";
     } else if (role === 'businessman') {
       promptText = selectedLang === 'hi' || selectedLang === 'bho' || selectedLang === 'mai'
-        ? "संस्थागत व्यापारी व GeM खरीद पंजीकरण। कृपया अपनी कंपनी या संस्था का विवरण दर्ज करें।"
-        : "Institutional Businessman & GeM Procurement registration. Please enter your enterprise details.";
+        ? "संस्थागत व्यापारी व GeM खरीद पंजीकरण। कृपया अपना विवरण और पासवर्ड दर्ज करें।"
+        : "Institutional Businessman & GeM Procurement registration. Please enter your credentials.";
     } else {
       promptText = selectedLang === 'hi' || selectedLang === 'bho' || selectedLang === 'mai'
-        ? "खरीदार पंजीकरण। कृपया अपनी डिलीवरी प्रोफ़ाइल दर्ज करें।"
-        : "Retail Buyer registration. Please complete your delivery profile.";
+        ? "खरीदार पंजीकरण। कृपया अपनी प्रोफ़ाइल और पासवर्ड दर्ज करें।"
+        : "Retail Buyer registration. Please complete your username and credentials.";
     }
 
     setTimeout(() => {
@@ -121,8 +138,85 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     }, 250);
   };
 
-  // Form State for Login / Register
-  const [authMode, setAuthMode] = useState('register'); // 'register' | 'login'
+  // Form State for Login / Register / Forgot Password (UPDATE 4)
+  const [authMode, setAuthMode] = useState('register'); // 'register' | 'login' | 'forgot_password'
+  
+  // Registration Credentials State
+  const [regUsername, setRegUsername] = useState('bunkar_ramdas');
+  const [regPassword, setRegPassword] = useState('craft123');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('craft123');
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [authError, setAuthError] = useState('');
+
+  // Login Credentials State
+  const [loginIdentifier, setLoginIdentifier] = useState('bunkar_ramdas');
+  const [loginPassword, setLoginPassword] = useState('craft123');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+
+  // Forgot Password State
+  const [forgotIdentifier, setForgotIdentifier] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState('');
+  const [forgotError, setForgotError] = useState('');
+
+  // Local Accounts Helper
+  const getStoredAccounts = () => {
+    try {
+      const data = localStorage.getItem('craftx_user_accounts') || localStorage.getItem('kalasetu_user_accounts');
+      if (data) return JSON.parse(data);
+    } catch (e) {}
+    return [
+      {
+        username: 'bunkar_ramdas',
+        password: 'craft123',
+        role: 'artisan',
+        lang: 'hi',
+        name: 'Master Ram Das Bunkar',
+        phone: '+91 98765 43210',
+        craft_type: 'Handloom Pure Silk Weaving',
+        location: 'Kotwa, Varanasi, Uttar Pradesh',
+        scheme_id: 'MoSJE-VISH-2026-UP-091'
+      },
+      {
+        username: 'priya_sharma',
+        password: 'buyer123',
+        role: 'buyer',
+        lang: 'en',
+        name: 'Priya Sharma',
+        phone: '+91 98112 34567',
+        email: 'priya.sharma@heritagecraft.in',
+        location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
+        buyer_type: 'Individual Heritage Collector'
+      },
+      {
+        username: 'singhal_exports',
+        password: 'b2b123',
+        role: 'businessman',
+        lang: 'en',
+        name: 'Rajesh Singhal',
+        company: 'Singhal Crafts Export & Retailers Pvt Ltd',
+        phone: '+91 98200 11223',
+        email: 'procurement@singhalcrafts.com',
+        gstin: '07AAAAA0000A1Z5',
+        gem_org_id: 'GEM-DL-2026-9912',
+        location: 'New Delhi & Global Exporter',
+        procurement_type: 'B2B Wholesale & Government GeM Tenders'
+      }
+    ];
+  };
+
+  const saveAccount = (account) => {
+    try {
+      const existing = getStoredAccounts();
+      const filtered = existing.filter(a => a.username?.toLowerCase() !== account.username?.toLowerCase());
+      const updated = [account, ...filtered];
+      localStorage.setItem('craftx_user_accounts', JSON.stringify(updated));
+      localStorage.setItem('kalasetu_user_accounts', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to save account to localStorage:', e);
+    }
+  };
 
   // Artisan Form Data
   const [artisanForm, setArtisanForm] = useState({
@@ -312,43 +406,52 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
   };
 
   // Complete Onboarding & Save
-  const handleFinish = (roleOverride) => {
+  const handleFinish = (roleOverride, customDetails) => {
     stopVoiceListening();
     const finalRole = roleOverride || selectedRole;
-    let userDetails = null;
+    let userDetails = customDetails || null;
 
-    if (finalRole === 'artisan') {
-      userDetails = {
-        name: artisanForm.name || 'Master Ram Das Bunkar',
-        phone: artisanForm.phone || '+91 98765 43210',
-        role: 'artisan',
-        craft_type: artisanForm.craft_type || 'Handloom Pure Silk Weaving',
-        location: `${artisanForm.village || 'Kotwa, Varanasi'}, ${artisanForm.state || 'Uttar Pradesh'}`,
-        scheme_id: artisanForm.scheme_id || 'MoSJE-VISH-2026-UP-091'
-      };
-    } else if (finalRole === 'businessman') {
-      userDetails = {
-        name: businessmanForm.name || 'Rajesh Singhal',
-        company: businessmanForm.company || 'Singhal Crafts Export & Retailers Pvt Ltd',
-        phone: businessmanForm.phone || '+91 98200 11223',
-        email: businessmanForm.email || 'procurement@singhalcrafts.com',
-        gstin: businessmanForm.gstin || '07AAAAA0000A1Z5',
-        gem_org_id: businessmanForm.gem_org_id || 'GEM-DL-2026-9912',
-        role: 'businessman',
-        location: businessmanForm.city || 'New Delhi / Global Exporter',
-        procurement_type: businessmanForm.procurement_type || 'B2B Wholesale & Government GeM Tenders'
-      };
-    } else {
-      userDetails = {
-        name: buyerForm.name || 'Priya Sharma',
-        phone: buyerForm.phone || '+91 98112 34567',
-        email: buyerForm.email || 'priya.sharma@heritagecraft.in',
-        role: 'buyer',
-        location: `${buyerForm.location || '124 Connaught Place, Central Delhi'} - ${buyerForm.pincode || '110001'}`,
-        buyer_type: buyerForm.buyer_type || 'Individual Heritage Collector'
-      };
+    if (!userDetails) {
+      if (finalRole === 'artisan') {
+        userDetails = {
+          username: regUsername || 'bunkar_ramdas',
+          password: regPassword || 'craft123',
+          name: artisanForm.name || 'Master Ram Das Bunkar',
+          phone: artisanForm.phone || '+91 98765 43210',
+          role: 'artisan',
+          craft_type: artisanForm.craft_type || 'Handloom Pure Silk Weaving',
+          location: `${artisanForm.village || 'Kotwa, Varanasi'}, ${artisanForm.state || 'Uttar Pradesh'}`,
+          scheme_id: artisanForm.scheme_id || 'MoSJE-VISH-2026-UP-091'
+        };
+      } else if (finalRole === 'businessman') {
+        userDetails = {
+          username: regUsername || 'singhal_exports',
+          password: regPassword || 'b2b123',
+          name: businessmanForm.name || 'Rajesh Singhal',
+          company: businessmanForm.company || 'Singhal Crafts Export & Retailers Pvt Ltd',
+          phone: businessmanForm.phone || '+91 98200 11223',
+          email: businessmanForm.email || 'procurement@singhalcrafts.com',
+          gstin: businessmanForm.gstin || '07AAAAA0000A1Z5',
+          gem_org_id: businessmanForm.gem_org_id || 'GEM-DL-2026-9912',
+          role: 'businessman',
+          location: businessmanForm.city || 'New Delhi / Global Exporter',
+          procurement_type: businessmanForm.procurement_type || 'B2B Wholesale & Government GeM Tenders'
+        };
+      } else {
+        userDetails = {
+          username: regUsername || 'priya_sharma',
+          password: regPassword || 'buyer123',
+          name: buyerForm.name || 'Priya Sharma',
+          phone: buyerForm.phone || '+91 98112 34567',
+          email: buyerForm.email || 'priya.sharma@heritagecraft.in',
+          role: 'buyer',
+          location: `${buyerForm.location || '124 Connaught Place, Central Delhi'} - ${buyerForm.pincode || '110001'}`,
+          buyer_type: buyerForm.buyer_type || 'Individual Heritage Collector'
+        };
+      }
     }
 
+    saveAccount(userDetails);
     completeOnboarding(finalRole, selectedLang, userDetails);
   };
 
@@ -357,9 +460,113 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     handleFinish(role);
   };
 
+  const handleManualLogin = (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+    const accounts = getStoredAccounts();
+    const ident = (loginIdentifier || '').trim().toLowerCase();
+    const pass = (loginPassword || '').trim();
+
+    if (!ident || !pass) {
+      setAuthError(selectedLang === 'hi' ? 'कृपया यूजरनेम और पासवर्ड दोनों दर्ज करें।' : 'Please enter both username and password.');
+      return;
+    }
+
+    const user = accounts.find(a => 
+      (a.username && a.username.toLowerCase() === ident) ||
+      (a.phone && a.phone.replace(/[^0-9]/g, '').endsWith(ident.replace(/[^0-9]/g, ''))) ||
+      (a.email && a.email.toLowerCase() === ident)
+    );
+
+    if (!user) {
+      setAuthError(selectedLang === 'hi' ? 'खाता नहीं मिला। कृपया यूजरनेम जांचें या नया खाता बनाएँ।' : 'Account not found. Please check username or register.');
+      return;
+    }
+
+    if (user.password && user.password !== pass) {
+      setAuthError(selectedLang === 'hi' ? 'गलत पासवर्ड। कृपया पुनः प्रयास करें या पासवर्ड रीसेट करें।' : 'Incorrect password. Please try again or reset password.');
+      return;
+    }
+
+    stopVoiceListening();
+    const role = user.role || selectedRole;
+    completeOnboarding(role, user.lang || selectedLang, user);
+  };
+
+  const handleRegisterSubmit = (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+
+    const u = (regUsername || '').trim();
+    const p = (regPassword || '').trim();
+    const cp = (regConfirmPassword || '').trim();
+
+    if (!u) {
+      setAuthError(selectedLang === 'hi' ? 'कृपया एक यूजरनेम चुनें।' : 'Please enter a username.');
+      return;
+    }
+    if (p.length < 4) {
+      setAuthError(selectedLang === 'hi' ? 'पासवर्ड कम से कम 4 अक्षरों का होना चाहिए।' : 'Password must be at least 4 characters.');
+      return;
+    }
+    if (p !== cp) {
+      setAuthError(selectedLang === 'hi' ? 'पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते।' : 'Passwords do not match.');
+      return;
+    }
+
+    handleFinish(selectedRole);
+  };
+
+  const handleForgotPasswordReset = (e) => {
+    if (e) e.preventDefault();
+    setForgotError('');
+    setForgotSuccess('');
+
+    const ident = (forgotIdentifier || '').trim().toLowerCase();
+    const np = (forgotNewPassword || '').trim();
+    const cnp = (forgotConfirmPassword || '').trim();
+
+    if (!ident) {
+      setForgotError(selectedLang === 'hi' ? 'कृपया अपना यूजरनेम या मोबाइल नंबर दर्ज करें।' : 'Please enter your username or phone number.');
+      return;
+    }
+    if (np.length < 4) {
+      setForgotError(selectedLang === 'hi' ? 'नया पासवर्ड कम से कम 4 अक्षरों का होना चाहिए।' : 'New password must be at least 4 characters.');
+      return;
+    }
+    if (np !== cnp) {
+      setForgotError(selectedLang === 'hi' ? 'दोनों पासवर्ड मेल नहीं खाते।' : 'Passwords do not match.');
+      return;
+    }
+
+    const accounts = getStoredAccounts();
+    const idx = accounts.findIndex(a => 
+      (a.username && a.username.toLowerCase() === ident) ||
+      (a.phone && a.phone.replace(/[^0-9]/g, '').endsWith(ident.replace(/[^0-9]/g, ''))) ||
+      (a.email && a.email.toLowerCase() === ident)
+    );
+
+    if (idx === -1) {
+      setForgotError(selectedLang === 'hi' ? 'इस यूजरनेम/नंबर से कोई खाता नहीं मिला।' : 'No account found matching this identifier.');
+      return;
+    }
+
+    accounts[idx].password = np;
+    localStorage.setItem('craftx_user_accounts', JSON.stringify(accounts));
+    localStorage.setItem('kalasetu_user_accounts', JSON.stringify(accounts));
+
+    setForgotSuccess(selectedLang === 'hi' ? 'पासवर्ड सफलतापूर्वक बदल दिया गया! अब लॉगिन करें।' : 'Password reset successfully! You can now log in.');
+    setTimeout(() => {
+      setLoginIdentifier(accounts[idx].username || ident);
+      setLoginPassword(np);
+      setAuthMode('login');
+      setForgotSuccess('');
+    }, 1200);
+  };
+
   const replayAudio = () => {
     if (step === 1) {
-      speechService.speak("नमस्ते! कलासेतु में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?", 'hi');
+      speechService.speak("नमस्ते! क्राफ्टएक्स में आपका स्वागत है। आप किस भाषा में बात करना पसंद करेंगे?", 'hi');
     } else if (step === 2) {
       const promptText = getTranslation(selectedLang, 'onboarding3RolePrompt') || 
         "नमस्ते! क्या आप कारीगर/विक्रेता हैं, व्यक्तिगत खरीदार हैं, या थोक व्यापारी हैं?";
@@ -408,7 +615,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                   SIH 2026 • MoSJE SIH26090
                 </span>
                 <h2 className="text-lg sm:text-xl font-black tracking-tight text-stone-950 mt-0.5 font-hindi">
-                  KalaSetu (कलासेतु)
+                  CraftX (क्राफ्टएक्स)
                 </h2>
               </div>
             </div>
@@ -628,19 +835,20 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
             </div>
           )}
 
-          {/* STEP 3: REGISTRATION & LOGIN SCREEN (COMBINED AUTH) */}
+          {/* STEP 3: REGISTRATION, LOGIN & FORGOT PASSWORD (UPDATE 4) */}
           {step === 3 && (
             <div className="space-y-4 animate-fade-in">
               
-              {/* Segmented Auth Mode Switcher (Register vs Login) */}
+              {/* Segmented Auth Mode Switcher (Register vs Login vs Forgot Password) */}
               <div className="flex rounded-2xl bg-stone-800 p-1 border border-stone-700">
                 <button
                   type="button"
                   onClick={() => {
                     stopVoiceListening();
+                    setAuthError('');
                     setAuthMode('register');
                   }}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1.5 ${
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1 ${
                     authMode === 'register'
                       ? selectedRole === 'artisan'
                         ? 'bg-orange-600 text-white shadow-md'
@@ -650,15 +858,16 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                       : 'text-stone-400 hover:text-white'
                   }`}
                 >
-                  <span>📝 {selectedLang === 'hi' ? 'नया खाता बनाएँ (Register)' : 'New User? Register'}</span>
+                  <span>📝 {selectedLang === 'hi' ? 'नया खाता (Register)' : 'Register'}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     stopVoiceListening();
+                    setAuthError('');
                     setAuthMode('login');
                   }}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1.5 ${
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1 ${
                     authMode === 'login'
                       ? selectedRole === 'artisan'
                         ? 'bg-orange-600 text-white shadow-md'
@@ -668,9 +877,35 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                       : 'text-stone-400 hover:text-white'
                   }`}
                 >
-                  <span>🔑 {selectedLang === 'hi' ? 'पहले से खाता है? लॉगिन करें (Log In)' : 'Already Registered? Log In'}</span>
+                  <span>🔑 {selectedLang === 'hi' ? 'लॉगिन (Log In)' : 'Log In'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopVoiceListening();
+                    setForgotError('');
+                    setForgotSuccess('');
+                    setAuthMode('forgot_password');
+                  }}
+                  className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center space-x-1 ${
+                    authMode === 'forgot_password'
+                      ? 'bg-stone-700 text-white shadow-md'
+                      : 'text-stone-400 hover:text-white'
+                  }`}
+                  title="Reset Password"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{selectedLang === 'hi' ? 'पासवर्ड भूल गए?' : 'Reset'}</span>
                 </button>
               </div>
+
+              {/* Error Notification Alert */}
+              {authError && (
+                <div className="p-3 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs flex items-center space-x-2 animate-fade-in">
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  <span>{authError}</span>
+                </div>
+              )}
 
               {/* ========================================================================= */}
               {/* RETURNING USER LOGIN TAB */}
@@ -688,6 +923,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         <button
                           onClick={() => {
                             completeOnboarding('artisan', selectedLang, {
+                              username: 'bunkar_ramdas',
                               name: 'Master Ram Das Bunkar',
                               phone: '+91 98765 43210',
                               role: 'artisan',
@@ -703,7 +939,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                               RB
                             </div>
                             <div>
-                              <h4 className="font-bold text-sm text-white font-hindi">Master Ram Das Bunkar</h4>
+                              <div className="flex items-center space-x-1.5">
+                                <h4 className="font-bold text-sm text-white font-hindi">Master Ram Das Bunkar</h4>
+                                <span className="text-[10px] text-stone-400 font-mono">@bunkar_ramdas</span>
+                              </div>
                               <p className="text-[11px] text-stone-400">Handloom Silk • Kotwa, Varanasi • MoSJE-UP-091</p>
                             </div>
                           </div>
@@ -715,6 +954,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         <button
                           onClick={() => {
                             completeOnboarding('artisan', selectedLang, {
+                              username: 'sita_devi',
                               name: 'Sita Devi',
                               phone: '+91 98765 43211',
                               role: 'artisan',
@@ -730,7 +970,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                               SD
                             </div>
                             <div>
-                              <h4 className="font-bold text-sm text-white font-hindi">Sita Devi</h4>
+                              <div className="flex items-center space-x-1.5">
+                                <h4 className="font-bold text-sm text-white font-hindi">Sita Devi</h4>
+                                <span className="text-[10px] text-stone-400 font-mono">@sita_devi</span>
+                              </div>
                               <p className="text-[11px] text-stone-400">Mithila Folk Painting • Ranti, Bihar • MoSJE-BR-118</p>
                             </div>
                           </div>
@@ -746,6 +989,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         <button
                           onClick={() => {
                             completeOnboarding('buyer', selectedLang, {
+                              username: 'priya_sharma',
                               name: 'Priya Sharma',
                               phone: '+91 98112 34567',
                               email: 'priya.sharma@heritagecraft.in',
@@ -761,7 +1005,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                               PS
                             </div>
                             <div>
-                              <h4 className="font-bold text-sm text-white">Priya Sharma</h4>
+                              <div className="flex items-center space-x-1.5">
+                                <h4 className="font-bold text-sm text-white">Priya Sharma</h4>
+                                <span className="text-[10px] text-stone-400 font-mono">@priya_sharma</span>
+                              </div>
                               <p className="text-[11px] text-stone-400">Retail Buyer • Central Delhi - 110001</p>
                             </div>
                           </div>
@@ -773,6 +1020,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         <button
                           onClick={() => {
                             completeOnboarding('buyer', selectedLang, {
+                              username: 'ananya_roy',
                               name: 'Ananya Roy',
                               phone: '+91 98300 45678',
                               email: 'ananya.roy@craftart.in',
@@ -788,7 +1036,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                               AR
                             </div>
                             <div>
-                              <h4 className="font-bold text-sm text-white">Ananya Roy</h4>
+                              <div className="flex items-center space-x-1.5">
+                                <h4 className="font-bold text-sm text-white">Ananya Roy</h4>
+                                <span className="text-[10px] text-stone-400 font-mono">@ananya_roy</span>
+                              </div>
                               <p className="text-[11px] text-stone-400">Retail Buyer • Salt Lake, Kolkata - 700091</p>
                             </div>
                           </div>
@@ -804,6 +1055,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                         <button
                           onClick={() => {
                             completeOnboarding('businessman', selectedLang, {
+                              username: 'singhal_exports',
                               name: 'Rajesh Singhal',
                               company: 'Singhal Crafts Export & Retailers Pvt Ltd',
                               phone: '+91 98200 11223',
@@ -822,7 +1074,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                               RS
                             </div>
                             <div>
-                              <h4 className="font-bold text-sm text-white">Rajesh Singhal (Singhal Exports)</h4>
+                              <div className="flex items-center space-x-1.5">
+                                <h4 className="font-bold text-sm text-white">Rajesh Singhal</h4>
+                                <span className="text-[10px] text-stone-400 font-mono">@singhal_exports</span>
+                              </div>
                               <p className="text-[11px] text-stone-400">GSTIN: 07AAAAA0000A1Z5 • GeM ID: GEM-DL-2026</p>
                             </div>
                           </div>
@@ -834,37 +1089,162 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                     )}
                   </div>
 
-                  {/* Direct Phone / ID Sign-In */}
-                  <div className="space-y-2.5 p-4 rounded-2xl bg-stone-850 border border-stone-700">
+                  {/* Manual Username & Password Sign-In */}
+                  <form onSubmit={handleManualLogin} className="space-y-3 p-4 rounded-2xl bg-stone-850 border border-stone-700">
                     <label className="text-xs font-bold text-stone-300 block">
-                      {selectedLang === 'hi' 
-                        ? (selectedRole === 'artisan' ? 'पंजीकृत मोबाइल नंबर या विश्वकर्मा ID से लॉगिन करें:' : 'पंजीकृत मोबाइल नंबर या ईमेल दर्ज करें:') 
-                        : 'Or Log In with Registered Phone / ID:'}
+                      {selectedLang === 'hi' ? 'यूजरनेम व पासवर्ड से लॉगिन करें:' : 'Sign In with Username & Password:'}
                     </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder={selectedRole === 'artisan' ? '+91 98765 43210' : (selectedRole === 'businessman' ? '07AAAAA0000A1Z5' : '+91 98112 34567')}
-                        defaultValue={selectedRole === 'artisan' ? artisanForm.phone : (selectedRole === 'businessman' ? businessmanForm.phone : buyerForm.phone)}
-                        className="flex-1 p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
-                      />
+
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder={selectedRole === 'artisan' ? 'Username (e.g. bunkar_ramdas or phone)' : (selectedRole === 'businessman' ? 'Username (e.g. singhal_exports)' : 'Username (e.g. priya_sharma)')}
+                          value={loginIdentifier}
+                          onChange={(e) => setLoginIdentifier(e.target.value)}
+                          className="w-full p-2.5 pl-9 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                        />
+                        <User className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
+                      </div>
+
+                      <div className="relative">
+                        <input
+                          type={showLoginPassword ? 'text' : 'password'}
+                          placeholder="Password (पासवर्ड)"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          className="w-full p-2.5 pl-9 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                        />
+                        <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
+                        <button
+                          type="button"
+                          onClick={() => setShowLoginPassword(!showLoginPassword)}
+                          className="absolute right-3 top-2.5 text-stone-400 hover:text-white"
+                        >
+                          {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1">
                       <button
-                        onClick={() => handleDemoInstantLogin(selectedRole)}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-extrabold shadow-md ${
+                        type="button"
+                        onClick={() => {
+                          setForgotIdentifier(loginIdentifier);
+                          setAuthMode('forgot_password');
+                        }}
+                        className="text-xs text-orange-400 hover:underline font-medium"
+                      >
+                        {selectedLang === 'hi' ? 'पासवर्ड भूल गए? (Forgot?)' : 'Forgot Password?'}
+                      </button>
+
+                      <button
+                        type="submit"
+                        className={`px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md transition-all ${
                           selectedRole === 'artisan' ? 'bg-orange-600 hover:bg-orange-500 text-white' :
                           selectedRole === 'businessman' ? 'bg-blue-600 hover:bg-blue-500 text-white' :
                           'bg-amber-600 hover:bg-amber-500 text-stone-950'
                         }`}
                       >
-                        {selectedLang === 'hi' ? 'लॉगिन ➔' : 'Sign In ➔'}
+                        {selectedLang === 'hi' ? 'लॉगिन करें ➔' : 'Sign In ➔'}
                       </button>
                     </div>
+                  </form>
+                </div>
+              )}
+
+              {/* ========================================================================= */}
+              {/* FORGOT PASSWORD TAB (UPDATE 4) */}
+              {/* ========================================================================= */}
+              {authMode === 'forgot_password' && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="p-4 rounded-2xl bg-stone-850 border border-stone-700 space-y-3">
+                    <div className="flex items-center space-x-2 text-stone-200">
+                      <KeyRound className="w-4 h-4 text-orange-400" />
+                      <h4 className="font-bold text-xs sm:text-sm">
+                        {selectedLang === 'hi' ? 'पासवर्ड रीसेट करें (Reset Password)' : 'Reset Your CraftX Password'}
+                      </h4>
+                    </div>
+
+                    {forgotError && (
+                      <div className="p-2.5 rounded-xl bg-red-950/80 border border-red-500/60 text-red-200 text-xs flex items-center space-x-2">
+                        <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                        <span>{forgotError}</span>
+                      </div>
+                    )}
+
+                    {forgotSuccess && (
+                      <div className="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500/60 text-emerald-200 text-xs flex items-center space-x-2">
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>{forgotSuccess}</span>
+                      </div>
+                    )}
+
+                    <form onSubmit={handleForgotPasswordReset} className="space-y-2.5">
+                      <div>
+                        <label className="text-[11px] font-bold text-stone-400 block mb-1">
+                          {selectedLang === 'hi' ? 'यूजरनेम, पंजीकृत मोबाइल या ईमेल:' : 'Username, Registered Phone or Email:'}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. bunkar_ramdas or +91 98765 43210"
+                          value={forgotIdentifier}
+                          onChange={(e) => setForgotIdentifier(e.target.value)}
+                          className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[11px] font-bold text-stone-400 block mb-1">
+                            {selectedLang === 'hi' ? 'नया पासवर्ड:' : 'New Password:'}
+                          </label>
+                          <input
+                            type="password"
+                            placeholder="Min 4 characters"
+                            value={forgotNewPassword}
+                            onChange={(e) => setForgotNewPassword(e.target.value)}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-stone-400 block mb-1">
+                            {selectedLang === 'hi' ? 'पासवर्ड की पुष्टि करें:' : 'Confirm Password:'}
+                          </label>
+                          <input
+                            type="password"
+                            placeholder="Re-enter password"
+                            value={forgotConfirmPassword}
+                            onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setAuthMode('login')}
+                          className="text-xs text-stone-400 hover:text-white underline font-medium"
+                        >
+                          ← {selectedLang === 'hi' ? 'वापस लॉगिन पर जाएँ' : 'Back to Login'}
+                        </button>
+
+                        <button
+                          type="submit"
+                          className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-md transition-all"
+                        >
+                          {selectedLang === 'hi' ? 'पासवर्ड अपडेट करें ➔' : 'Update Password ➔'}
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               )}
 
               {/* ========================================================================= */}
-              {/* NEW USER REGISTRATION TAB */}
+              {/* NEW USER REGISTRATION TAB (UPDATE 4: USERNAME + PASSWORDS) */}
               {/* ========================================================================= */}
               {authMode === 'register' && (
                 <div className="space-y-4">
@@ -889,417 +1269,492 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                     </span>
                   </button>
 
+                  {/* USERNAME & PASSWORD AUTH SETUP CARD (ALL 3 ROLES) */}
+                  <div className="p-3.5 rounded-2xl bg-stone-850 border border-stone-700/80 space-y-2.5">
+                    <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider block flex items-center space-x-1.5">
+                      <Lock className="w-3.5 h-3.5 text-orange-400" />
+                      <span>{selectedLang === 'hi' ? 'यूजरनेम व पासवर्ड सेट करें (Login Credentials)' : 'Account Login Credentials'}</span>
+                    </span>
+
+                    <div className="space-y-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-stone-300 block mb-1">
+                          {selectedLang === 'hi' ? 'यूजरनेम (Username)' : 'Choose Username'}
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-2.5 text-stone-500 font-mono text-xs">@</span>
+                          <input
+                            type="text"
+                            value={regUsername}
+                            onChange={(e) => setRegUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                            placeholder="e.g. bunkar_ramdas"
+                            className="w-full p-2.5 pl-7 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[11px] font-bold text-stone-300 block mb-1">
+                            {selectedLang === 'hi' ? 'पासवर्ड (Password)' : 'Password'}
+                          </label>
+                          <div className="relative">
+                            <input
+                              type={showRegPassword ? 'text' : 'password'}
+                              value={regPassword}
+                              onChange={(e) => setRegPassword(e.target.value)}
+                              placeholder="Min 4 chars"
+                              className="w-full p-2.5 pr-9 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowRegPassword(!showRegPassword)}
+                              className="absolute right-2.5 top-2.5 text-stone-400 hover:text-white"
+                            >
+                              {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-stone-300 block mb-1">
+                            {selectedLang === 'hi' ? 'पासवर्ड पुष्टि (Confirm)' : 'Confirm Password'}
+                          </label>
+                          <input
+                            type={showRegPassword ? 'text' : 'password'}
+                            value={regConfirmPassword}
+                            onChange={(e) => setRegConfirmPassword(e.target.value)}
+                            placeholder="Re-enter password"
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* ========================================================================= */}
                   {/* ARTISAN VOICE-FIRST AUTO-FILL REGISTRATION */}
                   {/* ========================================================================= */}
                   {selectedRole === 'artisan' && (
                     <div className="space-y-4">
                   
-                  {/* Interactive Voice Assistant Question Box */}
-                  <div className="p-4 rounded-3xl bg-gradient-to-br from-orange-950/80 via-stone-850 to-stone-900 border-2 border-orange-500/60 shadow-xl relative overflow-hidden">
-                    <div className="flex items-start space-x-3">
-                      <div className="p-2.5 rounded-2xl bg-orange-600 text-white shrink-0 shadow-md animate-pulse">
-                        <Volume2 className="w-5 h-5" />
+                      {/* Interactive Voice Assistant Question Box */}
+                      <div className="p-4 rounded-3xl bg-gradient-to-br from-orange-950/80 via-stone-850 to-stone-900 border-2 border-orange-500/60 shadow-xl relative overflow-hidden">
+                        <div className="flex items-start space-x-3">
+                          <div className="p-2.5 rounded-2xl bg-orange-600 text-white shrink-0 shadow-md animate-pulse">
+                            <Volume2 className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-bold tracking-wider text-orange-400">
+                                {artisanVoiceIndex < 4 
+                                  ? `AI Voice Question (${artisanVoiceIndex + 1} of 4)` 
+                                  : 'AI Profile Confirmation'}
+                              </span>
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300">
+                                Voice Auto-Fill
+                              </span>
+                            </div>
+
+                            {/* Current Voice Question Prompt */}
+                            <p className="text-sm sm:text-base font-bold text-white mt-1 leading-snug">
+                              {artisanVoiceIndex < 4 
+                                ? artisanQuestions[artisanVoiceIndex].speechPrompt 
+                                : (getTranslation(selectedLang, 'voiceRegConfirm') || "बहुत बढ़िया! मैं आपकी कारीगर प्रोफ़ाइल सहेज रही हूँ, क्या यह सही है?")}
+                            </p>
+
+                            {/* Speech hint */}
+                            <p className="text-[11px] text-stone-300 mt-1">
+                              {artisanVoiceIndex < 4 
+                                ? artisanQuestions[artisanVoiceIndex].hint 
+                                : "नीचे सभी विवरण देख कर पुष्टि करें और AI स्टूडियो में प्रवेश करें।"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Live Voice Wave & Mic Action Bar */}
+                        <div className="mt-3.5 pt-3 border-t border-orange-500/30 flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isVoiceListening) {
+                                stopVoiceListening();
+                              } else {
+                                if (artisanVoiceIndex < 4) startVoiceQuestion(artisanVoiceIndex);
+                              }
+                            }}
+                            className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all shadow-md ${
+                              isVoiceListening 
+                                ? 'bg-red-600 text-white animate-pulse' 
+                                : 'bg-orange-600 hover:bg-orange-500 text-white'
+                            }`}
+                          >
+                            {isVoiceListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
+                            <span>{isVoiceListening ? 'सुन रहे हैं... (Listening)' : '🎙️ बोलकर बताएं (Speak Answer)'}</span>
+                          </button>
+
+                          {artisanVoiceIndex < 4 ? (
+                            <button
+                              type="button"
+                              onClick={handleNextVoiceQuestion}
+                              className="px-3.5 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-orange-300 border border-stone-600 font-bold text-xs flex items-center space-x-1.5 transition-colors"
+                            >
+                              <span>{selectedLang === 'hi' ? 'अगला सवाल' : 'Next'}</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setArtisanVoiceIndex(0)}
+                              className="px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold flex items-center space-x-1"
+                            >
+                              <RotateCcw className="w-3.5 h-3.5" />
+                              <span>पुनः बोलें</span>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Live speech transcription ticker */}
+                        {liveVoiceTranscript && (
+                          <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-orange-500/40 text-[11px] text-orange-200 flex items-center space-x-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                            <span className="truncate">"{liveVoiceTranscript}"</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex-1">
+
+                      {/* Real-time Captured Profile Fields (Visual Auto-Filled Cards) */}
+                      <div className="space-y-2.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] uppercase font-bold tracking-wider text-orange-400">
-                            {artisanVoiceIndex < 4 
-                              ? `AI Voice Question (${artisanVoiceIndex + 1} of 4)` 
-                              : 'AI Profile Confirmation'}
-                          </span>
-                          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300">
-                            Voice Auto-Fill
-                          </span>
+                          <label className="text-xs font-bold text-stone-300 uppercase tracking-wider">
+                            {selectedLang === 'hi' ? 'आपकी कारीगर प्रोफ़ाइल (स्वतः भरी जा रही है)' : 'Your Artisan Profile (Auto-Filling by Voice)'}
+                          </label>
+                          <span className="text-[10px] text-stone-400">टैप करके संपादित भी कर सकते हैं</span>
                         </div>
 
-                        {/* Current Voice Question Prompt */}
-                        <p className="text-sm sm:text-base font-bold text-white mt-1 leading-snug">
-                          {artisanVoiceIndex < 4 
-                            ? artisanQuestions[artisanVoiceIndex].speechPrompt 
-                            : (getTranslation(selectedLang, 'voiceRegConfirm') || "बहुत बढ़िया! मैं आपकी कारीगर प्रोफ़ाइल सहेज रही हूँ, क्या यह सही है?")}
-                        </p>
-
-                        {/* Speech hint */}
-                        <p className="text-[11px] text-stone-300 mt-1">
-                          {artisanVoiceIndex < 4 
-                            ? artisanQuestions[artisanVoiceIndex].hint 
-                            : "नीचे सभी विवरण देख कर पुष्टि करें और AI स्टूडियो में प्रवेश करें।"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Live Voice Wave & Mic Action Bar */}
-                    <div className="mt-3.5 pt-3 border-t border-orange-500/30 flex items-center justify-between gap-2">
-                      <button
-                        onClick={() => {
-                          if (isVoiceListening) {
-                            stopVoiceListening();
-                          } else {
-                            if (artisanVoiceIndex < 4) startVoiceQuestion(artisanVoiceIndex);
-                          }
-                        }}
-                        className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center space-x-2 transition-all shadow-md ${
-                          isVoiceListening 
-                            ? 'bg-red-600 text-white animate-pulse' 
-                            : 'bg-orange-600 hover:bg-orange-500 text-white'
-                        }`}
-                      >
-                        {isVoiceListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
-                        <span>{isVoiceListening ? 'सुन रहे हैं... (Listening)' : '🎙️ बोलकर बताएं (Speak Answer)'}</span>
-                      </button>
-
-                      {artisanVoiceIndex < 4 ? (
-                        <button
-                          onClick={handleNextVoiceQuestion}
-                          className="px-3.5 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-orange-300 border border-stone-600 font-bold text-xs flex items-center space-x-1.5 transition-colors"
-                        >
-                          <span>{selectedLang === 'hi' ? 'अगला सवाल' : 'Next'}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      ) : (
-                        <button
+                        {/* 1. Full Name Field Card */}
+                        <div 
                           onClick={() => setArtisanVoiceIndex(0)}
-                          className="px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold flex items-center space-x-1"
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                            artisanVoiceIndex === 0 
+                              ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
+                              : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
+                          }`}
                         >
-                          <RotateCcw className="w-3.5 h-3.5" />
-                          <span>पुनः बोलें</span>
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Live speech transcription ticker */}
-                    {liveVoiceTranscript && (
-                      <div className="mt-2.5 p-2 rounded-lg bg-black/40 border border-orange-500/40 text-[11px] text-orange-200 flex items-center space-x-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                        <span className="truncate">"{liveVoiceTranscript}"</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Real-time Captured Profile Fields (Visual Auto-Filled Cards) */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-stone-300 uppercase tracking-wider">
-                        {selectedLang === 'hi' ? 'आपकी कारीगर प्रोफ़ाइल (स्वतः भरी जा रही है)' : 'Your Artisan Profile (Auto-Filling by Voice)'}
-                      </label>
-                      <span className="text-[10px] text-stone-400">टैप करके संपादित भी कर सकते हैं</span>
-                    </div>
-
-                    {/* 1. Full Name Field Card */}
-                    <div 
-                      onClick={() => setArtisanVoiceIndex(0)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                        artisanVoiceIndex === 0 
-                          ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
-                          : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-                        <div className="p-2 rounded-xl bg-orange-600/20 text-orange-400 shrink-0">
-                          <User className="w-4 h-4" />
+                          <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+                            <div className="p-2 rounded-xl bg-orange-600/20 text-orange-400 shrink-0">
+                              <User className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[10px] uppercase font-bold text-stone-400 block">पूरा नाम (Full Name)</span>
+                              <input
+                                type="text"
+                                value={artisanForm.name}
+                                onChange={(e) => setArtisanForm({ ...artisanForm, name: e.target.value })}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); startVoiceQuestion(0); }}
+                            className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
+                            title="Speak Name"
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-stone-400 block">पूरा नाम (Full Name)</span>
+
+                        {/* 2. Craft Type Field Card */}
+                        <div 
+                          onClick={() => setArtisanVoiceIndex(1)}
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                            artisanVoiceIndex === 1 
+                              ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
+                              : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+                            <div className="p-2 rounded-xl bg-amber-600/20 text-amber-400 shrink-0">
+                              <Palette className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[10px] uppercase font-bold text-stone-400 block">शिल्प श्रेणी (Craft Type)</span>
+                              <input
+                                type="text"
+                                value={artisanForm.craft_type}
+                                onChange={(e) => setArtisanForm({ ...artisanForm, craft_type: e.target.value })}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); startVoiceQuestion(1); }}
+                            className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
+                            title="Speak Craft"
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* 3. Location Field Card */}
+                        <div 
+                          onClick={() => setArtisanVoiceIndex(2)}
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                            artisanVoiceIndex === 2 
+                              ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
+                              : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+                            <div className="p-2 rounded-xl bg-emerald-600/20 text-emerald-400 shrink-0">
+                              <MapPin className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[10px] uppercase font-bold text-stone-400 block">स्थान / गाँव (Location / Village)</span>
+                              <input
+                                type="text"
+                                value={artisanForm.village}
+                                onChange={(e) => setArtisanForm({ ...artisanForm, village: e.target.value })}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); startVoiceQuestion(2); }}
+                            className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
+                            title="Speak Location"
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* 4. Phone Field Card */}
+                        <div 
+                          onClick={() => setArtisanVoiceIndex(3)}
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+                            artisanVoiceIndex === 3 
+                              ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
+                              : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
+                            <div className="p-2 rounded-xl bg-blue-600/20 text-blue-400 shrink-0">
+                              <Phone className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <span className="text-[10px] uppercase font-bold text-stone-400 block">मोबाइल नंबर (Phone)</span>
+                              <input
+                                type="text"
+                                value={artisanForm.phone}
+                                onChange={(e) => setArtisanForm({ ...artisanForm, phone: e.target.value })}
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); startVoiceQuestion(3); }}
+                            className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
+                            title="Speak Phone"
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* MoSJE Verified ID Badge Card */}
+                        <div className="p-3 rounded-2xl bg-orange-950/30 border border-orange-600/40 flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-2 text-orange-300">
+                            <ShieldCheck className="w-4 h-4 text-orange-400" />
+                            <span className="font-bold">MoSJE Pehchan Card / Vishwakarma ID:</span>
+                          </div>
+                          <span className="font-mono text-orange-400 font-bold bg-orange-900/60 px-2 py-0.5 rounded border border-orange-700">
+                            {artisanForm.scheme_id}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ========================================================================= */}
+                  {/* BUYER STANDARD REGISTRATION FORM */}
+                  {/* ========================================================================= */}
+                  {selectedRole === 'buyer' && (
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-stone-300 block">
+                          {selectedLang === 'hi' ? 'खरीदार का नाम' : 'Buyer Name'}
+                        </label>
+                        <div className="relative">
                           <input
                             type="text"
-                            value={artisanForm.name}
-                            onChange={(e) => setArtisanForm({ ...artisanForm, name: e.target.value })}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                            value={buyerForm.name}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, name: e.target.value })}
+                            placeholder="e.g. Priya Sharma"
+                            className="w-full p-2.5 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => handleGenericFieldVoice('name', setBuyerForm)}
+                            className={`absolute right-2 top-2 p-1.5 rounded-lg ${activeRecordingField === 'name' ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-700 text-stone-300 hover:text-white'}`}
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'ईमेल' : 'Email Address'}
+                          </label>
+                          <input
+                            type="text"
+                            value={buyerForm.email}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, email: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'पिनकोड' : 'Pincode'}
+                          </label>
+                          <input
+                            type="text"
+                            value={buyerForm.pincode}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, pincode: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
                           />
                         </div>
                       </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); startVoiceQuestion(0); }}
-                        className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
-                        title="Speak Name"
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
 
-                    {/* 2. Craft Type Field Card */}
-                    <div 
-                      onClick={() => setArtisanVoiceIndex(1)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                        artisanVoiceIndex === 1 
-                          ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
-                          : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-                        <div className="p-2 rounded-xl bg-amber-600/20 text-amber-400 shrink-0">
-                          <Palette className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-stone-400 block">शिल्प श्रेणी (Craft Type)</span>
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-stone-300 block">
+                          {selectedLang === 'hi' ? 'डिलीवरी का पता (Shipping Address)' : 'Delivery Address'}
+                        </label>
+                        <div className="relative">
                           <input
                             type="text"
-                            value={artisanForm.craft_type}
-                            onChange={(e) => setArtisanForm({ ...artisanForm, craft_type: e.target.value })}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                            value={buyerForm.location}
+                            onChange={(e) => setBuyerForm({ ...buyerForm, location: e.target.value })}
+                            placeholder="Street, City, Landmark"
+                            className="w-full p-2.5 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => handleGenericFieldVoice('location', setBuyerForm)}
+                            className={`absolute right-2 top-2 p-1.5 rounded-lg ${activeRecordingField === 'location' ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-700 text-stone-300 hover:text-white'}`}
+                          >
+                            <Mic className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ========================================================================= */}
+                  {/* BUSINESSMAN STANDARD REGISTRATION FORM */}
+                  {/* ========================================================================= */}
+                  {selectedRole === 'businessman' && (
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'अधिकारी / व्यापारी नाम' : 'Representative Name'}
+                          </label>
+                          <input
+                            type="text"
+                            value={businessmanForm.name}
+                            onChange={(e) => setBusinessmanForm({ ...businessmanForm, name: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'कंपनी / संस्था का नाम' : 'Company / Enterprise'}
+                          </label>
+                          <input
+                            type="text"
+                            value={businessmanForm.company}
+                            onChange={(e) => setBusinessmanForm({ ...businessmanForm, company: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                           />
                         </div>
                       </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); startVoiceQuestion(1); }}
-                        className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
-                        title="Speak Craft"
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
 
-                    {/* 3. Location Field Card */}
-                    <div 
-                      onClick={() => setArtisanVoiceIndex(2)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                        artisanVoiceIndex === 2 
-                          ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
-                          : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
-                      }`}
-                    >
-                      <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-                        <div className="p-2 rounded-xl bg-emerald-600/20 text-emerald-400 shrink-0">
-                          <MapPin className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-stone-400 block">स्थान / गाँव (Location / Village)</span>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'GSTIN नंबर' : 'GSTIN Registration'}
+                          </label>
                           <input
                             type="text"
-                            value={artisanForm.village}
-                            onChange={(e) => setArtisanForm({ ...artisanForm, village: e.target.value })}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
+                            value={businessmanForm.gstin}
+                            onChange={(e) => setBusinessmanForm({ ...businessmanForm, gstin: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-blue-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs font-bold text-stone-300 block">
+                            {selectedLang === 'hi' ? 'GeM / ONDC खरीदार ID' : 'GeM / ONDC Buyer ID'}
+                          </label>
+                          <input
+                            type="text"
+                            value={businessmanForm.gem_org_id}
+                            onChange={(e) => setBusinessmanForm({ ...businessmanForm, gem_org_id: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-blue-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
                       </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); startVoiceQuestion(2); }}
-                        className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
-                        title="Speak Location"
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
 
-                    {/* 4. Phone Field Card */}
-                    <div 
-                      onClick={() => setArtisanVoiceIndex(3)}
-                      className={`p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
-                        artisanVoiceIndex === 3 
-                          ? 'bg-orange-950/40 border-orange-500 shadow-md ring-1 ring-orange-500/50' 
-                          : 'bg-stone-800/80 border-stone-700 hover:border-stone-600'
+                      <div className="space-y-1">
+                        <label className="text-xs font-bold text-stone-300 block">
+                          {selectedLang === 'hi' ? 'थोक सोर्सिंग दायरा (Procurement Scope)' : 'Procurement Scope & Category'}
+                        </label>
+                        <input
+                          type="text"
+                          value={businessmanForm.procurement_type}
+                          onChange={(e) => setBusinessmanForm({ ...businessmanForm, procurement_type: e.target.value })}
+                          className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Submit Registration Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={handleRegisterSubmit}
+                      className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center space-x-2 ${
+                        selectedRole === 'artisan'
+                          ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-stone-950'
+                          : selectedRole === 'businessman'
+                          ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white'
+                          : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-stone-950'
                       }`}
                     >
-                      <div className="flex items-center space-x-3 flex-1 min-w-0 pr-2">
-                        <div className="p-2 rounded-xl bg-blue-600/20 text-blue-400 shrink-0">
-                          <Phone className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-[10px] uppercase font-bold text-stone-400 block">मोबाइल नंबर (Phone)</span>
-                          <input
-                            type="text"
-                            value={artisanForm.phone}
-                            onChange={(e) => setArtisanForm({ ...artisanForm, phone: e.target.value })}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full bg-transparent text-xs font-bold text-white focus:outline-none border-b border-transparent focus:border-orange-500"
-                          />
-                        </div>
-                      </div>
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); startVoiceQuestion(3); }}
-                        className="p-2 rounded-xl bg-stone-700 hover:bg-orange-600 text-stone-200 hover:text-white transition-colors"
-                        title="Speak Phone"
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    {/* MoSJE Verified ID Badge Card */}
-                    <div className="p-3 rounded-2xl bg-orange-950/30 border border-orange-600/40 flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-2 text-orange-300">
-                        <ShieldCheck className="w-4 h-4 text-orange-400" />
-                        <span className="font-bold">MoSJE Pehchan Card / Vishwakarma ID:</span>
-                      </div>
-                      <span className="font-mono text-orange-400 font-bold bg-orange-900/60 px-2 py-0.5 rounded border border-orange-700">
-                        {artisanForm.scheme_id}
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>
+                        {selectedRole === 'artisan'
+                          ? (selectedLang === 'hi' ? 'कारीगर पंजीकरण पूरा करें व AI स्टूडियो खोलें ➔' : 'Complete Registration & Open AI Studio ➔')
+                          : selectedRole === 'businessman'
+                          ? (selectedLang === 'hi' ? 'संस्थागत GeM व B2B पोर्टल में प्रवेश करें ➔' : 'Complete B2B Registration & Enter Portal ➔')
+                          : (selectedLang === 'hi' ? 'पंजीकरण पूरा करें व बाज़ार देखें ➔' : 'Complete Registration & Explore ➔')}
                       </span>
-                    </div>
+                    </button>
                   </div>
                 </div>
               )}
-
-              {/* ========================================================================= */}
-              {/* BUYER STANDARD REGISTRATION FORM */}
-              {/* ========================================================================= */}
-              {selectedRole === 'buyer' && (
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-300 block">
-                      {selectedLang === 'hi' ? 'खरीदार का नाम' : 'Buyer Name'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={buyerForm.name}
-                        onChange={(e) => setBuyerForm({ ...buyerForm, name: e.target.value })}
-                        placeholder="e.g. Priya Sharma"
-                        className="w-full p-2.5 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
-                      />
-                      <button 
-                        onClick={() => handleGenericFieldVoice('name', setBuyerForm)}
-                        className={`absolute right-2 top-2 p-1.5 rounded-lg ${activeRecordingField === 'name' ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-700 text-stone-300 hover:text-white'}`}
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'ईमेल' : 'Email Address'}
-                      </label>
-                      <input
-                        type="text"
-                        value={buyerForm.email}
-                        onChange={(e) => setBuyerForm({ ...buyerForm, email: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'पिनकोड' : 'Pincode'}
-                      </label>
-                      <input
-                        type="text"
-                        value={buyerForm.pincode}
-                        onChange={(e) => setBuyerForm({ ...buyerForm, pincode: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-300 block">
-                      {selectedLang === 'hi' ? 'डिलीवरी का पता (Shipping Address)' : 'Delivery Address'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={buyerForm.location}
-                        onChange={(e) => setBuyerForm({ ...buyerForm, location: e.target.value })}
-                        placeholder="Street, City, Landmark"
-                        className="w-full p-2.5 pr-10 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-amber-500 font-sans"
-                      />
-                      <button 
-                        onClick={() => handleGenericFieldVoice('location', setBuyerForm)}
-                        className={`absolute right-2 top-2 p-1.5 rounded-lg ${activeRecordingField === 'location' ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-700 text-stone-300 hover:text-white'}`}
-                      >
-                        <Mic className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ========================================================================= */}
-              {/* BUSINESSMAN STANDARD REGISTRATION FORM */}
-              {/* ========================================================================= */}
-              {selectedRole === 'businessman' && (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'अधिकारी / व्यापारी नाम' : 'Representative Name'}
-                      </label>
-                      <input
-                        type="text"
-                        value={businessmanForm.name}
-                        onChange={(e) => setBusinessmanForm({ ...businessmanForm, name: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'कंपनी / संस्था का नाम' : 'Company / Enterprise'}
-                      </label>
-                      <input
-                        type="text"
-                        value={businessmanForm.company}
-                        onChange={(e) => setBusinessmanForm({ ...businessmanForm, company: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'GSTIN नंबर' : 'GSTIN Registration'}
-                      </label>
-                      <input
-                        type="text"
-                        value={businessmanForm.gstin}
-                        onChange={(e) => setBusinessmanForm({ ...businessmanForm, gstin: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-blue-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-stone-300 block">
-                        {selectedLang === 'hi' ? 'GeM / ONDC खरीदार ID' : 'GeM / ONDC Buyer ID'}
-                      </label>
-                      <input
-                        type="text"
-                        value={businessmanForm.gem_org_id}
-                        onChange={(e) => setBusinessmanForm({ ...businessmanForm, gem_org_id: e.target.value })}
-                        className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-blue-300 font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-stone-300 block">
-                      {selectedLang === 'hi' ? 'थोक सोर्सिंग दायरा (Procurement Scope)' : 'Procurement Scope & Category'}
-                    </label>
-                    <input
-                      type="text"
-                      value={businessmanForm.procurement_type}
-                      onChange={(e) => setBusinessmanForm({ ...businessmanForm, procurement_type: e.target.value })}
-                      className="w-full p-2.5 rounded-xl bg-stone-800 border border-stone-700 text-xs text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Submit Registration Button */}
-              <div className="pt-2">
-                <button
-                  onClick={() => handleFinish()}
-                  className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center space-x-2 ${
-                    selectedRole === 'artisan'
-                      ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-stone-950'
-                      : selectedRole === 'businessman'
-                      ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white'
-                      : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-stone-950'
-                  }`}
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>
-                    {selectedRole === 'artisan'
-                      ? (selectedLang === 'hi' ? 'कारीगर पंजीकरण पूरा करें व AI स्टूडियो खोलें ➔' : 'Complete Registration & Open AI Studio ➔')
-                      : selectedRole === 'businessman'
-                      ? (selectedLang === 'hi' ? 'संस्थागत GeM व B2B पोर्टल में प्रवेश करें ➔' : 'Complete B2B Registration & Enter Portal ➔')
-                      : (selectedLang === 'hi' ? 'पंजीकरण पूरा करें व बाज़ार देखें ➔' : 'Complete Registration & Explore ➔')}
-                  </span>
-                </button>
-              </div>
             </div>
           )}
 
@@ -1320,11 +1775,8 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
           </div>
 
         </div>
-      )}
-
+      </div>
     </div>
-  </div>
-</div>
   );
 };
 

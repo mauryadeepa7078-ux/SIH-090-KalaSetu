@@ -42,13 +42,13 @@ export class ErrorBoundary extends React.Component {
 
             <div className="space-y-2">
               <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-orange-950/80 text-orange-400 border border-orange-600/40">
-                KalaSetu (कलासेतु) • Recovery Guard
+                CraftX (क्राफ्टएक्स) • Recovery Guard
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white">
                 Application Rendering Notice
               </h2>
               <p className="text-xs sm:text-sm text-stone-400 leading-relaxed">
-                A component encountered a runtime state conflict. KalaSetu's automatic recovery guard intercepted the error to protect your craft data.
+                A component encountered a runtime state conflict. CraftX's automatic recovery guard intercepted the error to protect your craft data.
               </p>
             </div>
 
