@@ -40,27 +40,19 @@ export const VoiceCatalogPage = () => {
 
   // Editable Form Fields State
   const [formData, setFormData] = useState({
-    title_en: activeDraft.title_en || 'Handcrafted Banarasi Pure Silk Saree',
-    title_hi: activeDraft.title_hi || 'हस्तनिर्मित शुद्ध बनारसी सिल्क साड़ी',
-    description_en: activeDraft.description_en || 'Exquisitely handwoven by master weavers in Varanasi using pure mulberry silk and golden zari motifs.',
-    description_hi: activeDraft.description_hi || 'वाराणसी के कुशल बुनकरों द्वारा शुद्ध शहतूत रेशम और सुनहरी जरी के बारीक काम से तैयार पारंपरिक साड़ी।',
-    cultural_story_en: activeDraft.cultural_story_en || 'Banarasi silk weaving is an ancient GI-certified heritage craft celebrating centuries of Indian royal handloom tradition.',
-    cultural_story_hi: activeDraft.cultural_story_hi || 'बनारसी बुनाई एक सदियों पुरानी जीआई प्रमाणित विरासत कला है जो भारतीय हथकरघा परंपरा का गौरव है।',
-    category: activeDraft.category || 'Handloom Saree',
-    material_type: activeDraft.material_type || 'Pure Mulberry Silk & Golden Zari',
-    dimensions: activeDraft.dimensions || '6.2 Meters with Blouse',
-    care_instructions: activeDraft.care_instructions || 'Dry Clean Only. Wrap in soft cotton muslin.',
-    tags: activeDraft.tags || ['BanarasiSilk', 'Handloom', 'MoSJE', 'GIProduct'],
-    bullet_points_en: activeDraft.bullet_points_en?.length ? activeDraft.bullet_points_en : [
-      '100% Certified Pure Silk with Silk Mark Guarantee',
-      'Handwoven Kadwa zari motifs across pallu',
-      'Direct from National Awardee master artisan family'
-    ],
-    bullet_points_hi: activeDraft.bullet_points_hi?.length ? activeDraft.bullet_points_hi : [
-      '100% शुद्ध सिल्क मार्क प्रमाणित रेशम',
-      'पल्लू पर हाथ से बुनी सुनहरी जरी की बारीक कलाकारी',
-      'राष्ट्रीय पुरस्कार प्राप्त बुनकर परिवार द्वारा प्रत्यक्ष निर्मित'
-    ]
+    title_en: activeDraft.title_en || '',
+    title_hi: activeDraft.title_hi || '',
+    description_en: activeDraft.description_en || '',
+    description_hi: activeDraft.description_hi || '',
+    cultural_story_en: activeDraft.cultural_story_en || '',
+    cultural_story_hi: activeDraft.cultural_story_hi || '',
+    category: activeDraft.category || '',
+    material_type: activeDraft.material_type || '',
+    dimensions: activeDraft.dimensions || '',
+    care_instructions: activeDraft.care_instructions || '',
+    tags: activeDraft.tags || [],
+    bullet_points_en: activeDraft.bullet_points_en || [],
+    bullet_points_hi: activeDraft.bullet_points_hi || []
   });
 
   useEffect(() => {

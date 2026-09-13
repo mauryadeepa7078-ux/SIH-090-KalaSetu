@@ -32,10 +32,10 @@ export const getCategoryFallbackImage = (category) => {
  * 2. Checks enhanced_image_url (formats relative paths to absolute backend URL)
  * 3. Checks original_image_data / original_image_url
  * 4. Checks images array and image property
- * 5. Falls back to authentic category photo
+ * 5. Returns null/empty if no real image exists (unless allowFallback is true)
  */
-export const getProductImage = (product) => {
-  if (!product) return DEFAULT_IMAGE;
+export const getProductImage = (product, allowFallback = false) => {
+  if (!product) return allowFallback ? DEFAULT_IMAGE : '';
 
   // 1. Base64 data URIs (infallible cross-domain)
   if (product.enhanced_image_data && product.enhanced_image_data.startsWith('data:image')) {
@@ -65,9 +65,9 @@ export const getProductImage = (product) => {
     img = product.image;
   }
 
-  // If no image specified, use authentic category fallback
+  // If no real image exists
   if (!img) {
-    return getCategoryFallbackImage(product.category);
+    return allowFallback ? getCategoryFallbackImage(product.category) : '';
   }
 
   // If relative path from backend (e.g. /static/uploads/... or /static/processed/...)

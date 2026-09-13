@@ -29,51 +29,67 @@ import {
 } from 'lucide-react';
 
 // Fast client-side image compression (max 1200x1200 for crisp luxury detail)
-const compressImageForAI = (file, maxDim = 1200) => {
+const compressImageForAI = (input, maxDim = 1200) => {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
+    if (!input) {
+      resolve(null);
+      return;
+    }
 
-        if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
+    const processImg = (img, filename = 'artisan_craft.jpg') => {
+      let width = img.width || 800;
+      let height = img.height || 800;
+
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
         }
+      }
 
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
 
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name || 'compressed_craft.jpg', {
-                type: 'image/jpeg'
-              });
-              resolve(compressedFile);
-            } else {
-              resolve(file);
-            }
-          },
-          'image/jpeg',
-          0.92
-        );
-      };
-      img.onerror = () => resolve(file);
-      img.src = e.target.result;
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], filename, {
+              type: 'image/jpeg'
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(input instanceof File ? input : null);
+          }
+        },
+        'image/jpeg',
+        0.92
+      );
     };
-    reader.onerror = () => resolve(file);
-    reader.readAsDataURL(file);
+
+    if (input instanceof Blob || input instanceof File) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => processImg(img, input.name || 'artisan_craft.jpg');
+        img.onerror = () => resolve(input);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(input);
+      reader.readAsDataURL(input);
+    } else if (typeof input === 'string' && (input.startsWith('data:') || input.startsWith('blob:'))) {
+      const img = new Image();
+      img.onload = () => processImg(img, 'artisan_craft.jpg');
+      img.onerror = () => resolve(null);
+      img.src = input;
+    } else {
+      resolve(input);
+    }
   });
 };
 
@@ -142,6 +158,7 @@ export const PhotoStudioPage = () => {
   const [rawPreview, setRawPreview] = useState(activeDraft.original_image_url || null);
   const [studioResult, setStudioResult] = useState(activeDraft.enhanced_image_url || null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingError, setProcessingError] = useState(null);
   
   // Active Preset
   const [activePreset, setActivePreset] = useState('studio_pro');
@@ -196,6 +213,7 @@ export const PhotoStudioPage = () => {
   const startCamera = async () => {
     try {
       setIsCameraActive(true);
+      setProcessingError(null);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 1280 } }
       });
@@ -226,16 +244,30 @@ export const PhotoStudioPage = () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+    const capturedDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+    console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] Camera frame captured as Data URL (length:', capturedDataUrl.length, ')');
+
     canvas.toBlob(async (blob) => {
       if (blob) {
         const file = new File([blob], 'artisan_capture.jpg', { type: 'image/jpeg' });
-        console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] Camera frame captured:', file.name, `size=${blob.size} bytes`);
+        console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] Camera File created:', file.name, `size=${blob.size} bytes`);
         setSelectedFile(file);
-        const localPreviewUrl = URL.createObjectURL(blob);
-        setRawPreview(localPreviewUrl);
+        setRawPreview(capturedDataUrl);
+        setStudioResult(null);
+        setProcessingError(null);
         stopCamera();
+
+        // Immediately attach user's real captured photo to activeDraft
+        setActiveDraft(prev => ({
+          ...prev,
+          original_image_url: capturedDataUrl,
+          original_image_data: capturedDataUrl,
+          enhanced_image_url: capturedDataUrl,
+          enhanced_image_data: capturedDataUrl
+        }));
+
         const optimizedFile = await compressImageForAI(file);
-        processImageWithAI(optimizedFile, localPreviewUrl);
+        processImageWithAI(optimizedFile, capturedDataUrl);
       }
     }, 'image/jpeg', 0.95);
   };
@@ -244,12 +276,28 @@ export const PhotoStudioPage = () => {
     const file = e.target.files?.[0];
     if (file) {
       console.log('[PHOTO-STUDIO] [STEP 1: PHOTO CAPTURED] File selected from gallery:', file.name, `size=${file.size} bytes`);
-      setSelectedFile(file);
-      const localPreviewUrl = URL.createObjectURL(file);
-      setRawPreview(localPreviewUrl);
-      stopCamera();
-      const optimizedFile = await compressImageForAI(file);
-      processImageWithAI(optimizedFile, localPreviewUrl);
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const dataUrl = ev.target.result;
+        setSelectedFile(file);
+        setRawPreview(dataUrl);
+        setStudioResult(null);
+        setProcessingError(null);
+        stopCamera();
+
+        // Immediately attach user's real captured photo to activeDraft
+        setActiveDraft(prev => ({
+          ...prev,
+          original_image_url: dataUrl,
+          original_image_data: dataUrl,
+          enhanced_image_url: dataUrl,
+          enhanced_image_data: dataUrl
+        }));
+
+        const optimizedFile = await compressImageForAI(file);
+        processImageWithAI(optimizedFile, dataUrl);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -265,13 +313,14 @@ export const PhotoStudioPage = () => {
     style = bgStyle
   ) => {
     if (!fileToProcess && !fallbackPreview) {
-      showToast('Please select or capture a photo first.', 'warning');
+      showToast(lang === 'hi' ? 'कृपया पहले फोटो खींचें या चुनें।' : 'Please select or capture a photo first.', 'warning');
       return;
     }
 
     setIsProcessing(true);
+    setProcessingError(null);
     console.log('[PHOTO-STUDIO] [STEP 2: SENT FOR ENHANCEMENT] Sending image to backend AI Photo Studio endpoint with parameters:', { b, c, v, s, sh, style });
-    showToast('AI Photo Studio: Refining micro-textures & isolating craft background...', 'info');
+    showToast(lang === 'hi' ? 'AI फोटो स्टूडियो: कारीगरी के बारीक डिज़ाइन व रंग निखारे जा रहे हैं...' : 'AI Photo Studio: Refining micro-textures & isolating craft background...', 'info');
 
     try {
       let readyFile = fileToProcess;
@@ -281,9 +330,14 @@ export const PhotoStudioPage = () => {
         readyFile = new File([blob], 'artisan_craft.jpg', { type: 'image/jpeg' });
       }
 
-      const compressedFile = await compressImageForAI(readyFile);
+      const compressedFile = (readyFile instanceof File) ? await compressImageForAI(readyFile) : readyFile;
       const formData = new FormData();
-      formData.append('file', compressedFile);
+      if (compressedFile) {
+        formData.append('file', compressedFile);
+      } else if (fallbackPreview) {
+        const blob = await fetch(fallbackPreview).then(r => r.blob());
+        formData.append('file', new File([blob], 'artisan_craft.jpg', { type: 'image/jpeg' }));
+      }
       formData.append('remove_bg', removeBg.toString());
       formData.append('apply_enhancement', applyEnhancement.toString());
       formData.append('standardize', standardize.toString());
@@ -303,18 +357,31 @@ export const PhotoStudioPage = () => {
 
         console.log('[PHOTO-STUDIO] [STEP 4: IMAGE RENDERED] Rendering enhanced studio photo in viewport (length:', displayImg?.length, ')');
         setStudioResult(displayImg);
+        setProcessingError(null);
         
-        // Update active draft state with the enhanced image
+        // Update active draft state with the user's real enhanced image
         setActiveDraft(prev => ({
           ...prev,
           original_image_url: originalImg,
-          enhanced_image_url: displayImg
+          original_image_data: res.data.original_image_data || originalImg,
+          enhanced_image_url: displayImg,
+          enhanced_image_data: res.data.enhanced_image_data || displayImg
         }));
 
         if (res.data.salient_object_detected === false) {
-          showToast('Notice: Complex background detected. Applied adaptive lighting & tone balance.', 'info');
+          showToast(
+            lang === 'hi' 
+              ? 'जटिल पृष्ठभूमि पहचानी गई: अनुकूलित प्रकाश व रंग संतुलन लागू किया गया।' 
+              : 'Complex background detected: Applied adaptive lighting & dynamic range balance.', 
+            'info'
+          );
         } else {
-          showToast('Photo standardized to clean e-commerce studio format with background removed!', 'success');
+          showToast(
+            lang === 'hi' 
+              ? 'फोटो का बैकग्राउंड साफ हो गया और उत्पाद स्टूडियो रूप में तैयार है!' 
+              : 'Photo standardized to clean e-commerce studio format with background removed!', 
+            'success'
+          );
         }
 
         // Proactive AI Guide prompt
@@ -330,10 +397,21 @@ export const PhotoStudioPage = () => {
       }
     } catch (err) {
       console.error('[PHOTO-STUDIO-ERROR] AI Photo Studio processing error:', err);
-      showToast(`Photo Studio notice: ${err.message || 'Could not process background removal'}. Please retry or select another photo.`, 'warning');
+      const errorMsg = lang === 'hi'
+        ? 'फोटो संपादन में समस्या आई। आपकी मूल फोटो सुरक्षित है। कृपया पुनः प्रयास करें।'
+        : 'Image enhancement failed. Your original photo is preserved. Please retry.';
+      setProcessingError(errorMsg);
+      showToast(errorMsg, 'warning');
       const fallback = fallbackPreview || rawPreview;
       if (fallback) {
         setStudioResult(fallback);
+        setActiveDraft(prev => ({
+          ...prev,
+          original_image_url: fallback,
+          original_image_data: fallback.startsWith('data:') ? fallback : prev.original_image_data,
+          enhanced_image_url: fallback,
+          enhanced_image_data: fallback.startsWith('data:') ? fallback : prev.enhanced_image_data
+        }));
       }
     } finally {
       setIsProcessing(false);
@@ -573,6 +651,44 @@ export const PhotoStudioPage = () => {
 
             <canvas ref={canvasRef} className="hidden" />
           </div>
+
+          {/* Error & Retry Banner */}
+          {processingError && (
+            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-800 dark:text-red-300 text-xs space-y-2.5 animate-fade-in">
+              <div className="flex items-start space-x-2">
+                <HelpCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="font-bold block">{processingError}</span>
+                  <span className="text-[11px] text-stone-600 dark:text-stone-400 mt-0.5 block">
+                    {lang === 'hi' 
+                      ? 'आप पुनः AI संपादन का प्रयास कर सकते हैं या अपनी मूल फोटो के साथ आगे बढ़ सकते हैं।'
+                      : 'You can retry AI studio enhancement or proceed using your authentic captured photo.'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => processImageWithAI(selectedFile, rawPreview)}
+                  className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs flex items-center space-x-1.5 shadow-sm transition-all"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>{lang === 'hi' ? 'पुनः प्रयास करें (Retry)' : 'Retry Enhancement'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProcessingError(null);
+                    setStudioResult(rawPreview);
+                    showToast(lang === 'hi' ? 'मूल फोटो का चयन किया गया।' : 'Using original captured craft photo.', 'info');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-800 dark:text-stone-200 font-bold text-xs transition-all"
+                >
+                  <span>{lang === 'hi' ? 'मूल फोटो का उपयोग करें' : 'Use Original Photo'}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Quick Capture Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">

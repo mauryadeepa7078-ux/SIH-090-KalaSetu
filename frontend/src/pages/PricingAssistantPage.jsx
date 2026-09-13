@@ -96,8 +96,21 @@ export const PricingAssistantPage = () => {
 
   // Save product to Backend or Offline Queue
   const handleSaveAndPublish = async () => {
+    // 1. Strict Validation: User must have an authentic captured/uploaded photo!
+    const userRealImage = activeDraft.enhanced_image_data || activeDraft.enhanced_image_url || activeDraft.original_image_data || activeDraft.original_image_url;
+    
+    if (!userRealImage) {
+      showToast(
+        lang === 'hi'
+          ? 'उत्पाद प्रकाशित करने से पहले कृपया उत्पाद की असली फोटो खींचें या अपलोड करें।'
+          : 'Please capture or upload an authentic craft photo before publishing.',
+        'warning'
+      );
+      setActiveTab('camera');
+      return;
+    }
+
     setIsSaving(true);
-    const chosenImage = getProductImage(activeDraft) || getCategoryFallbackImage(activeDraft.category || 'Handloom Saree');
     
     const finalProduct = {
       ...activeDraft,
@@ -105,25 +118,26 @@ export const PricingAssistantPage = () => {
       title_hi: activeDraft.title_hi || 'पारंपरिक हस्तशिल्प उत्पाद',
       description_en: activeDraft.description_en || 'Authentic handmade Indian craft created with traditional techniques.',
       description_hi: activeDraft.description_hi || 'पारंपरिक भारतीय हस्तशिल्प कला द्वारा निर्मित।',
-      category: activeDraft.category || 'Handloom Saree',
-      material_type: activeDraft.material_type || 'Natural Fiber',
-      price: pricingResult.recommended_price || 3500.0,
-      min_price: pricingResult.min_price || 2800.0,
-      max_price: pricingResult.max_price || 4200.0,
-      material_cost: parseFloat(materialCost) || 650.0,
-      hours_spent: parseFloat(hoursSpent) || 16.0,
-      price_explanation: pricingResult.explanation_en || '',
-      enhanced_image_url: chosenImage,
-      enhanced_image_data: activeDraft.enhanced_image_data,
-      original_image_url: activeDraft.original_image_url || chosenImage,
-      artisan_name: activeDraft.artisan_name || 'Master Artisan Ram Das',
-      artisan_village: activeDraft.artisan_village || 'Kotwa, Varanasi',
+      category: activeDraft.category || 'Handicraft',
+      material_type: activeDraft.material_type || 'Natural Material',
+      price: pricingResult.recommended_price || (activeDraft.price > 0 ? activeDraft.price : 3500.0),
+      min_price: pricingResult.min_price || (activeDraft.min_price > 0 ? activeDraft.min_price : 2800.0),
+      max_price: pricingResult.max_price || (activeDraft.max_price > 0 ? activeDraft.max_price : 4200.0),
+      material_cost: parseFloat(materialCost) || (activeDraft.material_cost > 0 ? activeDraft.material_cost : 650.0),
+      hours_spent: parseFloat(hoursSpent) || (activeDraft.hours_spent > 0 ? activeDraft.hours_spent : 16.0),
+      price_explanation: pricingResult.explanation_en || activeDraft.price_explanation || '',
+      enhanced_image_url: activeDraft.enhanced_image_url || userRealImage,
+      enhanced_image_data: activeDraft.enhanced_image_data || (userRealImage.startsWith('data:') ? userRealImage : undefined),
+      original_image_url: activeDraft.original_image_url || userRealImage,
+      original_image_data: activeDraft.original_image_data || (userRealImage.startsWith('data:') ? userRealImage : undefined),
+      artisan_name: currentUser?.name || activeDraft.artisan_name || 'Master Artisan',
+      artisan_village: currentUser?.location || activeDraft.artisan_village || 'Varanasi',
       artisan_state: activeDraft.artisan_state || 'Uttar Pradesh',
       gi_tagged: isGiTagged,
       sync_status: isOnline ? 'SYNCED' : 'PENDING'
     };
 
-    console.log('[FRONTEND-SAVE] [STEP 1: FORM SUBMITTED] Preparing product listing:', finalProduct);
+    console.log('[FRONTEND-SAVE] [STEP 1: FORM SUBMITTED] Preparing product listing with verified user image:', finalProduct);
 
     try {
       if (isOnline) {
@@ -138,7 +152,7 @@ export const PricingAssistantPage = () => {
         console.log('[FRONTEND-SAVE] [STEP 4: WRITE CONFIRMED] Product saved to database & synchronized with local cache!');
         setSelectedProduct(res.product || finalProduct);
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-        showToast('Product listing published successfully!', 'success');
+        showToast(lang === 'hi' ? 'उत्पाद सफलतापूर्वक प्रकाशित हुआ!' : 'Product listing published successfully!', 'success');
         setActiveTab('detail');
       } else {
         console.log('[FRONTEND-SAVE] [OFFLINE QUEUED] Offline mode active, queuing in local storage...');
@@ -146,16 +160,15 @@ export const PricingAssistantPage = () => {
         await loadProducts();
         setSelectedProduct(finalProduct);
         confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
-        showToast('Saved to Offline Queue. Will sync when back online.', 'warning');
+        showToast(lang === 'hi' ? 'ऑफ़लाइन कतार में सहेजा गया। ऑनलाइन होने पर सिंक होगा।' : 'Saved to Offline Queue. Will sync when back online.', 'warning');
         setActiveTab('detail');
       }
     } catch (err) {
       console.error('[FRONTEND-SAVE-ERROR] Backend save error, using offline storage fallback:', err);
-      // Fallback offline queue
       offlineStorage.addToQueue(finalProduct);
       await loadProducts();
       setSelectedProduct(finalProduct);
-      showToast('Saved to local storage.', 'info');
+      showToast(lang === 'hi' ? 'स्थानीय स्टोरेज में सुरक्षित किया गया।' : 'Saved to local storage.', 'info');
       setActiveTab('detail');
     } finally {
       setIsSaving(false);

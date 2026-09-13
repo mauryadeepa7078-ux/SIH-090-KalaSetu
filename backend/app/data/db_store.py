@@ -1,10 +1,11 @@
 import json
 import os
 import uuid
+import base64
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from backend.app.config import DATA_DIR
+from backend.app.config import DATA_DIR, UPLOAD_DIR
 from backend.app.data.seed_data import SEED_PRODUCTS, SEED_RFQS, SEED_ORDERS
 from backend.app.pipeline.qr_generator import generate_product_qr_badge
 
@@ -143,6 +144,29 @@ class DatabaseStore:
                 product_data["qr_badge_url"] = generate_product_qr_badge(prod_id, product_data.get("artisan_name", "Artisan"))
             except Exception:
                 product_data["qr_badge_url"] = f"/static/qrcodes/qr_{prod_id}.png"
+
+        # Persist base64 enhanced/original images to real disk files if provided
+        for img_key, url_key, prefix in [
+            ("enhanced_image_data", "enhanced_image_url", "studio_prod"),
+            ("original_image_data", "original_image_url", "raw_prod")
+        ]:
+            data_val = product_data.get(img_key)
+            if data_val and isinstance(data_val, str) and data_val.startswith("data:image"):
+                try:
+                    header, encoded = data_val.split(",", 1)
+                    ext = "png" if "png" in header else "jpg"
+                    img_filename = f"{prefix}_{prod_id}.{ext}"
+                    disk_path = UPLOAD_DIR / img_filename
+                    with open(disk_path, "wb") as img_file:
+                        img_file.write(base64.b64decode(encoded))
+                    product_data[url_key] = f"/static/uploads/{img_filename}"
+                    print(f"[BACKEND-DB] Persisted image '{img_key}' to disk: {disk_path}")
+                except Exception as img_err:
+                    print(f"[WARN] Error persisting base64 image to disk: {img_err}")
+
+        # Ensure image property fallback points to real enhanced image
+        if not product_data.get("image"):
+            product_data["image"] = product_data.get("enhanced_image_url") or product_data.get("original_image_url")
 
         print(f"[BACKEND-DB] add_or_update_product called for ID={prod_id}, title={product_data.get('title_en')}")
 

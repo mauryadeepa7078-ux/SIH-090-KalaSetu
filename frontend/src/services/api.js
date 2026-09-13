@@ -86,19 +86,31 @@ export const api = {
   // AI Pipeline
   async processPhotoStudio(formData) {
     console.log(`[API] [PHOTO-STUDIO] Sending photo to ${API_BASE}/ai/photo-studio...`);
-    const res = await fetch(`${API_BASE}/ai/photo-studio`, {
-      method: 'POST',
-      body: formData
-    });
-    console.log(`[API] [PHOTO-STUDIO] Response status: ${res.status}`);
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      console.error('[API-ERROR] Photo studio failed:', res.status, errText);
-      throw new Error(`Photo Studio processing failed (${res.status}): ${errText}`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+    try {
+      const res = await fetch(`${API_BASE}/ai/photo-studio`, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      console.log(`[API] [PHOTO-STUDIO] Response status: ${res.status}`);
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        console.error('[API-ERROR] Photo studio failed:', res.status, errText);
+        throw new Error(`Photo Studio processing failed (${res.status}): ${errText}`);
+      }
+      const data = await res.json();
+      console.log('[API] [PHOTO-STUDIO] Processed photo received successfully:', data);
+      return data;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err.name === 'AbortError') {
+        throw new Error('Photo Studio request timed out. Please retry.');
+      }
+      throw err;
     }
-    const data = await res.json();
-    console.log('[API] [PHOTO-STUDIO] Processed photo received successfully:', data);
-    return data;
   },
 
 
