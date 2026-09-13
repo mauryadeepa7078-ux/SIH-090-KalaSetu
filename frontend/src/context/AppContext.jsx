@@ -418,7 +418,7 @@ export const AppProvider = ({ children }) => {
 
 
   // Shared active product draft passing between Photo Studio -> Voice Catalog -> Pricing
-  const [activeDraft, setActiveDraft] = useState({
+  const initialDraftState = {
     title_en: '',
     title_hi: '',
     description_en: '',
@@ -452,7 +452,19 @@ export const AppProvider = ({ children }) => {
     gem_published: false,
     ondc_published: true,
     sync_status: 'SYNCED'
-  });
+  };
+
+  const [activeDraft, setActiveDraft] = useState(initialDraftState);
+
+  const resetActiveDraft = () => {
+    setActiveDraft({
+      ...initialDraftState,
+      artisan_name: currentUser?.name || '',
+      artisan_village: currentUser?.location || '',
+      artisan_state: '',
+      mosje_scheme_id: currentUser?.scheme_id || ''
+    });
+  };
 
   // Translation lookup helper
   const t = (key) => {
@@ -655,6 +667,7 @@ export const AppProvider = ({ children }) => {
         setSelectedProduct,
         activeDraft,
         setActiveDraft,
+        resetActiveDraft,
         isMobileFrame,
         setIsMobileFrame,
         screenDevice,

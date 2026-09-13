@@ -38,7 +38,7 @@ export const speechService = {
   // Check browser speech recognition support
   isSpeechRecognitionSupported() {
     try {
-      if (typeof window !== 'undefined') return false;
+      if (typeof window === 'undefined') return false;
       const supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
       console.log('[SpeechService] Speech recognition supported in browser:', supported);
       return !!supported;

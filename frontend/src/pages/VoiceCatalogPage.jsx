@@ -71,6 +71,29 @@ export const VoiceCatalogPage = () => {
     };
   }, []);
 
+  // Synchronize form data when activeDraft is reset or updated
+  useEffect(() => {
+    if (!activeDraft.title_en && !activeDraft.title_hi && !activeDraft.description_en && !activeDraft.category) {
+      setFormData({
+        title_en: '',
+        title_hi: '',
+        description_en: '',
+        description_hi: '',
+        cultural_story_en: '',
+        cultural_story_hi: '',
+        category: '',
+        material_type: '',
+        dimensions: '',
+        care_instructions: '',
+        tags: [],
+        bullet_points_en: [],
+        bullet_points_hi: []
+      });
+      setIsCatalogGenerated(false);
+      setTranscript('');
+    }
+  }, [activeDraft]);
+
   // Start Voice Recording with Web Speech Recognition + MediaRecorder
   const startRecording = async () => {
     console.log('[VoiceCatalogPage] startRecording called.');

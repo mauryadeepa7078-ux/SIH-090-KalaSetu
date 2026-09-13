@@ -153,20 +153,76 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
   const [forgotSuccess, setForgotSuccess] = useState('');
   const [forgotError, setForgotError] = useState('');
 
+  const normalizeIdentifier = (val) => (val || '').replace(/^@/, '').trim().toLowerCase();
+
+  const DEFAULT_SEED_ACCOUNTS = [
+    {
+      username: 'artisan',
+      password: 'craft123',
+      name: 'Master Ram Das Bunkar',
+      role: 'artisan',
+      phone: '+91 98765 43210',
+      location: 'Kotwa, Varanasi, UP',
+      craft_type: 'Handloom & Silk Weaving',
+      scheme_id: 'MoSJE-VISH-2026-UP-091'
+    },
+    {
+      username: 'bunkar_ramdas',
+      password: 'craft123',
+      name: 'Master Ram Das Bunkar',
+      role: 'artisan',
+      phone: '+91 98765 43210',
+      location: 'Kotwa, Varanasi, UP',
+      craft_type: 'Handloom & Silk Weaving',
+      scheme_id: 'MoSJE-VISH-2026-UP-091'
+    },
+    {
+      username: 'buyer',
+      password: 'buyer123',
+      name: 'Priya Sharma (Retail Buyer)',
+      role: 'buyer',
+      phone: '+91 98112 34567',
+      email: 'priya.sharma@heritagecraft.in',
+      location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
+      buyer_type: 'Individual Heritage Collector'
+    },
+    {
+      username: 'businessman',
+      password: 'b2b123',
+      name: 'Rajesh Singhal',
+      role: 'businessman',
+      phone: '+91 98200 11223',
+      company: 'Singhal Crafts Export & Retailers Pvt Ltd',
+      email: 'procurement@singhalcrafts.com',
+      gstin: '07AAAAA0000A1Z5',
+      gem_org_id: 'GEM-DL-2026-9912',
+      location: 'New Delhi & Global Exporter',
+      procurement_type: 'B2B Wholesale & Government GeM Tenders'
+    }
+  ];
+
   // Local Accounts Helper
   const getStoredAccounts = () => {
     try {
       const data = localStorage.getItem('craftx_user_accounts') || localStorage.getItem('kalasetu_user_accounts');
-      if (data) return JSON.parse(data);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch (e) {}
-    return [];
+    return DEFAULT_SEED_ACCOUNTS;
   };
 
   const saveAccount = (account) => {
     try {
+      const cleanUsername = normalizeIdentifier(account.username);
+      const accToSave = {
+        ...account,
+        username: cleanUsername || account.username
+      };
       const existing = getStoredAccounts();
-      const filtered = existing.filter(a => a.username?.toLowerCase() !== account.username?.toLowerCase());
-      const updated = [account, ...filtered];
+      const filtered = existing.filter(a => normalizeIdentifier(a.username) !== cleanUsername);
+      const updated = [accToSave, ...filtered];
       localStorage.setItem('craftx_user_accounts', JSON.stringify(updated));
       localStorage.setItem('kalasetu_user_accounts', JSON.stringify(updated));
     } catch (e) {
@@ -418,19 +474,27 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     if (e) e.preventDefault();
     setAuthError('');
     const accounts = getStoredAccounts();
-    const ident = (loginIdentifier || '').trim().toLowerCase();
+    const cleanIdent = normalizeIdentifier(loginIdentifier);
+    const numericDigits = (loginIdentifier || '').replace(/[^0-9]/g, '');
     const pass = (loginPassword || '').trim();
 
-    if (!ident || !pass) {
+    if (!cleanIdent || !pass) {
       setAuthError(selectedLang === 'hi' ? 'कृपया यूजरनेम और पासवर्ड दोनों दर्ज करें।' : 'Please enter both username and password.');
       return;
     }
 
-    const user = accounts.find(a => 
-      (a.username && a.username.toLowerCase() === ident) ||
-      (a.phone && a.phone.replace(/[^0-9]/g, '').endsWith(ident.replace(/[^0-9]/g, ''))) ||
-      (a.email && a.email.toLowerCase() === ident)
-    );
+    const user = accounts.find(a => {
+      const aUser = normalizeIdentifier(a.username);
+      const aPhone = (a.phone || '').replace(/[^0-9]/g, '');
+      const aEmail = (a.email || '').trim().toLowerCase();
+      const aName = (a.name || '').trim().toLowerCase();
+
+      if (aUser && aUser === cleanIdent) return true;
+      if (aEmail && aEmail === cleanIdent) return true;
+      if (aName && aName === cleanIdent) return true;
+      if (numericDigits.length >= 4 && aPhone && aPhone.endsWith(numericDigits)) return true;
+      return false;
+    });
 
     if (!user) {
       setAuthError(selectedLang === 'hi' ? 'खाता नहीं मिला। कृपया यूजरनेम जांचें या नया खाता बनाएँ।' : 'Account not found. Please check username or register.');
@@ -476,11 +540,12 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     setForgotError('');
     setForgotSuccess('');
 
-    const ident = (forgotIdentifier || '').trim().toLowerCase();
+    const cleanIdent = normalizeIdentifier(forgotIdentifier);
+    const numericDigits = (forgotIdentifier || '').replace(/[^0-9]/g, '');
     const np = (forgotNewPassword || '').trim();
     const cnp = (forgotConfirmPassword || '').trim();
 
-    if (!ident) {
+    if (!cleanIdent) {
       setForgotError(selectedLang === 'hi' ? 'कृपया अपना यूजरनेम या मोबाइल नंबर दर्ज करें।' : 'Please enter your username or phone number.');
       return;
     }
@@ -494,11 +559,18 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     }
 
     const accounts = getStoredAccounts();
-    const idx = accounts.findIndex(a => 
-      (a.username && a.username.toLowerCase() === ident) ||
-      (a.phone && a.phone.replace(/[^0-9]/g, '').endsWith(ident.replace(/[^0-9]/g, ''))) ||
-      (a.email && a.email.toLowerCase() === ident)
-    );
+    const idx = accounts.findIndex(a => {
+      const aUser = normalizeIdentifier(a.username);
+      const aPhone = (a.phone || '').replace(/[^0-9]/g, '');
+      const aEmail = (a.email || '').trim().toLowerCase();
+      const aName = (a.name || '').trim().toLowerCase();
+
+      if (aUser && aUser === cleanIdent) return true;
+      if (aEmail && aEmail === cleanIdent) return true;
+      if (aName && aName === cleanIdent) return true;
+      if (numericDigits.length >= 4 && aPhone && aPhone.endsWith(numericDigits)) return true;
+      return false;
+    });
 
     if (idx === -1) {
       setForgotError(selectedLang === 'hi' ? 'इस यूजरनेम/नंबर से कोई खाता नहीं मिला।' : 'No account found matching this identifier.');
@@ -511,7 +583,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
     setForgotSuccess(selectedLang === 'hi' ? 'पासवर्ड सफलतापूर्वक बदल दिया गया! अब लॉगिन करें।' : 'Password reset successfully! You can now log in.');
     setTimeout(() => {
-      setLoginIdentifier(accounts[idx].username || ident);
+      setLoginIdentifier(accounts[idx].username || cleanIdent);
       setLoginPassword(np);
       setAuthMode('login');
       setForgotSuccess('');

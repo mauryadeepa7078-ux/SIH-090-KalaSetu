@@ -25,31 +25,33 @@ export const PricingAssistantPage = () => {
     lang, 
     activeDraft, 
     setActiveDraft, 
+    resetActiveDraft,
     setActiveTab, 
     isOnline, 
     loadProducts, 
     showToast,
-    setSelectedProduct 
+    setSelectedProduct,
+    currentUser
   } = useApp();
 
   // Pricing inputs
-  const [materialCost, setMaterialCost] = useState(activeDraft.material_cost || 650);
-  const [hoursSpent, setHoursSpent] = useState(activeDraft.hours_spent || 16);
+  const [materialCost, setMaterialCost] = useState(activeDraft.material_cost || 350);
+  const [hoursSpent, setHoursSpent] = useState(activeDraft.hours_spent || 8);
   const [skillLevel, setSkillLevel] = useState('Master Artisan');
   const [dimensions, setDimensions] = useState('Medium');
-  const [isGiTagged, setIsGiTagged] = useState(activeDraft.gi_tagged !== undefined ? activeDraft.gi_tagged : true);
+  const [isGiTagged, setIsGiTagged] = useState(activeDraft.gi_tagged !== undefined ? activeDraft.gi_tagged : false);
 
   // Result state
   const [pricingResult, setPricingResult] = useState({
-    min_price: activeDraft.min_price || 2800,
-    recommended_price: activeDraft.price || 3500,
-    max_price: activeDraft.max_price || 4200,
-    material_cost: 650,
-    labor_cost: 2240,
-    heritage_margin: 610,
-    platform_avg: 3600,
-    explanation_en: 'Raw Material (₹650) + 16hrs Master Artisan Labor (₹2240) + Fair Profit Margin (₹610) + 20% GI Heritage Premium. Category market average is ~₹3600.',
-    explanation_hi: 'कच्चा माल (₹650) + 16 घंटे वरिष्ठ उस्ताद श्रम (₹2240) + उचित लाभ मार्जिन (₹610) + 20% जीआई विरासत प्रीमियम पर आधारित। श्रेणी का औसत ~₹3600 है।'
+    min_price: activeDraft.min_price || 1200,
+    recommended_price: activeDraft.price || 1650,
+    max_price: activeDraft.max_price || 2100,
+    material_cost: activeDraft.material_cost || 350,
+    labor_cost: 960,
+    heritage_margin: 340,
+    platform_avg: 1700,
+    explanation_en: 'Raw Material + Master Artisan Labor + Fair Margin + Heritage Value.',
+    explanation_hi: 'कच्चा माल + कारीगर श्रम + उचित लाभ मार्जिन + विरासत मूल्य पर आधारित।'
   });
 
   const [isCalculating, setIsCalculating] = useState(false);
@@ -60,8 +62,8 @@ export const PricingAssistantPage = () => {
     setIsCalculating(true);
     try {
       const payload = {
-        category: activeDraft.category || 'Handloom Saree',
-        material_type: activeDraft.material_type || 'Pure Silk',
+        category: activeDraft.category || 'Handicraft',
+        material_type: activeDraft.material_type || 'Natural Material',
         material_cost: parseFloat(materialCost) || 100,
         hours_spent: parseFloat(hoursSpent) || 4,
         skill_level: skillLevel,
@@ -120,11 +122,11 @@ export const PricingAssistantPage = () => {
       description_hi: activeDraft.description_hi || 'पारंपरिक भारतीय हस्तशिल्प कला द्वारा निर्मित।',
       category: activeDraft.category || 'Handicraft',
       material_type: activeDraft.material_type || 'Natural Material',
-      price: pricingResult.recommended_price || (activeDraft.price > 0 ? activeDraft.price : 3500.0),
-      min_price: pricingResult.min_price || (activeDraft.min_price > 0 ? activeDraft.min_price : 2800.0),
-      max_price: pricingResult.max_price || (activeDraft.max_price > 0 ? activeDraft.max_price : 4200.0),
-      material_cost: parseFloat(materialCost) || (activeDraft.material_cost > 0 ? activeDraft.material_cost : 650.0),
-      hours_spent: parseFloat(hoursSpent) || (activeDraft.hours_spent > 0 ? activeDraft.hours_spent : 16.0),
+      price: pricingResult.recommended_price || (activeDraft.price > 0 ? activeDraft.price : 1650.0),
+      min_price: pricingResult.min_price || (activeDraft.min_price > 0 ? activeDraft.min_price : 1200.0),
+      max_price: pricingResult.max_price || (activeDraft.max_price > 0 ? activeDraft.max_price : 2100.0),
+      material_cost: parseFloat(materialCost) || (activeDraft.material_cost > 0 ? activeDraft.material_cost : 350.0),
+      hours_spent: parseFloat(hoursSpent) || (activeDraft.hours_spent > 0 ? activeDraft.hours_spent : 8.0),
       price_explanation: pricingResult.explanation_en || activeDraft.price_explanation || '',
       enhanced_image_url: activeDraft.enhanced_image_url || userRealImage,
       enhanced_image_data: activeDraft.enhanced_image_data || (userRealImage.startsWith('data:') ? userRealImage : undefined),
@@ -153,6 +155,7 @@ export const PricingAssistantPage = () => {
         setSelectedProduct(res.product || finalProduct);
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
         showToast(lang === 'hi' ? 'उत्पाद सफलतापूर्वक प्रकाशित हुआ!' : 'Product listing published successfully!', 'success');
+        resetActiveDraft();
         setActiveTab('detail');
       } else {
         console.log('[FRONTEND-SAVE] [OFFLINE QUEUED] Offline mode active, queuing in local storage...');
@@ -161,6 +164,7 @@ export const PricingAssistantPage = () => {
         setSelectedProduct(finalProduct);
         confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
         showToast(lang === 'hi' ? 'ऑफ़लाइन कतार में सहेजा गया। ऑनलाइन होने पर सिंक होगा।' : 'Saved to Offline Queue. Will sync when back online.', 'warning');
+        resetActiveDraft();
         setActiveTab('detail');
       }
     } catch (err) {
@@ -169,6 +173,7 @@ export const PricingAssistantPage = () => {
       await loadProducts();
       setSelectedProduct(finalProduct);
       showToast(lang === 'hi' ? 'स्थानीय स्टोरेज में सुरक्षित किया गया।' : 'Saved to local storage.', 'info');
+      resetActiveDraft();
       setActiveTab('detail');
     } finally {
       setIsSaving(false);

@@ -70,6 +70,10 @@ class ProductCreate(BaseModel):
     # Images
     original_image_url: Optional[str] = ""
     enhanced_image_url: Optional[str] = ""
+    original_image_data: Optional[str] = None
+    enhanced_image_data: Optional[str] = None
+    image: Optional[str] = None
+    qr_badge_url: Optional[str] = None
     
     # Artisan & Trust Details
     artisan_name: Optional[str] = "Master Artisan"
@@ -88,6 +92,9 @@ class ProductCreate(BaseModel):
     inquiries_count: int = 0
     sync_status: str = "SYNCED"  # PENDING, SYNCED
     created_at: Optional[str] = None
+
+    class Config:
+        extra = "allow"
 
 class BatchSyncRequest(BaseModel):
     products: List[ProductCreate]
