@@ -105,14 +105,10 @@ export const BuyerLandingPage = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-            <button
-              onClick={() => switchRole('artisan')}
-              className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-stone-200 border border-white/20 text-xs font-bold transition-all flex items-center justify-center space-x-2 shadow-md backdrop-blur-md"
-              title="Switch to Seller / Creator view"
-            >
-              <Palette className="w-4 h-4 text-orange-400" />
-              <span>{lang === 'hi' ? 'कारीगर मोड में बदलें' : 'Switch to Artisan Mode'}</span>
-            </button>
+            <div className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/10 text-stone-200 border border-white/20 text-xs font-bold flex items-center justify-center space-x-2 shadow-md backdrop-blur-md">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>Direct Heritage Sourcing</span>
+            </div>
           </div>
         </div>
       </div>

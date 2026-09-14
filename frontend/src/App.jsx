@@ -7,6 +7,7 @@ import { VoiceAssistantBar } from './components/VoiceAssistantBar';
 import { DeviceFrameToggle } from './components/DeviceFrameToggle';
 import { ResetDemoModal } from './components/ResetDemoModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { isTabAllowedForRole, getSafeTabForRole } from './utils/roleGuard';
 
 // Pages
 import { ArtisanLandingPage } from './pages/ArtisanLandingPage';
@@ -36,23 +37,14 @@ const MainContent = () => {
   }
 
   const renderCurrentTab = () => {
-    // Strict Role-Based Tab Guard across all 3 Roles
-    if (userRole === 'buyer') {
-      const buyerAllowedTabs = ['buyer-market', 'detail', 'cart', 'orders', 'wishlist', 'certificate', 'community'];
-      if (!buyerAllowedTabs.includes(activeTab)) {
-        return <BuyerLandingPage />;
-      }
-    } else if (userRole === 'businessman') {
-      const businessmanAllowedTabs = ['businessman-home', 'businessman-orders', 'gem', 'detail', 'certificate', 'whatsapp', 'community'];
-      if (!businessmanAllowedTabs.includes(activeTab)) {
-        return <BusinessmanLandingPage />;
-      }
-    } else {
-      // Artisan Role
-      const artisanAllowedTabs = ['artisan-home', 'artisan-orders', 'camera', 'voice', 'pricing', 'catalog', 'detail', 'certificate', 'whatsapp', 'analytics', 'community'];
-      if (!artisanAllowedTabs.includes(activeTab)) {
-        return <ArtisanLandingPage />;
-      }
+    // ⚠️ CRITICAL: Centralized Role Isolation Check (Single Source of Truth)
+    if (!isTabAllowedForRole(userRole, activeTab)) {
+      console.warn(`[App.jsx RoleGuard] Forbidden tab '${activeTab}' requested by role '${userRole}'. Rendering role home.`);
+      return userRole === 'businessman' 
+        ? <BusinessmanLandingPage /> 
+        : userRole === 'buyer' 
+        ? <BuyerLandingPage /> 
+        : <ArtisanLandingPage />;
     }
 
     switch (activeTab) {

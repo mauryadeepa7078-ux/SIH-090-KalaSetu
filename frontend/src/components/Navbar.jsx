@@ -273,38 +273,13 @@ export const Navbar = () => {
               <span>{isOnline ? t('online') : t('offline')}</span>
             </button>
 
-            {/* Role Switcher Pill */}
-            <div className="hidden sm:flex items-center bg-stone-200/70 dark:bg-stone-800/80 p-0.5 rounded-xl border border-stone-300/60 dark:border-stone-700/60">
-              <button
-                onClick={() => switchRole('artisan')}
-                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
-                  userRole === 'artisan'
-                    ? 'bg-orange-600 text-white shadow-sm'
-                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
-                }`}
-              >
-                🎨 Artisan
-              </button>
-              <button
-                onClick={() => switchRole('buyer')}
-                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
-                  userRole === 'buyer'
-                    ? 'bg-amber-600 text-stone-950 shadow-sm'
-                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
-                }`}
-              >
-                🛍️ Buyer
-              </button>
-              <button
-                onClick={() => switchRole('businessman')}
-                className={`px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold transition-all ${
-                  userRole === 'businessman'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white'
-                }`}
-              >
-                🏢 B2B / GeM
-              </button>
+            {/* Active Isolated Portal Badge */}
+            <div className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-stone-200/60 dark:bg-stone-800/60 border-stone-300/60 dark:border-stone-700/60 text-stone-700 dark:text-stone-300">
+              <span>
+                {userRole === 'artisan' ? '🎨 Master Artisan Portal' :
+                 userRole === 'businessman' ? '🏢 B2B & GeM Procurement' :
+                 '🛍️ Retail Craft Marketplace'}
+              </span>
             </div>
           </div>
 

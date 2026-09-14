@@ -25,8 +25,7 @@ export const ArtisanLandingPage = () => {
     lang, 
     t, 
     products, 
-    switchRole, 
-    openOnboarding,
+    currentUser,
     activeDraft
   } = useApp();
 
@@ -142,14 +141,10 @@ export const ArtisanLandingPage = () => {
           </div>
 
           <div className="flex items-center space-x-3 shrink-0">
-            <button
-              onClick={() => switchRole('buyer')}
-              className="px-4 py-2.5 rounded-2xl bg-white/15 hover:bg-white/25 backdrop-blur-md text-white border border-white/30 text-xs font-bold transition-all flex items-center space-x-2 shadow-sm"
-              title="Switch to Buyer Marketplace view"
-            >
-              <ShoppingBag className="w-4 h-4 text-amber-200" />
-              <span>{lang === 'hi' ? 'खरीदार दृश्य' : 'Buyer View'}</span>
-            </button>
+            <div className="px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-md text-white border border-white/30 text-xs font-bold flex items-center space-x-2 shadow-sm">
+              <Award className="w-4 h-4 text-amber-200" />
+              <span>Pehchan ID: {currentUser?.scheme_id || 'MoSJE-UP-2026-091'}</span>
+            </div>
           </div>
         </div>
       </div>

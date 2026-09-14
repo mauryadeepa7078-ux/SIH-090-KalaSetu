@@ -3,7 +3,11 @@ import { translations } from '../services/translations';
 import { api } from '../services/api';
 import { offlineStorage } from '../services/offlineStorage';
 import { speechService } from '../services/speechService';
+import { ROLE_ALLOWED_TABS, ROLE_DEFAULT_TAB, isTabAllowedForRole, getSafeTabForRole } from '../utils/roleGuard';
+import { generateUniqueMosjePehchanId } from '../utils/artisanIdentity';
 import confetti from 'canvas-confetti';
+
+export { ROLE_ALLOWED_TABS, ROLE_DEFAULT_TAB, isTabAllowedForRole, getSafeTabForRole };
 
 const AppContext = createContext();
 
@@ -28,18 +32,6 @@ const setSafeStorage = (key, val) => {
   } catch (e) {
     console.warn('LocalStorage write error:', key, e);
   }
-};
-
-export const ROLE_ALLOWED_TABS = {
-  artisan: ['artisan-home', 'artisan-orders', 'camera', 'voice', 'pricing', 'catalog', 'detail', 'certificate', 'whatsapp', 'analytics', 'community'],
-  buyer: ['buyer-market', 'detail', 'cart', 'orders', 'wishlist', 'certificate', 'community'],
-  businessman: ['businessman-home', 'businessman-orders', 'gem', 'detail', 'certificate', 'whatsapp', 'community']
-};
-
-export const ROLE_DEFAULT_TAB = {
-  artisan: 'artisan-home',
-  buyer: 'buyer-market',
-  businessman: 'businessman-home'
 };
 
 export const AppProvider = ({ children }) => {

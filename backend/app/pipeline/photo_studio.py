@@ -107,8 +107,10 @@ def refine_alpha_edges(rgba_img: Image.Image) -> Image.Image:
 
 def remove_background_grabcut_clean(pil_img: Image.Image) -> tuple[Image.Image, str, float]:
     """
-    State-of-the-art OpenCV background removal using safe-margin GrabCut + morphological closing/dilation.
-    Guarantees no diagonal cuts, no distorted aspect ratios, and full preservation of authentic craft details.
+    State-of-the-art OpenCV background removal using safe-margin GrabCut + 
+    connected-component artifact filtering + hole filling + fine edge refinement.
+    Guarantees no diagonal cuts, no gray halo fringes around fine decorative edges,
+    and removes any stray background artifacts.
     """
     if not CV2_AVAILABLE:
         pil_rgba = remove_background_pil_saliency(pil_img)
@@ -118,7 +120,7 @@ def remove_background_grabcut_clean(pil_img: Image.Image) -> tuple[Image.Image, 
         img_rgb = pil_img.convert('RGB')
         orig_w, orig_h = img_rgb.size
 
-        # Fast 480px proxy for sub-second precision
+        # Fast 480px proxy for sub-second precision and smooth gradient convergence
         proxy = img_rgb.copy()
         proxy.thumbnail((480, 480), Image.Resampling.BILINEAR)
         pw, ph = proxy.size
@@ -126,7 +128,7 @@ def remove_background_grabcut_clean(pil_img: Image.Image) -> tuple[Image.Image, 
         img_np = np.array(proxy)
         img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
 
-        # 1. Initialize GrabCut with safe margin rectangle
+        # 1. Initialize GrabCut with safe margin rectangle (4% border protection)
         margin_x = max(6, int(pw * 0.04))
         margin_y = max(6, int(ph * 0.04))
         rect = (margin_x, margin_y, pw - 2 * margin_x, ph - 2 * margin_y)
@@ -135,20 +137,58 @@ def remove_background_grabcut_clean(pil_img: Image.Image) -> tuple[Image.Image, 
         bgd_model = np.zeros((1, 65), np.float64)
         fgd_model = np.zeros((1, 65), np.float64)
 
-        cv2.grabCut(img_bgr, mask, rect, bgd_model, fgd_model, 3, cv2.GC_INIT_WITH_RECT)
+        # 5 iterations for cleaner convergence around intricate borders
+        cv2.grabCut(img_bgr, mask, rect, bgd_model, fgd_model, 5, cv2.GC_INIT_WITH_RECT)
         fg_binary = np.where((mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD), 255, 0).astype(np.uint8)
 
-        # 2. Morphological closing to bridge thin lines & dilation to preserve fine edges
-        kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-        fg_closed = cv2.morphologyEx(fg_binary, cv2.MORPH_CLOSE, kernel_close, iterations=2)
-        fg_dilated = cv2.dilate(fg_closed, kernel_close, iterations=1)
+        # 2. Artifact Removal: Connected Component analysis to remove disconnected background fragments
+        num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(fg_binary, connectivity=8)
+        if num_labels > 1:
+            areas = stats[1:, cv2.CC_STAT_AREA]
+            max_idx = int(np.argmax(areas)) + 1
+            max_area = stats[max_idx, cv2.CC_STAT_AREA]
+            mx = stats[max_idx, cv2.CC_STAT_LEFT]
+            my = stats[max_idx, cv2.CC_STAT_TOP]
+            mw = stats[max_idx, cv2.CC_STAT_WIDTH]
+            mh = stats[max_idx, cv2.CC_STAT_HEIGHT]
 
-        # 3. Soft anti-aliasing
-        fg_pil = Image.fromarray(fg_dilated).filter(ImageFilter.GaussianBlur(radius=1.2))
-        full_mask = fg_pil.resize((orig_w, orig_h), Image.Resampling.BILINEAR)
+            clean_fg = np.zeros_like(fg_binary)
+            for i in range(1, num_labels):
+                area = stats[i, cv2.CC_STAT_AREA]
+                x = stats[i, cv2.CC_STAT_LEFT]
+                y = stats[i, cv2.CC_STAT_TOP]
+                bw = stats[i, cv2.CC_STAT_WIDTH]
+                bh = stats[i, cv2.CC_STAT_HEIGHT]
+                
+                # Keep main product body
+                if i == max_idx:
+                    clean_fg[labels == i] = 255
+                # Keep attached details (e.g. pot lid, tassel, flower tip) if close to main bounding box and > 1.2% area
+                elif area > (max_area * 0.012):
+                    dist_x = max(0, max(mx - (x + bw), x - (mx + mw)))
+                    dist_y = max(0, max(my - (y + bh), y - (my + mh)))
+                    if dist_x < 30 and dist_y < 30:
+                        clean_fg[labels == i] = 255
+            fg_binary = clean_fg
+
+        # 3. Interior Hole Filling: Ensure craft interior is solid without transparent voids
+        h_fg, w_fg = fg_binary.shape
+        flood_mask = np.zeros((h_fg + 2, w_fg + 2), np.uint8)
+        im_floodfill = fg_binary.copy()
+        cv2.floodFill(im_floodfill, flood_mask, (0, 0), 255)
+        im_floodfill_inv = cv2.bitwise_not(im_floodfill)
+        fg_filled = fg_binary | im_floodfill_inv
+
+        # 4. Fine edge refinement: 3x3 morphological closing (preserves fine flower petals & rims) + Gaussian anti-aliasing
+        kernel_3 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+        fg_closed = cv2.morphologyEx(fg_filled, cv2.MORPH_CLOSE, kernel_3, iterations=1)
+        fg_soft = cv2.GaussianBlur(fg_closed, (3, 3), 0.5)
+
+        # Scale mask back to full original image resolution
+        full_mask = cv2.resize(fg_soft, (orig_w, orig_h), interpolation=cv2.INTER_LANCZOS4)
 
         res_rgba = pil_img.convert('RGBA')
-        res_rgba.putalpha(full_mask)
+        res_rgba.putalpha(Image.fromarray(full_mask))
         res_rgba = refine_alpha_edges(res_rgba)
 
         alpha_np = np.array(full_mask)

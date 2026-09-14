@@ -379,25 +379,21 @@ export const VoiceCatalogPage = () => {
                   onClick={isRecording ? stopRecording : startRecording}
                   className={`relative w-28 h-28 sm:w-32 sm:h-32 rounded-full transition-all duration-300 shadow-2xl flex items-center justify-center cursor-pointer select-none ${
                     isRecording
-                      ? 'bg-gradient-to-tr from-red-600 to-rose-600 text-white ring-8 ring-red-400/40 scale-105 animate-pulse shadow-red-900/50'
+                      ? 'bg-gradient-to-tr from-red-600 via-rose-600 to-red-500 text-white ring-8 ring-red-400/40 scale-105 shadow-red-900/50'
                       : 'bg-gradient-to-tr from-orange-600 via-amber-600 to-orange-500 text-white hover:scale-105 active:scale-95 shadow-orange-900/40 hover:shadow-orange-600/50 ring-4 ring-orange-500/20'
                   }`}
-                  title={isRecording ? 'Tap to Stop Recording' : 'Tap to Start Speaking'}
+                  title={isRecording ? 'Listening Live... Tap to Finish Speaking' : 'Tap to Start Speaking'}
                 >
-                  {isRecording ? (
-                    <MicOff className="w-12 h-12 sm:w-14 sm:h-14 animate-bounce" />
-                  ) : (
-                    <Mic className="w-12 h-12 sm:w-14 sm:h-14" />
-                  )}
+                  <Mic className={`w-12 h-12 sm:w-14 sm:h-14 ${isRecording ? 'animate-pulse text-white' : 'text-white'}`} />
                 </button>
               </div>
 
               <div className="mt-5 space-y-1.5">
                 <span className="text-base sm:text-lg font-black text-stone-900 dark:text-white block font-serif">
-                  {isRecording ? t('listening') : t('startRecording')}
+                  {isRecording ? (lang === 'hi' ? '🎙️ सुन रहा हूँ... बोलिए' : '🎙️ Listening... Please Speak') : t('startRecording')}
                 </span>
                 <span className="text-xs text-stone-500 dark:text-stone-400 max-w-xs mx-auto block leading-relaxed font-sans">
-                  {isRecording ? 'Listening through microphone... Tap button when finished speaking.' : t('speakHint')}
+                  {isRecording ? (lang === 'hi' ? 'माइक चालू है। बोलने के बाद बटन दोबारा दबाएँ।' : 'Microphone is live. Tap button when finished speaking.') : t('speakHint')}
                 </span>
               </div>
             </div>

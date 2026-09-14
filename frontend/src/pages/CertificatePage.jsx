@@ -147,8 +147,8 @@ export const CertificatePage = () => {
               </div>
 
               <div className="flex items-center justify-between py-2 border-b border-stone-200 dark:border-stone-800">
-                <span className="font-bold text-stone-500 dark:text-stone-400 uppercase text-xs font-sans">MoSJE Scheme ID:</span>
-                <span className="font-mono font-bold text-orange-800 dark:text-orange-400">{certData?.mosje_scheme_id || 'MoSJE-VISH-2026'}</span>
+                <span className="font-bold text-stone-500 dark:text-stone-400 uppercase text-xs font-sans">MoSJE Pehchan ID:</span>
+                <span className="font-mono font-bold text-orange-800 dark:text-orange-400">{certData?.mosje_scheme_id || certData?.scheme_id || 'MoSJE-UP-2026-091'}</span>
               </div>
 
               {certData?.gi_tagged && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { speechService } from '../services/speechService';
 import { getTranslation } from '../services/translations';
+import { generateUniqueMosjePehchanId } from '../utils/artisanIdentity';
 import { 
   Sparkles, 
   Volume2, 
@@ -426,6 +427,8 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     if (!userDetails) {
       if (finalRole === 'artisan') {
         const uName = (artisanForm.name || '').trim() || (regUsername ? `@${regUsername}` : 'Artisan');
+        const loc = [artisanForm.village, artisanForm.state].filter(Boolean).join(', ') || 'India';
+        const uniquePehchanId = artisanForm.scheme_id || generateUniqueMosjePehchanId(loc);
         userDetails = {
           username: regUsername || `artisan_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'craft123',
@@ -433,8 +436,9 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
           phone: artisanForm.phone || '',
           role: 'artisan',
           craft_type: artisanForm.craft_type || 'Handicrafts',
-          location: [artisanForm.village, artisanForm.state].filter(Boolean).join(', ') || 'India',
-          scheme_id: artisanForm.scheme_id || `MoSJE-VISH-2026-${Math.floor(100 + Math.random() * 900)}`
+          location: loc,
+          scheme_id: uniquePehchanId,
+          mosje_pehchan_id: uniquePehchanId
         };
       } else if (finalRole === 'businessman') {
         const uName = (businessmanForm.name || '').trim() || (businessmanForm.company || '').trim() || 'Institutional Buyer';

@@ -154,8 +154,8 @@ export const ProductDetailPage = () => {
 
             <div className="grid grid-cols-2 gap-3 text-xs text-stone-700 dark:text-stone-300">
               <div className="p-3 rounded-2xl bg-white dark:bg-stone-900 border border-orange-200/60 dark:border-orange-900/40 shadow-sm">
-                <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold">Artisan Beneficiary ID</span>
-                <span className="font-mono font-bold text-stone-900 dark:text-white">{p.mosje_scheme_id || 'MoSJE-VISH-2026-908'}</span>
+                <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold">MoSJE Pehchan ID</span>
+                <span className="font-mono font-bold text-stone-900 dark:text-white">{p.mosje_scheme_id || p.scheme_id || 'MoSJE-UP-2026-091'}</span>
               </div>
               <div className="p-3 rounded-2xl bg-white dark:bg-stone-900 border border-orange-200/60 dark:border-orange-900/40 shadow-sm">
                 <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold">Heritage Craft Origin</span>
