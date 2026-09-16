@@ -474,139 +474,206 @@ export const VoiceCatalogPage = () => {
 
         {/* Right Column: Bilingual Listing Editor & Preview */}
         <div className="lg:col-span-7 space-y-5">
-          <div className="bg-white dark:bg-stone-900 rounded-[28px] p-6 sm:p-7 border border-stone-200/80 dark:border-stone-800 shadow-card hover:shadow-elevated transition-all space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
-              <div className="flex items-center space-x-2">
-                <Edit3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                <span className="text-sm font-extrabold text-stone-900 dark:text-white font-serif">
-                  {t('bilingualEditor')}
+          {isGenerating ? (
+            <div className="bg-white dark:bg-stone-900 rounded-[28px] p-6 sm:p-8 border border-stone-200/80 dark:border-stone-800 shadow-card space-y-6 text-center animate-fade-in">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-craft-terracotta flex items-center space-x-1.5">
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  <span>AI Voice-to-Catalog Filmstrip Pipeline</span>
+                </span>
+                <span className="text-[11px] font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                  Active Generation
                 </span>
               </div>
-              <span className="text-[11px] text-stone-500 dark:text-stone-400 font-semibold">
-                ✓ Live editable before publishing
-              </span>
-            </div>
 
-            {/* Dual Language Titles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">
-                  {t('titleEnglish')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.title_en}
-                  onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-medium text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-hindi">
-                  {t('titleHindi')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.title_hi}
-                  onChange={(e) => setFormData({ ...formData, title_hi: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-medium text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-hindi min-h-[44px] transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Dual Language Descriptions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">
-                  {t('descEnglish')}
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description_en}
-                  onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 leading-relaxed min-h-[85px] transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-hindi">
-                  {t('descHindi')}
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description_hi}
-                  onChange={(e) => setFormData({ ...formData, description_hi: e.target.value })}
-                  className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 leading-relaxed font-hindi min-h-[85px] transition-colors"
-                />
-              </div>
-            </div>
-
-            {/* Cultural Heritage Stories */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 space-y-3">
-              <div className="flex items-center space-x-2 text-xs font-bold text-amber-900 dark:text-amber-400">
-                <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                <span className="font-serif text-sm">Cultural Heritage Narrative (MoSJE Heritage Theme)</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">English Story</span>
-                  <p className="text-stone-700 dark:text-stone-300 leading-relaxed italic bg-white dark:bg-stone-950 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800">
-                    "{formData.cultural_story_en}"
-                  </p>
+              {/* 4-Step Voice Filmstrip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-left">
+                {/* Step 1: Voice Capture */}
+                <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-400 dark:border-amber-700 shadow-sm">
+                  <div className="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center mb-2 shadow-sm">
+                    <Mic className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-black text-stone-900 dark:text-white block">1. Speech Input</span>
+                  <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">Audio stream captured</span>
                 </div>
-                <div>
-                  <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1 font-hindi">विरासत कथा (हिंदी)</span>
-                  <p className="text-stone-700 dark:text-stone-300 leading-relaxed italic bg-white dark:bg-stone-950 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 font-hindi">
-                    "{formData.cultural_story_hi}"
-                  </p>
+
+                {/* Step 2: Whisper AI */}
+                <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-400 dark:border-amber-700 shadow-sm ring-2 ring-amber-400/30 animate-pulse">
+                  <div className="w-8 h-8 rounded-xl bg-amber-600 text-white flex items-center justify-center mb-2 shadow-sm">
+                    <Volume2 className="w-4 h-4 animate-bounce" />
+                  </div>
+                  <span className="text-xs font-black text-stone-900 dark:text-white block">2. Whisper AI</span>
+                  <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">Indic dialect STT</span>
+                </div>
+
+                {/* Step 3: LLM Craft Engine */}
+                <div className="p-3 rounded-2xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+                  <div className="w-8 h-8 rounded-xl bg-stone-700 text-white flex items-center justify-center mb-2">
+                    <Edit3 className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-black text-stone-900 dark:text-white block">3. Bilingual LLM</span>
+                  <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">Craft story synthesis</span>
+                </div>
+
+                {/* Step 4: Catalog Ready */}
+                <div className="p-3 rounded-2xl bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+                  <div className="w-8 h-8 rounded-xl bg-stone-700 text-white flex items-center justify-center mb-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-black text-stone-900 dark:text-white block">4. Catalog Ready</span>
+                  <span className="text-[10px] text-stone-500 dark:text-stone-400 block truncate">GI & E-commerce</span>
                 </div>
               </div>
-            </div>
 
-            {/* Metadata (Category, Material, Dimensions) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('categoryLabel')}</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
-                >
-                  <option value="Handloom Saree">Handloom Saree</option>
-                  <option value="Terracotta Pottery">Terracotta Pottery</option>
-                  <option value="Brass Dokra Craft">Brass Dokra Craft</option>
-                  <option value="Madhubani Painting">Madhubani Painting</option>
-                  <option value="Blue Pottery">Blue Pottery</option>
-                  <option value="Wood Carving">Wood Carving</option>
-                  <option value="Leather Craft">Leather Craft</option>
-                  <option value="Zari Embroidery">Zari Embroidery</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('materialLabel')}</label>
-                <input
-                  type="text"
-                  value={formData.material_type}
-                  onChange={(e) => setFormData({ ...formData, material_type: e.target.value })}
-                  className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('dimensionsLabel')}</label>
-                <input
-                  type="text"
-                  value={formData.dimensions}
-                  onChange={(e) => setFormData({ ...formData, dimensions: e.target.value })}
-                  className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
-                />
+              <div className="space-y-2 max-w-md mx-auto pt-2">
+                <div className="w-full bg-stone-100 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#B35438] via-[#C86D51] to-[#C29B38] h-full w-3/4 animate-pulse rounded-full"></div>
+                </div>
+                <p className="text-sm font-extrabold text-stone-900 dark:text-white font-editorial">
+                  {lang === 'hi'
+                    ? 'AI द्विभाषी कैटलॉग तैयार कर रहा है: शीर्षक, विवरण और MoSJE सांस्कृतिक कथा का निर्माण...'
+                    : 'AI Craft Engine: Generating bilingual titles, descriptions & cultural heritage story...'}
+                </p>
+                <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
+                  OpenAI Whisper Indic • LLM Multilingual Craft Prompt • SEO E-Commerce Attributes
+                </p>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white dark:bg-stone-900 rounded-[28px] p-6 sm:p-7 border border-stone-200/80 dark:border-stone-800 shadow-card hover:shadow-elevated transition-all space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+                <div className="flex items-center space-x-2">
+                  <Edit3 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                  <span className="text-sm font-extrabold text-stone-900 dark:text-white font-serif">
+                    {t('bilingualEditor')}
+                  </span>
+                </div>
+                <span className="text-[11px] text-stone-500 dark:text-stone-400 font-semibold">
+                  ✓ Live editable before publishing
+                </span>
+              </div>
+
+              {/* Dual Language Titles */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">
+                    {t('titleEnglish')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title_en}
+                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-editorial font-bold text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-hindi">
+                    {t('titleHindi')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title_hi}
+                    onChange={(e) => setFormData({ ...formData, title_hi: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-hindi font-bold text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Dual Language Descriptions */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">
+                    {t('descEnglish')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.description_en}
+                    onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 leading-relaxed min-h-[85px] transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-hindi">
+                    {t('descHindi')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.description_hi}
+                    onChange={(e) => setFormData({ ...formData, description_hi: e.target.value })}
+                    className="w-full p-3.5 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-2 focus:ring-orange-500 leading-relaxed font-hindi min-h-[85px] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Cultural Heritage Stories */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 space-y-3">
+                <div className="flex items-center space-x-2 text-xs font-bold text-amber-900 dark:text-amber-400">
+                  <BookOpen className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span className="font-editorial text-sm font-bold">Cultural Heritage Narrative (MoSJE Heritage Theme)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1">English Story</span>
+                    <p className="text-stone-700 dark:text-stone-300 leading-relaxed italic bg-white dark:bg-stone-950 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 font-editorial">
+                      "{formData.cultural_story_en}"
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-stone-500 dark:text-stone-400 font-bold uppercase block mb-1 font-hindi">विरासत कथा (हिंदी)</span>
+                    <p className="text-stone-700 dark:text-stone-300 leading-relaxed italic bg-white dark:bg-stone-950 p-3.5 rounded-xl border border-stone-200 dark:border-stone-800 font-hindi">
+                      "{formData.cultural_story_hi}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metadata (Category, Material, Dimensions) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('categoryLabel')}</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
+                  >
+                    <option value="Handloom Saree">Handloom Saree</option>
+                    <option value="Terracotta Pottery">Terracotta Pottery</option>
+                    <option value="Brass Dokra Craft">Brass Dokra Craft</option>
+                    <option value="Madhubani Painting">Madhubani Painting</option>
+                    <option value="Blue Pottery">Blue Pottery</option>
+                    <option value="Wood Carving">Wood Carving</option>
+                    <option value="Leather Craft">Leather Craft</option>
+                    <option value="Zari Embroidery">Zari Embroidery</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('materialLabel')}</label>
+                  <input
+                    type="text"
+                    value={formData.material_type}
+                    onChange={(e) => setFormData({ ...formData, material_type: e.target.value })}
+                    className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-stone-700 dark:text-stone-300 block font-sans">{t('dimensionsLabel')}</label>
+                  <input
+                    type="text"
+                    value={formData.dimensions}
+                    onChange={(e) => setFormData({ ...formData, dimensions: e.target.value })}
+                    className="w-full p-3 rounded-2xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 text-xs text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px] transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Next Step Action Button & Proactive Guide */}
-          <div className="bg-gradient-to-br from-orange-600 via-amber-600 to-yellow-600 rounded-[28px] p-6 text-white shadow-xl space-y-4 border border-orange-400/40">
+          <div className="bg-gradient-to-br from-[#B35438] via-[#C86D51] to-[#C29B38] rounded-[28px] p-6 text-white shadow-xl space-y-4 border border-orange-400/40">
             <div className="flex items-center space-x-2 text-sm font-bold font-serif">
               <Sparkles className="w-5 h-5 text-yellow-200" />
               <span>AI साथी मार्गदर्शन (Step 2 Complete)</span>
@@ -624,10 +691,10 @@ export const VoiceCatalogPage = () => {
             <button
               type="button"
               onClick={handleProceedToPricing}
-              className="w-full py-4 rounded-2xl bg-white text-orange-900 font-black text-sm shadow-2xl hover:bg-orange-50 active:scale-95 transition-all flex items-center justify-center space-x-2 ring-4 ring-white/30 animate-pulse min-h-[48px]"
+              className="w-full py-4 rounded-2xl bg-white text-stone-900 font-black text-sm shadow-2xl hover:bg-stone-50 active:scale-95 transition-all flex items-center justify-center space-x-2 ring-4 ring-white/30 animate-pulse min-h-[48px]"
             >
               <span>{t('proceedToPricing')}</span>
-              <ArrowRight className="w-4 h-4 text-orange-600" />
+              <ArrowRight className="w-4 h-4 text-craft-terracotta" />
             </button>
           </div>
         </div>

@@ -555,21 +555,133 @@ export const PhotoStudioPage = () => {
                 </button>
               </div>
             ) : isProcessing ? (
-              <div className="text-center space-y-4 p-8">
-                <div className="relative w-20 h-20 mx-auto">
-                  <div className="w-20 h-20 border-4 border-amber-200 dark:border-amber-900/50 border-t-amber-600 rounded-full animate-spin"></div>
-                  <Sparkles className="w-8 h-8 text-amber-600 absolute inset-0 m-auto animate-pulse" />
+              <div className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 space-y-6 text-center animate-fade-in bg-stone-50/50 dark:bg-stone-900/50 rounded-xl">
+                {/* Process Filmstrip AI Pipeline */}
+                <div className="w-full max-w-lg space-y-4">
+                  <div className="flex items-center justify-between px-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-craft-terracotta flex items-center space-x-1.5">
+                      <Sparkles className="w-3.5 h-3.5 animate-spin" />
+                      <span>AI Photo Studio Filmstrip Pipeline</span>
+                    </span>
+                    <span className="text-[11px] font-mono font-bold text-stone-500">
+                      Step {processStep + 1} of 4
+                    </span>
+                  </div>
+
+                  {/* 4-Step Filmstrip Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {/* Step 1: Raw Capture */}
+                    <div className={`p-2.5 rounded-2xl border text-left transition-all ${
+                      processStep >= 0 
+                        ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-400 dark:border-amber-700 shadow-sm' 
+                        : 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-60'
+                    }`}>
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-200 dark:bg-stone-800 mb-2">
+                        {rawPreview ? (
+                          <img src={rawPreview} alt="Raw" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-stone-400">
+                            <Camera className="w-5 h-5" />
+                          </div>
+                        )}
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
+                          1. Raw
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-stone-900 dark:text-stone-100 block truncate">
+                        Raw Capture
+                      </span>
+                      <span className="text-[9px] text-stone-500 dark:text-stone-400 block truncate">
+                        Original Photo
+                      </span>
+                    </div>
+
+                    {/* Step 2: GrabCut Mask */}
+                    <div className={`p-2.5 rounded-2xl border text-left transition-all ${
+                      processStep >= 1 
+                        ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-400 dark:border-amber-700 shadow-sm ring-2 ring-amber-400/30' 
+                        : processStep === 0
+                        ? 'bg-amber-500/10 border-amber-300 animate-pulse'
+                        : 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-60'
+                    }`}>
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-900 flex items-center justify-center mb-2">
+                        <Scissors className="w-6 h-6 text-amber-400 animate-bounce" />
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
+                          2. Mask
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-stone-900 dark:text-stone-100 block truncate">
+                        GrabCut AI
+                      </span>
+                      <span className="text-[9px] text-stone-500 dark:text-stone-400 block truncate">
+                        Edge Isolation
+                      </span>
+                    </div>
+
+                    {/* Step 3: Texture & CLAHE */}
+                    <div className={`p-2.5 rounded-2xl border text-left transition-all ${
+                      processStep >= 2 
+                        ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-400 dark:border-amber-700 shadow-sm' 
+                        : processStep === 1
+                        ? 'bg-amber-500/10 border-amber-300 animate-pulse'
+                        : 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-60'
+                    }`}>
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-900 flex items-center justify-center mb-2">
+                        <Sun className="w-6 h-6 text-yellow-400 animate-spin" />
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
+                          3. CLAHE
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-stone-900 dark:text-stone-100 block truncate">
+                        Texture Tuning
+                      </span>
+                      <span className="text-[9px] text-stone-500 dark:text-stone-400 block truncate">
+                        Dynamic Range
+                      </span>
+                    </div>
+
+                    {/* Step 4: Studio Master */}
+                    <div className={`p-2.5 rounded-2xl border text-left transition-all ${
+                      processStep >= 3 
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-400 dark:border-emerald-700 shadow-sm' 
+                        : processStep === 2
+                        ? 'bg-amber-500/10 border-amber-300 animate-pulse'
+                        : 'bg-stone-100 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-60'
+                    }`}>
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-stone-900 flex items-center justify-center mb-2">
+                        <Crown className="w-6 h-6 text-amber-400" />
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white">
+                          4. Master
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-bold text-stone-900 dark:text-stone-100 block truncate">
+                        Studio Master
+                      </span>
+                      <span className="text-[9px] text-stone-500 dark:text-stone-400 block truncate">
+                        Shadow & Lighting
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-base font-extrabold text-stone-900 dark:text-stone-100 font-serif">
+
+                {/* Progress Bar & Status Text */}
+                <div className="space-y-2 max-w-md">
+                  <div className="w-full bg-stone-200 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-[#B35438] via-[#C86D51] to-[#C29B38] h-full transition-all duration-500 rounded-full"
+                      style={{ width: `${Math.max(25, (processStep + 1) * 25)}%` }}
+                    ></div>
+                  </div>
+
+                  <p className="text-sm font-extrabold text-stone-900 dark:text-stone-100 font-editorial">
                     {processStep === 0
-                      ? (lang === 'hi' ? 'AI फोटो स्टूडियो: कारीगरी के बारीक डिज़ाइन व रंग निखारे जा रहे हैं...' : 'AI Photo Studio: Isolating craft foreground & optimizing micro-textures...')
+                      ? (lang === 'hi' ? 'AI फोटो स्टूडियो: मूल फोटो से शिल्प का अग्रभाग पहचाना जा रहा है...' : 'AI Photo Studio: Isolating craft foreground & optimizing micro-textures...')
                       : processStep === 1
                       ? (lang === 'hi' ? 'क्लाउड सर्वर से संपर्क कर रहे हैं व रंग संतुलन लागू किया जा रहा है...' : 'Connecting to AI Cloud Studio & applying CLAHE dynamic range...')
                       : (lang === 'hi' ? 'स्टूडियो लाइटिंग व सॉफ्ट कांटेक्ट शैडो तैयार की जा रही है...' : 'Finalizing edge defringing, studio lighting & contact shadow...')}
                   </p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto">
-                    OpenCV GrabCut Pro • Multi-band Unsharp Mask (USM) • CLAHE Tone Balance • Studio Contact Shadow
+                  <p className="text-[11px] text-stone-500 dark:text-stone-400">
+                    OpenCV GrabCut Pro • Multi-band USM • CLAHE Tone Balance • Soft Contact Shadow
                   </p>
                 </div>
               </div>

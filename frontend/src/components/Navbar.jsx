@@ -462,13 +462,13 @@ export const Navbar = () => {
             <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl p-0.5 shadow-lg group-hover:scale-105 transition-transform flex items-center justify-center ${
               userRole === 'businessman' 
                 ? 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 shadow-blue-900/30'
-                : 'bg-gradient-to-tr from-orange-600 via-amber-600 to-yellow-500 shadow-orange-900/30'
+                : 'bg-gradient-to-tr from-[#B35438] via-[#C86D51] to-[#C29B38] shadow-stone-900/30'
             }`}>
               <div className="w-full h-full bg-stone-900 dark:bg-stone-950 rounded-[14px] flex items-center justify-center">
                 {userRole === 'businessman' ? (
                   <Building2 className="w-5 h-5 text-blue-400" />
                 ) : (
-                  <Sparkles className="w-5 h-5 text-orange-400" />
+                  <Sparkles className="w-5 h-5 text-amber-400" />
                 )}
               </div>
             </div>

@@ -202,9 +202,9 @@ export const BuyerLandingPage = () => {
               <div
                 key={product.id}
                 onClick={() => handleOpenProduct(product)}
-                className="group bg-white dark:bg-stone-900 rounded-[28px] border border-stone-200/90 dark:border-stone-800 hover:border-amber-500/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="living-catalog-card group bg-white dark:bg-stone-900 rounded-[28px] border border-stone-200/90 dark:border-stone-800 hover:border-[#B35438]/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
-                {/* Product Image */}
+                {/* Product Image + Sliding Provenance Badge */}
                 <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 overflow-hidden flex items-center justify-center p-3">
                   <img
                     src={imgSrc}
@@ -219,31 +219,47 @@ export const BuyerLandingPage = () => {
 
                   {/* GI Tag Badge */}
                   {product.gi_tagged && (
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-600 text-white text-[10px] font-extrabold flex items-center space-x-1 shadow-md">
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#B35438] text-white text-[10px] font-extrabold flex items-center space-x-1 shadow-md">
                       <Award className="w-3 h-3" />
                       <span>GI TAG</span>
                     </div>
                   )}
 
                   {/* Verified MoSJE Badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-stone-900/80 backdrop-blur-sm text-emerald-400 text-[10px] font-bold flex items-center space-x-1 shadow-md">
+                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-stone-900/85 backdrop-blur-sm text-emerald-400 text-[10px] font-bold flex items-center space-x-1 shadow-md">
                     <ShieldCheck className="w-3 h-3 text-emerald-400" />
                     <span>MoSJE Verified</span>
                   </div>
 
+                  {/* Living Provenance Sliding Badge (Pillar 5) */}
+                  <div className="provenance-badge-slide absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-stone-950 via-stone-950/90 to-transparent text-white flex items-center justify-between pointer-events-none">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-7 h-7 rounded-full bg-[#B35438] text-white flex items-center justify-center text-xs font-bold ring-2 ring-white/30">
+                        {product.artisan_name ? product.artisan_name.charAt(0) : 'A'}
+                      </div>
+                      <div className="leading-tight">
+                        <span className="text-[11px] font-bold block truncate max-w-[120px]">{product.artisan_name}</span>
+                        <span className="text-[9px] text-stone-300 block">{product.artisan_village} • {product.craft_lineage_years || 20}+ Yrs Lineage</span>
+                      </div>
+                    </div>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-white/20 text-white font-bold backdrop-blur-sm">
+                      Authentic
+                    </span>
+                  </div>
+
                   {/* Quick Action Buttons on Image */}
-                  <div className="absolute bottom-3 right-3 flex items-center space-x-2">
+                  <div className="absolute bottom-3 right-3 flex items-center space-x-2 group-hover:opacity-0 transition-opacity">
                     <button
                       onClick={(e) => handleOpenCertificate(product, e)}
                       title="View Digital Provenance Certificate"
-                      className="p-2 rounded-xl bg-stone-900/80 hover:bg-stone-900 text-white backdrop-blur-sm shadow-md transition-transform group-hover:scale-110"
+                      className="p-2 rounded-xl bg-stone-900/80 hover:bg-stone-900 text-white backdrop-blur-sm shadow-md transition-transform group-hover:scale-110 pointer-events-auto"
                     >
                       <QrCode className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => handleWhatsAppInquiry(product, e)}
                       title="Direct WhatsApp Inquire"
-                      className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-transform group-hover:scale-110"
+                      className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-transform group-hover:scale-110 pointer-events-auto"
                     >
                       <MessageCircle className="w-4 h-4" />
                     </button>
@@ -258,12 +274,12 @@ export const BuyerLandingPage = () => {
                         {product.category}
                       </span>
                       <span className="flex items-center text-stone-500 dark:text-stone-400 text-[11px]">
-                        <MapPin className="w-3 h-3 mr-0.5" />
+                        <MapPin className="w-3 h-3 mr-0.5 text-craft-terracotta" />
                         {product.artisan_village}
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-stone-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors font-serif">
+                    <h3 className="font-bold text-stone-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-craft-terracotta transition-colors font-editorial">
                       {displayTitle}
                     </h3>
                   </div>
@@ -274,7 +290,7 @@ export const BuyerLandingPage = () => {
                       <span className="text-[10px] text-stone-400 dark:text-stone-500 block uppercase font-bold tracking-wider font-sans">
                         Direct Artisan Price
                       </span>
-                      <span className="text-lg font-black text-stone-900 dark:text-white font-sans">
+                      <span className="text-lg font-black text-stone-900 dark:text-white font-serif">
                         ₹{product.price?.toLocaleString('en-IN')}
                       </span>
                     </div>

@@ -20,6 +20,14 @@ export default {
           800: '#9a3412',
           900: '#7c2d12',
           950: '#431407',
+          terracotta: '#B35438',
+          clay: '#C86D51',
+          silk: '#FAF8F5',
+          bronze: '#C29B38',
+          brass: '#D4AF37',
+          indigo: '#1E3A5F',
+          charcoal: '#1C1917',
+          obsidian: '#0C0A09'
         },
         india: {
           saffron: '#FF9933',
@@ -36,6 +44,7 @@ export default {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['"Playfair Display"', '"Noto Serif Devanagari"', 'Georgia', 'serif'],
+        editorial: ['"Playfair Display"', '"Noto Serif Devanagari"', 'Georgia', 'serif'],
         heritage: ['Cinzel', '"Playfair Display"', '"Noto Serif Devanagari"', 'serif'],
         hindi: ['"Noto Sans Devanagari"', '"Noto Serif Devanagari"', 'sans-serif']
       }

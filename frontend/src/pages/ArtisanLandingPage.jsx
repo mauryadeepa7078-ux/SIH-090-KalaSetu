@@ -117,7 +117,7 @@ export const ArtisanLandingPage = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-7 animate-fade-in pb-28">
       
       {/* Top Welcome Card */}
-      <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-orange-950/15 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#B35438] via-[#C86D51] to-[#C29B38] rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-stone-950/15 relative overflow-hidden">
         {/* Subtle decorative glow circles */}
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-amber-400/15 rounded-full blur-xl pointer-events-none" />
@@ -129,7 +129,7 @@ export const ArtisanLandingPage = () => {
               <span>MoSJE Verified Artisan Portal</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-serif text-white">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-editorial text-white">
               {lang === 'hi' ? 'नमस्ते, शिल्पकार साथी!' : 'Namaste, Master Artisan!'}
             </h1>
 
@@ -152,11 +152,11 @@ export const ArtisanLandingPage = () => {
       {/* AI Voice Assistant Companion Card */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm flex items-center justify-between gap-4 transition-colors">
         <div className="flex items-center space-x-3.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-craft-terracotta flex items-center justify-center shrink-0">
             <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-extrabold tracking-wider text-orange-600 dark:text-orange-400 block">
+            <span className="text-[10px] uppercase font-extrabold tracking-wider text-craft-terracotta block">
               AI Companion Guide • सहायक
             </span>
             <p className="text-xs sm:text-sm font-semibold text-stone-800 dark:text-stone-200 truncate">
@@ -169,10 +169,10 @@ export const ArtisanLandingPage = () => {
 
         <button
           onClick={handleSpeakGreeting}
-          className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-orange-600 hover:text-white text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition-all shadow-sm shrink-0 flex items-center space-x-1.5"
+          className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#B35438] hover:text-white text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition-all shadow-sm shrink-0 flex items-center space-x-1.5"
           title="Listen to AI voice guide"
         >
-          <Volume2 className="w-4 h-4 text-orange-600 dark:text-orange-400 group-hover:text-white" />
+          <Volume2 className="w-4 h-4 text-craft-terracotta group-hover:text-white" />
           <span className="text-xs font-bold hidden sm:inline">Listen</span>
         </button>
       </div>
@@ -183,7 +183,7 @@ export const ArtisanLandingPage = () => {
           <span className="text-xs font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 font-sans">
             {lang === 'hi' ? 'मुख्य आसान कदम (Primary Actions)' : 'Fast Listing Studio'}
           </span>
-          <span className="text-xs font-bold text-orange-600 dark:text-orange-400 font-sans">
+          <span className="text-xs font-bold text-craft-terracotta font-sans">
             {lang === 'hi' ? '2 मिनट में लाइव' : 'Live in 2 mins'}
           </span>
         </div>
@@ -193,7 +193,7 @@ export const ArtisanLandingPage = () => {
           {/* Action 1: Photo Lo (AI Photo Studio) */}
           <button
             onClick={() => setActiveTab('camera')}
-            className="group relative p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-orange-600 via-amber-600 to-orange-500 text-white text-left shadow-xl shadow-orange-950/20 hover:shadow-2xl hover:scale-[1.015] active:scale-[0.985] transition-all border border-orange-400/30 flex flex-col justify-between min-h-[200px]"
+            className="group relative p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#B35438] via-[#C86D51] to-[#C29B38] text-white text-left shadow-xl shadow-stone-950/20 hover:shadow-2xl hover:scale-[1.015] active:scale-[0.985] transition-all border border-orange-400/30 flex flex-col justify-between min-h-[200px]"
           >
             <div className="flex items-center justify-between w-full">
               <div className="p-3.5 rounded-2xl bg-black/20 backdrop-blur-md group-hover:scale-110 transition-transform">
@@ -205,7 +205,7 @@ export const ArtisanLandingPage = () => {
             </div>
 
             <div className="mt-6 space-y-1.5">
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-serif flex items-center justify-between">
+              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-editorial flex items-center justify-between">
                 <span>{t('btnPhotoLo')}</span>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </h3>
@@ -218,10 +218,10 @@ export const ArtisanLandingPage = () => {
           {/* Action 2: Bolkar Batao (Voice to Catalog) */}
           <button
             onClick={() => setActiveTab('voice')}
-            className="group relative p-6 sm:p-8 rounded-[28px] bg-white dark:bg-stone-900 text-stone-900 dark:text-white text-left shadow-md dark:shadow-xl hover:shadow-xl hover:scale-[1.015] active:scale-[0.985] transition-all border-2 border-stone-200/90 dark:border-stone-800 hover:border-orange-500 dark:hover:border-orange-500 flex flex-col justify-between min-h-[200px]"
+            className="group relative p-6 sm:p-8 rounded-[28px] bg-white dark:bg-stone-900 text-stone-900 dark:text-white text-left shadow-md dark:shadow-xl hover:shadow-xl hover:scale-[1.015] active:scale-[0.985] transition-all border-2 border-stone-200/90 dark:border-stone-800 hover:border-[#B35438] dark:hover:border-[#C86D51] flex flex-col justify-between min-h-[200px]"
           >
             <div className="flex items-center justify-between w-full">
-              <div className="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 group-hover:scale-110 transition-transform">
+              <div className="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-craft-terracotta group-hover:scale-110 transition-transform">
                 <Mic className="w-7 h-7 sm:w-8 sm:h-8 animate-pulse" />
               </div>
               <span className="px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] font-black tracking-wider uppercase border border-stone-200 dark:border-stone-700">
@@ -230,7 +230,7 @@ export const ArtisanLandingPage = () => {
             </div>
 
             <div className="mt-6 space-y-1.5">
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-serif flex items-center justify-between text-stone-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-editorial flex items-center justify-between text-stone-900 dark:text-white group-hover:text-craft-terracotta transition-colors">
                 <span>{t('btnBolkarBatao')}</span>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
               </h3>

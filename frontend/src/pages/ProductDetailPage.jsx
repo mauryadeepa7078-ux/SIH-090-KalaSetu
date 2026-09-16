@@ -214,22 +214,37 @@ export const ProductDetailPage = () => {
             </div>
           )}
 
-          {/* Bullet Features */}
-          {bullets.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-stone-400 dark:text-stone-500 font-sans">
-                Authentic Craft Features
-              </h3>
-              <ul className="space-y-1.5 text-xs text-stone-700 dark:text-stone-300 font-sans">
-                {bullets.map((b, idx) => (
-                  <li key={idx} className="flex items-start space-x-2">
-                    <span className="text-orange-600 dark:text-orange-400 font-bold">✓</span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Meet the Master Artisan Storytelling Card (Pillar 5) */}
+          <div className="p-5 sm:p-6 rounded-[28px] bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 shadow-card space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-craft-terracotta flex items-center space-x-1.5 font-editorial">
+                <span>Meet the Master Artisan (कारीगर परिचय)</span>
+              </span>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-bold">
+                MoSJE Verified
+              </span>
             </div>
-          )}
+
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-[#B35438] to-[#C29B38] text-white flex items-center justify-center font-editorial text-xl font-bold shadow-md shrink-0">
+                {p.artisan_name ? p.artisan_name.charAt(0) : 'A'}
+              </div>
+
+              <div className="flex-1 space-y-1">
+                <h4 className="text-base sm:text-lg font-black text-stone-900 dark:text-white font-editorial">
+                  {p.artisan_name || 'Master Artisan'}
+                </h4>
+                <p className="text-xs text-stone-500 dark:text-stone-400 font-sans flex items-center gap-2">
+                  <span>📍 {p.artisan_village || 'Kotwa'}, {p.artisan_state || 'Uttar Pradesh'}</span>
+                  <span>•</span>
+                  <span className="text-craft-terracotta font-bold">{p.craft_lineage_years || 20}+ Yrs Heritage Lineage</span>
+                </p>
+                <p className="text-xs text-stone-600 dark:text-stone-300 pt-1 leading-relaxed font-sans">
+                  Practicing generational traditional craftsmanship using authentic sustainable raw materials. Certified under Ministry of Social Justice & Empowerment scheme.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Role-Specific Action Buttons */}
           <div className="pt-4 border-t border-stone-200 dark:border-stone-800 space-y-3">

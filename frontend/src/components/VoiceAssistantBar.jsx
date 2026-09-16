@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useVoiceNav } from '../context/VoiceNavContext';
 import { useApp } from '../context/AppContext';
-import { Mic, MicOff, Volume2, Sparkles, ChevronUp, ChevronDown, Bot } from 'lucide-react';
+import { Mic, MicOff, Volume2, Sparkles, ChevronUp, ChevronDown, Bot, Radio, Loader2 } from 'lucide-react';
 
 export const VoiceAssistantBar = () => {
   const { isListening, startVoiceNavigation, recognizedText, assistantReply, speakGuide } = useVoiceNav();
   const { t, lang, userRole } = useApp();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Derived state: 'listening' | 'responding' | 'idle'
+  const aiState = isListening ? 'listening' : assistantReply ? 'responding' : 'idle';
 
   const sampleCommands = userRole === 'businessman'
     ? [
@@ -55,20 +58,26 @@ export const VoiceAssistantBar = () => {
     >
       {/* Voice commands hint drawer */}
       {isExpanded && (
-        <div className="mb-3 p-5 bg-stone-900/95 backdrop-blur-xl border border-orange-500/40 rounded-3xl shadow-2xl w-80 sm:w-96 text-xs text-stone-200 transition-all animate-float">
+        <div className="mb-3 p-5 bg-stone-900/95 backdrop-blur-xl border border-stone-700 rounded-3xl shadow-2xl w-80 sm:w-96 text-xs text-stone-200 transition-all animate-float">
           <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-            <div className="flex items-center space-x-2 font-bold text-orange-400">
+            <div className="flex items-center space-x-2 font-bold text-craft-terracotta">
               <div className="p-1.5 rounded-xl bg-orange-500/20 text-orange-400">
                 <Sparkles className="w-4 h-4" />
               </div>
               <span className="font-serif text-sm text-white">{t('voiceNavActive')} (AI साथी)</span>
             </div>
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-stone-800 transition-colors"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-800 text-stone-300 font-mono">
+                {aiState === 'listening' ? '🎙️ Listening' : aiState === 'responding' ? '✨ Responding' : '🟢 Ready'}
+              </span>
+              <button
+                onClick={() => setIsExpanded(false)}
+                className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-stone-800 transition-colors"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Quick Voice Commands */}
@@ -81,7 +90,7 @@ export const VoiceAssistantBar = () => {
                 <span
                   key={idx}
                   onClick={() => speakGuide(item.cmd)}
-                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-stone-800/90 border border-stone-700/80 hover:border-orange-500 hover:bg-orange-950/40 text-stone-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
+                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-stone-800/90 border border-stone-700/80 hover:border-craft-terracotta hover:bg-stone-800 text-stone-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
                 >
                   🗣️ {item.label}
                 </span>
@@ -99,7 +108,7 @@ export const VoiceAssistantBar = () => {
                 <span
                   key={idx}
                   onClick={() => speakGuide(item.cmd)}
-                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-orange-950/60 border border-orange-800/60 hover:border-orange-400 hover:bg-orange-900/60 text-orange-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
+                  className="cursor-pointer px-2.5 py-1 rounded-xl bg-stone-800/80 border border-stone-700 hover:border-craft-terracotta hover:bg-stone-800 text-stone-200 hover:text-white text-[11px] font-semibold transition-all active:scale-95"
                 >
                   {item.label}
                 </span>
@@ -116,7 +125,7 @@ export const VoiceAssistantBar = () => {
           )}
 
           {assistantReply && (
-            <div className="mt-2.5 p-3 rounded-2xl bg-gradient-to-br from-orange-950/80 to-stone-900 border border-orange-600/40 text-orange-200 space-y-1 animate-fade-in shadow-md">
+            <div className="mt-2.5 p-3 rounded-2xl bg-stone-950 border border-orange-500/40 text-orange-200 space-y-1 animate-fade-in shadow-md">
               <span className="font-bold text-[10px] text-orange-400 uppercase tracking-wider block flex items-center gap-1 font-sans">
                 <Sparkles className="w-3 h-3 text-orange-400" /> AI Advisor Reply:
               </span>
@@ -141,7 +150,7 @@ export const VoiceAssistantBar = () => {
           className={`relative p-4 rounded-full shadow-2xl transition-all duration-300 flex items-center justify-center ${
             isListening
               ? 'bg-red-600 text-white ring-4 ring-red-400/50 animate-pulse scale-105'
-              : 'bg-gradient-to-tr from-orange-600 via-amber-600 to-yellow-500 text-white hover:scale-110 shadow-orange-900/50 glow-saffron'
+              : 'bg-gradient-to-tr from-[#B35438] via-[#C86D51] to-[#C29B38] text-white hover:scale-110 shadow-stone-950/50 glow-terracotta'
           }`}
           title="Click to speak a voice command"
         >
@@ -161,3 +170,4 @@ export const VoiceAssistantBar = () => {
     </div>
   );
 };
+
