@@ -202,7 +202,7 @@ export const BuyerLandingPage = () => {
               <div
                 key={product.id}
                 onClick={() => handleOpenProduct(product)}
-                className="living-catalog-card group bg-white dark:bg-stone-900 rounded-[28px] border border-stone-200/90 dark:border-stone-800 hover:border-[#B35438]/50 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                className="living-catalog-card craft-3d-card group bg-white dark:bg-stone-900 rounded-[28px] border border-stone-200/90 dark:border-stone-800 hover:border-[#C29B38]/60 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
               >
                 {/* Product Image + Sliding Provenance Badge */}
                 <div className="relative aspect-square bg-stone-50 dark:bg-stone-950 overflow-hidden flex items-center justify-center p-3">
@@ -219,15 +219,15 @@ export const BuyerLandingPage = () => {
 
                   {/* GI Tag Badge */}
                   {product.gi_tagged && (
-                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#B35438] text-white text-[10px] font-extrabold flex items-center space-x-1 shadow-md">
-                      <Award className="w-3 h-3" />
+                    <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-gradient-to-r from-[#C29B38] to-[#B35438] text-white text-[10px] font-extrabold flex items-center space-x-1 shadow-md">
+                      <Award className="w-3 h-3 text-amber-200" />
                       <span>GI TAG</span>
                     </div>
                   )}
 
                   {/* Verified MoSJE Badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-stone-900/85 backdrop-blur-sm text-emerald-400 text-[10px] font-bold flex items-center space-x-1 shadow-md">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-stone-900/90 backdrop-blur-md text-amber-300 text-[10px] font-bold flex items-center space-x-1 shadow-md border border-amber-500/30">
+                    <ShieldCheck className="w-3 h-3 text-amber-400" />
                     <span>MoSJE Verified</span>
                   </div>
 

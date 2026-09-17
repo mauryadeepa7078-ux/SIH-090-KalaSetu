@@ -206,43 +206,65 @@ export const BusinessmanLandingPage = () => {
             </div>
           </div>
 
-          {/* Quick Stats Grid */}
+          {/* Quick Stats Grid with Dimensional 3D Styling */}
           <div className="lg:col-span-4 grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
+            <div className="b2b-stat-card p-4 space-y-1">
               <div className="flex items-center justify-between text-blue-400">
                 <Briefcase className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">GeM Tenders</span>
+                <span className="text-[10px] uppercase font-bold text-slate-300 font-sans">GeM Tenders</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-white font-sans">₹48.6 L</div>
               <p className="text-[10px] text-emerald-400 font-medium font-sans">12 Active Tenders</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
+            <div className="b2b-stat-card p-4 space-y-1">
               <div className="flex items-center justify-between text-amber-400">
                 <Award className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Verified Hubs</span>
+                <span className="text-[10px] uppercase font-bold text-slate-300 font-sans">Verified Hubs</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-white font-sans">24 Guilds</div>
               <p className="text-[10px] text-amber-300 font-medium font-sans">100% MoSJE Verified</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
+            <div className="b2b-stat-card p-4 space-y-1">
               <div className="flex items-center justify-between text-emerald-400">
                 <TrendingUp className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Savings</span>
+                <span className="text-[10px] uppercase font-bold text-slate-300 font-sans">Savings</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-white font-sans">28.4%</div>
-              <p className="text-[10px] text-slate-400 font-medium font-sans">Zero Middlemen</p>
+              <p className="text-[10px] text-slate-300 font-medium font-sans">Zero Middlemen</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-900/80 border border-blue-500/20 space-y-1 backdrop-blur-md">
+            <div className="b2b-stat-card p-4 space-y-1">
               <div className="flex items-center justify-between text-cyan-400">
                 <Truck className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold text-slate-400 font-sans">Freight</span>
+                <span className="text-[10px] uppercase font-bold text-slate-300 font-sans">Freight</span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-white font-sans">IndiaPost</div>
               <p className="text-[10px] text-cyan-300 font-medium font-sans">DNK Export Kendra</p>
             </div>
+          </div>
+        </div>
+
+        {/* 3D Procurement Pipeline Stage Tracker */}
+        <div className="mt-6 pt-5 border-t border-blue-500/30 relative z-10 space-y-2.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-extrabold uppercase tracking-wider text-blue-300 font-sans flex items-center space-x-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Institutional GeM Pipeline Flow (संस्थागत खरीद चक्र)</span>
+            </span>
+            <span className="text-cyan-300 font-bold font-mono text-[11px]">Milestone: Active Escrow</span>
+          </div>
+
+          <div className="b2b-progress-track">
+            <div className="b2b-progress-fill" style={{ width: '75%' }}></div>
+          </div>
+
+          <div className="grid grid-cols-4 text-[10px] sm:text-[11px] font-sans text-slate-300 pt-0.5">
+            <span className="font-bold text-cyan-300">1. RFQ Generated ✓</span>
+            <span className="font-bold text-cyan-300 text-center">2. MoSJE Guild Match ✓</span>
+            <span className="font-bold text-cyan-300 text-center">3. DNK Logistics Booked ✓</span>
+            <span className="text-slate-400 text-right">4. GeM Settlement (In Progress)</span>
           </div>
         </div>
       </div>

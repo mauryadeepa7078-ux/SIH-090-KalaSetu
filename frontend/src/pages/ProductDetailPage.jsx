@@ -20,7 +20,10 @@ import {
   Heart, 
   MessageCircle,
   Truck,
-  Zap
+  Zap,
+  Eye,
+  Box,
+  ZoomIn
 } from 'lucide-react';
 
 export const ProductDetailPage = () => {
@@ -39,6 +42,7 @@ export const ProductDetailPage = () => {
     currentUser
   } = useApp();
 
+  const [inspectorAngle, setInspectorAngle] = useState('front'); // 'front' | 'perspective' | 'macro' | 'seal'
   const [copied, setCopied] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -115,25 +119,156 @@ export const ProductDetailPage = () => {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
-        {/* Left Column: Image and QR Badge */}
-        <div className="lg:col-span-6 space-y-5">
-          <div className="relative aspect-square w-full bg-white dark:bg-stone-900 rounded-[28px] p-4 border border-stone-200/80 dark:border-stone-800 shadow-card overflow-hidden flex items-center justify-center group">
-            <img
-              src={imgSrc}
-              alt={p.title_en}
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = getCategoryFallbackImage(p.category);
-              }}
-              className="w-full h-full object-contain rounded-2xl group-hover:scale-105 transition-transform duration-500"
-            />
+        {/* Left Column: Multi-Angle Craft Inspector and Trust Badge */}
+        <div className="lg:col-span-6 space-y-4">
+          {/* Main Inspection Stage */}
+          <div className="craft-inspector-viewport relative aspect-square w-full bg-stone-50 dark:bg-stone-900 rounded-[28px] p-4 border border-stone-200/90 dark:border-stone-800 shadow-card overflow-hidden flex items-center justify-center group">
+            
+            {/* Ambient Background Glow in Perspective Mode */}
+            {inspectorAngle === 'perspective' && (
+              <div className="absolute inset-0 bg-gradient-radial from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+            )}
 
-            {p.gi_tagged && (
-              <div className="absolute top-4 right-4 px-3.5 py-1.5 rounded-full bg-orange-600 text-white font-black text-xs flex items-center space-x-1.5 shadow-lg shadow-orange-900/40">
-                <Award className="w-4 h-4" />
-                <span>GI CERTIFIED CRAFT</span>
+            {/* Macro Grid Texture Overlay in Macro Mode */}
+            {inspectorAngle === 'macro' && (
+              <div className="absolute inset-0 bg-[radial-gradient(rgba(179,84,56,0.15)_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none z-10" />
+            )}
+
+            {/* Product Image with Angle Transform */}
+            <div className="w-full h-full flex items-center justify-center overflow-hidden rounded-2xl">
+              <img
+                src={imgSrc}
+                alt={p.title_en}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = getCategoryFallbackImage(p.category);
+                }}
+                className={`craft-inspector-target w-full h-full object-contain rounded-2xl ${
+                  inspectorAngle === 'perspective'
+                    ? 'view-perspective'
+                    : inspectorAngle === 'macro'
+                    ? 'view-macro'
+                    : inspectorAngle === 'seal'
+                    ? 'view-seal'
+                    : ''
+                }`}
+              />
+            </div>
+
+            {/* Mode Specific Badges & Overlays */}
+            {/* Mode 1: Front Master */}
+            {inspectorAngle === 'front' && (
+              <div className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-stone-900/80 backdrop-blur-md text-white text-[10px] font-bold flex items-center space-x-1.5 shadow-md">
+                <Sparkles className="w-3 h-3 text-amber-400" />
+                <span>Master AI Studio 4K Clarity</span>
               </div>
             )}
+
+            {/* Mode 2: 3D Perspective */}
+            {inspectorAngle === 'perspective' && (
+              <div className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-amber-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold flex items-center space-x-1.5 border border-amber-500/30 shadow-md">
+                <Box className="w-3 h-3 text-amber-400" />
+                <span>3D Dimensional Depth • 45° Perspective View</span>
+              </div>
+            )}
+
+            {/* Mode 3: Macro Weave */}
+            {inspectorAngle === 'macro' && (
+              <div className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-stone-950/90 backdrop-blur-md text-orange-300 text-[10px] font-bold flex items-center space-x-1.5 border border-orange-500/30 shadow-md z-20">
+                <ZoomIn className="w-3 h-3 text-orange-400" />
+                <span>Macro Handcraft Texture • 2.2x Artisan Weave</span>
+              </div>
+            )}
+
+            {/* Mode 4: MoSJE Hallmark Seal Overlay */}
+            {inspectorAngle === 'seal' && (
+              <div className="absolute inset-0 bg-stone-950/75 backdrop-blur-sm p-6 flex flex-col justify-between items-center text-center text-white z-20 animate-fade-in">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#C29B38] via-amber-400 to-[#B35438] p-0.5 shadow-2xl flex items-center justify-center mt-4">
+                  <div className="w-full h-full bg-stone-950 rounded-full flex items-center justify-center">
+                    <Award className="w-8 h-8 text-amber-400" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 max-w-xs">
+                  <span className="text-[10px] uppercase tracking-widest text-amber-400 font-extrabold block font-sans">
+                    Government of India • MoSJE
+                  </span>
+                  <h4 className="text-sm font-bold font-editorial text-white">
+                    Official Authenticity & Provenance Seal
+                  </h4>
+                  <p className="text-[11px] text-stone-300 font-mono">
+                    ID: {p.mosje_scheme_id || p.scheme_id || 'MoSJE-UP-2026-091'}
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-sans">
+                    Artisan: {p.artisan_name} • {p.artisan_village}, {p.artisan_state}
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2 text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-800">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>100% Genuine Handcrafted Guarantee</span>
+                </div>
+              </div>
+            )}
+
+            {/* Static GI Tag Badge in Top Right */}
+            {p.gi_tagged && (
+              <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-[#C29B38] to-[#B35438] text-white font-black text-xs flex items-center space-x-1.5 shadow-lg shadow-amber-950/40 z-20">
+                <Award className="w-3.5 h-3.5 text-amber-200" />
+                <span>GI TAGGED</span>
+              </div>
+            )}
+          </div>
+
+          {/* Interactive Multi-Angle Controls */}
+          <div className="grid grid-cols-4 gap-2">
+            <button
+              onClick={() => setInspectorAngle('front')}
+              className={`p-2.5 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 border ${
+                inspectorAngle === 'front'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-md ring-2 ring-amber-400/40'
+                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+              }`}
+            >
+              <Eye className="w-4 h-4" />
+              <span className="text-[10px] font-sans">Front</span>
+            </button>
+
+            <button
+              onClick={() => setInspectorAngle('perspective')}
+              className={`p-2.5 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 border ${
+                inspectorAngle === 'perspective'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-md ring-2 ring-amber-400/40'
+                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+              }`}
+            >
+              <Box className="w-4 h-4" />
+              <span className="text-[10px] font-sans">3D Angle</span>
+            </button>
+
+            <button
+              onClick={() => setInspectorAngle('macro')}
+              className={`p-2.5 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 border ${
+                inspectorAngle === 'macro'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-md ring-2 ring-amber-400/40'
+                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+              }`}
+            >
+              <ZoomIn className="w-4 h-4" />
+              <span className="text-[10px] font-sans">Macro</span>
+            </button>
+
+            <button
+              onClick={() => setInspectorAngle('seal')}
+              className={`p-2.5 rounded-2xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 border ${
+                inspectorAngle === 'seal'
+                  ? 'bg-amber-600 text-white border-amber-500 shadow-md ring-2 ring-amber-400/40'
+                  : 'bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span className="text-[10px] font-sans">Hallmark</span>
+            </button>
           </div>
 
           {/* Trust and Verification Panel */}
