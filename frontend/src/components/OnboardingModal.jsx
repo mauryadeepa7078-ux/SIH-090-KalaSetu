@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { speechService } from '../services/speechService';
 import { getTranslation } from '../services/translations';
 import { generateUniqueMosjePehchanId } from '../utils/artisanIdentity';
+import { api } from '../services/api';
 import { 
   Sparkles, 
   Volume2, 
@@ -32,7 +33,8 @@ import {
   KeyRound,
   Eye,
   EyeOff,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 
 export const OnboardingModal = ({ isFullScreen = false }) => {
@@ -154,82 +156,10 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
   const [forgotSuccess, setForgotSuccess] = useState('');
   const [forgotError, setForgotError] = useState('');
 
+  // Loading state for async backend auth operations
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const normalizeIdentifier = (val) => (val || '').replace(/^@/, '').trim().toLowerCase();
-
-  const DEFAULT_SEED_ACCOUNTS = [
-    {
-      username: 'artisan',
-      password: 'craft123',
-      name: 'Master Ram Das Bunkar',
-      role: 'artisan',
-      phone: '+91 98765 43210',
-      location: 'Kotwa, Varanasi, UP',
-      craft_type: 'Handloom & Silk Weaving',
-      scheme_id: 'MoSJE-VISH-2026-UP-091'
-    },
-    {
-      username: 'bunkar_ramdas',
-      password: 'craft123',
-      name: 'Master Ram Das Bunkar',
-      role: 'artisan',
-      phone: '+91 98765 43210',
-      location: 'Kotwa, Varanasi, UP',
-      craft_type: 'Handloom & Silk Weaving',
-      scheme_id: 'MoSJE-VISH-2026-UP-091'
-    },
-    {
-      username: 'buyer',
-      password: 'buyer123',
-      name: 'Priya Sharma (Retail Buyer)',
-      role: 'buyer',
-      phone: '+91 98112 34567',
-      email: 'priya.sharma@heritagecraft.in',
-      location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-      buyer_type: 'Individual Heritage Collector'
-    },
-    {
-      username: 'businessman',
-      password: 'b2b123',
-      name: 'Rajesh Singhal',
-      role: 'businessman',
-      phone: '+91 98200 11223',
-      company: 'Singhal Crafts Export & Retailers Pvt Ltd',
-      email: 'procurement@singhalcrafts.com',
-      gstin: '07AAAAA0000A1Z5',
-      gem_org_id: 'GEM-DL-2026-9912',
-      location: 'New Delhi & Global Exporter',
-      procurement_type: 'B2B Wholesale & Government GeM Tenders'
-    }
-  ];
-
-  // Local Accounts Helper
-  const getStoredAccounts = () => {
-    try {
-      const data = localStorage.getItem('craftx_user_accounts') || localStorage.getItem('kalasetu_user_accounts');
-      if (data) {
-        const parsed = JSON.parse(data);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {}
-    return DEFAULT_SEED_ACCOUNTS;
-  };
-
-  const saveAccount = (account) => {
-    try {
-      const cleanUsername = normalizeIdentifier(account.username);
-      const accToSave = {
-        ...account,
-        username: cleanUsername || account.username
-      };
-      const existing = getStoredAccounts();
-      const filtered = existing.filter(a => normalizeIdentifier(a.username) !== cleanUsername);
-      const updated = [accToSave, ...filtered];
-      localStorage.setItem('craftx_user_accounts', JSON.stringify(updated));
-      localStorage.setItem('kalasetu_user_accounts', JSON.stringify(updated));
-    } catch (e) {
-      console.warn('Failed to save account to localStorage:', e);
-    }
-  };
 
   // Artisan Form Data
   const [artisanForm, setArtisanForm] = useState({
@@ -418,18 +348,18 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     }
   };
 
-  // Complete Onboarding & Save
-  const handleFinish = (roleOverride, customDetails) => {
+  // Complete Onboarding & Save via Backend Auth API
+  const handleFinish = async (roleOverride, customDetails) => {
     stopVoiceListening();
     const finalRole = roleOverride || selectedRole;
-    let userDetails = customDetails || null;
+    let payload = customDetails || null;
 
-    if (!userDetails) {
+    if (!payload) {
       if (finalRole === 'artisan') {
         const uName = (artisanForm.name || '').trim() || (regUsername ? `@${regUsername}` : 'Artisan');
         const loc = [artisanForm.village, artisanForm.state].filter(Boolean).join(', ') || 'India';
         const uniquePehchanId = artisanForm.scheme_id || generateUniqueMosjePehchanId(loc);
-        userDetails = {
+        payload = {
           username: regUsername || `artisan_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'craft123',
           name: uName,
@@ -438,11 +368,12 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
           craft_type: artisanForm.craft_type || 'Handicrafts',
           location: loc,
           scheme_id: uniquePehchanId,
-          mosje_pehchan_id: uniquePehchanId
+          mosje_pehchan_id: uniquePehchanId,
+          lang: selectedLang
         };
       } else if (finalRole === 'businessman') {
         const uName = (businessmanForm.name || '').trim() || (businessmanForm.company || '').trim() || 'Institutional Buyer';
-        userDetails = {
+        payload = {
           username: regUsername || `buyer_b2b_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'b2b123',
           name: uName,
@@ -453,11 +384,12 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
           gem_org_id: businessmanForm.gem_org_id || '',
           role: 'businessman',
           location: businessmanForm.city || 'India',
-          procurement_type: businessmanForm.procurement_type || 'B2B Wholesale & Government GeM Tenders'
+          procurement_type: businessmanForm.procurement_type || 'B2B Wholesale & Government GeM Tenders',
+          lang: selectedLang
         };
       } else {
         const uName = (buyerForm.name || '').trim() || 'Heritage Collector';
-        userDetails = {
+        payload = {
           username: regUsername || `buyer_${Math.floor(1000 + Math.random() * 9000)}`,
           password: regPassword || 'buyer123',
           name: uName,
@@ -465,21 +397,33 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
           email: buyerForm.email || '',
           role: 'buyer',
           location: [buyerForm.location, buyerForm.pincode].filter(Boolean).join(' - ') || 'India',
-          buyer_type: buyerForm.buyer_type || 'Individual Heritage Collector'
+          buyer_type: buyerForm.buyer_type || 'Individual Heritage Collector',
+          lang: selectedLang
         };
       }
     }
 
-    saveAccount(userDetails);
-    completeOnboarding(finalRole, selectedLang, userDetails);
+    try {
+      setIsSubmitting(true);
+      const res = await api.register(payload);
+      if (res && res.success && res.user) {
+        completeOnboarding(res.user.role || finalRole, selectedLang, res.user, res.token);
+      } else {
+        const err = (res && res.detail) ? res.detail : (selectedLang === 'hi' ? 'पंजीकरण विफल रहा।' : 'Registration failed.');
+        setAuthError(err);
+      }
+    } catch (err) {
+      console.error('[OnboardingModal] Registration error:', err);
+      setAuthError(selectedLang === 'hi' ? 'सर्वर से संपर्क नहीं हो सका।' : 'Unable to connect to server.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleManualLogin = (e) => {
+  const handleManualLogin = async (e) => {
     if (e) e.preventDefault();
     setAuthError('');
-    const accounts = getStoredAccounts();
     const cleanIdent = normalizeIdentifier(loginIdentifier);
-    const numericDigits = (loginIdentifier || '').replace(/[^0-9]/g, '');
     const pass = (loginPassword || '').trim();
 
     if (!cleanIdent || !pass) {
@@ -487,32 +431,23 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
       return;
     }
 
-    const user = accounts.find(a => {
-      const aUser = normalizeIdentifier(a.username);
-      const aPhone = (a.phone || '').replace(/[^0-9]/g, '');
-      const aEmail = (a.email || '').trim().toLowerCase();
-      const aName = (a.name || '').trim().toLowerCase();
-
-      if (aUser && aUser === cleanIdent) return true;
-      if (aEmail && aEmail === cleanIdent) return true;
-      if (aName && aName === cleanIdent) return true;
-      if (numericDigits.length >= 4 && aPhone && aPhone.endsWith(numericDigits)) return true;
-      return false;
-    });
-
-    if (!user) {
-      setAuthError(selectedLang === 'hi' ? 'खाता नहीं मिला। कृपया यूजरनेम जांचें या नया खाता बनाएँ।' : 'Account not found. Please check username or register.');
-      return;
+    try {
+      setIsSubmitting(true);
+      const res = await api.login(cleanIdent, pass);
+      if (res && res.success && res.user) {
+        stopVoiceListening();
+        const role = res.user.role || selectedRole;
+        completeOnboarding(role, res.user.lang || selectedLang, res.user, res.token);
+      } else {
+        const errMsg = (res && res.detail) ? res.detail : (selectedLang === 'hi' ? 'गलत यूजरनेम या पासवर्ड।' : 'Invalid username or password.');
+        setAuthError(errMsg);
+      }
+    } catch (err) {
+      console.error('[OnboardingModal] Login error:', err);
+      setAuthError(selectedLang === 'hi' ? 'लॉगिन में त्रुटि। कृपया पुनः प्रयास करें।' : 'Login failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (user.password && user.password !== pass) {
-      setAuthError(selectedLang === 'hi' ? 'गलत पासवर्ड। कृपया पुनः प्रयास करें या पासवर्ड रीसेट करें।' : 'Incorrect password. Please try again or reset password.');
-      return;
-    }
-
-    stopVoiceListening();
-    const role = user.role || selectedRole;
-    completeOnboarding(role, user.lang || selectedLang, user);
   };
 
   const handleRegisterSubmit = (e) => {
@@ -539,13 +474,12 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
     handleFinish(selectedRole);
   };
 
-  const handleForgotPasswordReset = (e) => {
+  const handleForgotPasswordReset = async (e) => {
     if (e) e.preventDefault();
     setForgotError('');
     setForgotSuccess('');
 
     const cleanIdent = normalizeIdentifier(forgotIdentifier);
-    const numericDigits = (forgotIdentifier || '').replace(/[^0-9]/g, '');
     const np = (forgotNewPassword || '').trim();
     const cnp = (forgotConfirmPassword || '').trim();
 
@@ -562,36 +496,27 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
       return;
     }
 
-    const accounts = getStoredAccounts();
-    const idx = accounts.findIndex(a => {
-      const aUser = normalizeIdentifier(a.username);
-      const aPhone = (a.phone || '').replace(/[^0-9]/g, '');
-      const aEmail = (a.email || '').trim().toLowerCase();
-      const aName = (a.name || '').trim().toLowerCase();
-
-      if (aUser && aUser === cleanIdent) return true;
-      if (aEmail && aEmail === cleanIdent) return true;
-      if (aName && aName === cleanIdent) return true;
-      if (numericDigits.length >= 4 && aPhone && aPhone.endsWith(numericDigits)) return true;
-      return false;
-    });
-
-    if (idx === -1) {
-      setForgotError(selectedLang === 'hi' ? 'इस यूजरनेम/नंबर से कोई खाता नहीं मिला।' : 'No account found matching this identifier.');
-      return;
+    try {
+      setIsSubmitting(true);
+      const res = await api.resetPassword(cleanIdent, np);
+      if (res && res.success) {
+        setForgotSuccess(selectedLang === 'hi' ? 'पासवर्ड सफलतापूर्वक बदल दिया गया! अब लॉगिन करें।' : 'Password reset successfully! You can now log in.');
+        setTimeout(() => {
+          setLoginIdentifier(cleanIdent);
+          setLoginPassword(np);
+          setAuthMode('login');
+          setForgotSuccess('');
+        }, 1200);
+      } else {
+        const errMsg = (res && res.detail) ? res.detail : (selectedLang === 'hi' ? 'खाता नहीं मिला।' : 'No account found matching this identifier.');
+        setForgotError(errMsg);
+      }
+    } catch (err) {
+      console.error('[OnboardingModal] Reset password error:', err);
+      setForgotError(selectedLang === 'hi' ? 'पासवर्ड रीसेट विफल रहा।' : 'Password reset failed.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    accounts[idx].password = np;
-    localStorage.setItem('craftx_user_accounts', JSON.stringify(accounts));
-    localStorage.setItem('kalasetu_user_accounts', JSON.stringify(accounts));
-
-    setForgotSuccess(selectedLang === 'hi' ? 'पासवर्ड सफलतापूर्वक बदल दिया गया! अब लॉगिन करें।' : 'Password reset successfully! You can now log in.');
-    setTimeout(() => {
-      setLoginIdentifier(accounts[idx].username || cleanIdent);
-      setLoginPassword(np);
-      setAuthMode('login');
-      setForgotSuccess('');
-    }, 1200);
   };
 
   const replayAudio = () => {
@@ -663,7 +588,7 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
               {/* Close Button (Only in modal overlay mode) */}
               {!isFullScreen && (
                 <button
-                  onClick={() => handleFinish(selectedRole)}
+                  onClick={() => completeOnboarding(selectedRole, selectedLang, null)}
                   className="p-2.5 rounded-full bg-stone-950/20 hover:bg-stone-950/40 text-stone-950 transition-colors flex items-center justify-center text-xs font-bold"
                   title="Close Modal"
                 >
@@ -993,13 +918,17 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
                       <button
                         type="submit"
-                        className={`px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md transition-all ${
+                        disabled={isSubmitting}
+                        className={`px-5 py-2.5 rounded-xl text-xs font-extrabold shadow-md transition-all flex items-center space-x-1.5 ${
+                          isSubmitting ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
                           selectedRole === 'artisan' ? 'bg-orange-600 hover:bg-orange-500 text-white' :
                           selectedRole === 'businessman' ? 'bg-blue-600 hover:bg-blue-500 text-white' :
                           'bg-amber-600 hover:bg-amber-500 text-stone-950'
                         }`}
                       >
-                        {selectedLang === 'hi' ? 'लॉगिन करें ➔' : 'Sign In ➔'}
+                        {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                        <span>{selectedLang === 'hi' ? 'लॉगिन करें ➔' : 'Sign In ➔'}</span>
                       </button>
                     </div>
                   </form>
@@ -1086,9 +1015,13 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
 
                         <button
                           type="submit"
-                          className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-md transition-all"
+                          disabled={isSubmitting}
+                          className={`px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold shadow-md transition-all flex items-center space-x-1.5 ${
+                            isSubmitting ? 'opacity-60 cursor-not-allowed' : ''
+                          }`}
                         >
-                          {selectedLang === 'hi' ? 'पासवर्ड अपडेट करें ➔' : 'Update Password ➔'}
+                          {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                          <span>{selectedLang === 'hi' ? 'पासवर्ड अपडेट करें ➔' : 'Update Password ➔'}</span>
                         </button>
                       </div>
                     </form>
@@ -1566,8 +1499,11 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                   <div className="pt-2">
                     <button
                       type="button"
+                      disabled={isSubmitting}
                       onClick={handleRegisterSubmit}
                       className={`w-full py-3.5 rounded-2xl font-black text-xs sm:text-sm shadow-xl hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center space-x-2 ${
+                        isSubmitting ? 'opacity-60 cursor-not-allowed' : ''
+                      } ${
                         selectedRole === 'artisan'
                           ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-stone-950'
                           : selectedRole === 'businessman'
@@ -1575,7 +1511,11 @@ export const OnboardingModal = ({ isFullScreen = false }) => {
                           : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-stone-950'
                       }`}
                     >
-                      <CheckCircle2 className="w-4 h-4" />
+                      {isSubmitting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4" />
+                      )}
                       <span>
                         {selectedRole === 'artisan'
                           ? (selectedLang === 'hi' ? 'कारीगर पंजीकरण पूरा करें व AI स्टूडियो खोलें ➔' : 'Complete Registration & Open AI Studio ➔')

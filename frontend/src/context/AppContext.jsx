@@ -216,40 +216,15 @@ export const AppProvider = ({ children }) => {
     setSafeStorage('kalasetu_lang', newLang);
   };
 
-  const completeOnboarding = (role, selectedLang, userDetails) => {
+  const completeOnboarding = (role, selectedLang, userDetails, token = '') => {
     const finalLang = selectedLang || lang || 'hi';
     const finalRole = role || 'artisan';
-    const finalUser = userDetails || (
-      finalRole === 'artisan'
-        ? {
-            name: 'Master Artisan Ram Das',
-            phone: '+91 98765 43210',
-            role: 'artisan',
-            location: 'Varanasi, Uttar Pradesh',
-            craft_type: 'Handloom & Silk Weaving',
-            scheme_id: 'MoSJE-VISH-2026-UP-091'
-          }
-        : finalRole === 'businessman'
-        ? {
-            name: 'Rajesh Singhal',
-            company: 'Singhal Crafts Export & Retailers Pvt Ltd',
-            phone: '+91 98200 11223',
-            email: 'procurement@singhalcrafts.com',
-            gstin: '07AAAAA0000A1Z5',
-            gem_org_id: 'GEM-DL-2026-9912',
-            role: 'businessman',
-            location: 'New Delhi & Global Exporter',
-            procurement_type: 'B2B Wholesale & Government GeM Tenders'
-          }
-        : {
-            name: 'Priya Sharma (Retail Buyer)',
-            phone: '+91 98112 34567',
-            email: 'priya.sharma@heritagecraft.in',
-            role: 'buyer',
-            location: '124 Connaught Place, Central Delhi, New Delhi - 110001',
-            buyer_type: 'Individual Heritage Collector'
-          }
-    );
+    const finalUser = userDetails || {
+      name: finalRole === 'artisan' ? 'Master Artisan' : (finalRole === 'businessman' ? 'Institutional Buyer' : 'Heritage Collector'),
+      role: finalRole,
+      phone: '',
+      location: ''
+    };
 
     setLangState(finalLang);
     setUserRole(finalRole);
@@ -261,31 +236,18 @@ export const AppProvider = ({ children }) => {
     setSafeStorage('craftx_role', finalRole);
     setSafeStorage('craftx_onboarding_completed', 'true');
     setSafeStorage('craftx_user', JSON.stringify(finalUser));
-
-    if (finalRole === 'artisan') {
-      setActiveTabState('artisan-home');
-    } else if (finalRole === 'businessman') {
-      setActiveTabState('businessman-home');
-    } else {
-      setActiveTabState('buyer-market');
+    if (token) {
+      setSafeStorage('craftx_auth_token', token);
     }
+
+    const defaultTab = ROLE_DEFAULT_TAB[finalRole] || 'artisan-home';
+    setActiveTabState(defaultTab);
   };
 
   const switchRole = (newRole) => {
-    const roleToSet = newRole || 'artisan';
-    setUserRole(roleToSet);
-    setSafeStorage('craftx_role', roleToSet);
-    setSafeStorage('kalasetu_role', roleToSet);
-    if (roleToSet === 'artisan') {
-      setActiveTabState('artisan-home');
-      showToast('Switched to Artisan / Seller Portal (कारीगर मोड)', 'info');
-    } else if (roleToSet === 'businessman') {
-      setActiveTabState('businessman-home');
-      showToast('Switched to Institutional & GeM Procurement Portal (संस्थागत खरीद)', 'info');
-    } else {
-      setActiveTabState('buyer-market');
-      showToast('Switched to Consumer Buyer Marketplace (खरीदार बाज़ार)', 'info');
-    }
+    // Under strict role isolation, switching portals requires logging out and logging into that specific account
+    showToast('Role change requires authenticating with that role account. Logging out...', 'info');
+    logout();
   };
 
   // Logout method for Profile dropdown
@@ -293,10 +255,14 @@ export const AppProvider = ({ children }) => {
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.removeItem('craftx_onboarding_completed');
       localStorage.removeItem('craftx_user');
+      localStorage.removeItem('craftx_auth_token');
+      localStorage.removeItem('craftx_role');
       localStorage.removeItem('kalasetu_onboarding_completed');
       localStorage.removeItem('kalasetu_user');
+      localStorage.removeItem('kalasetu_role');
     }
     setHasCompletedOnboarding(false);
+    setCurrentUser(null);
     setShowOnboardingModal(true);
     showToast('Logged out successfully. Please log in or select your role.', 'info');
   };

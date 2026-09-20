@@ -144,53 +144,6 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
         </button>
       </div>
 
-      {/* Switch Role Quick Actions */}
-      <div className="space-y-1.5 pt-1 font-sans">
-        <span className="text-[10px] uppercase font-bold text-stone-500 dark:text-stone-400 tracking-wider block px-1">
-          Switch Portal / Role:
-        </span>
-        <div className="grid grid-cols-3 gap-1.5">
-          <button
-            onClick={() => {
-              switchRole('artisan');
-              onClose();
-            }}
-            className={`p-2 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center space-y-1 border transition-all ${
-              userRole === 'artisan' ? 'bg-orange-600 text-white border-orange-500 shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-750 border-stone-200 dark:border-stone-700'
-            }`}
-          >
-            <Palette className="w-3.5 h-3.5" />
-            <span>Artisan</span>
-          </button>
-
-          <button
-            onClick={() => {
-              switchRole('buyer');
-              onClose();
-            }}
-            className={`p-2 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center space-y-1 border transition-all ${
-              userRole === 'buyer' ? 'bg-amber-600 text-white border-amber-500 shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-750 border-stone-200 dark:border-stone-700'
-            }`}
-          >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Buyer</span>
-          </button>
-
-          <button
-            onClick={() => {
-              switchRole('businessman');
-              onClose();
-            }}
-            className={`p-2 rounded-xl text-[11px] font-extrabold flex flex-col items-center justify-center space-y-1 border transition-all ${
-              userRole === 'businessman' ? 'bg-blue-600 text-white border-blue-500 shadow-sm' : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-750 border-stone-200 dark:border-stone-700'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>B2B / GeM</span>
-          </button>
-        </div>
-      </div>
-
       {/* Logout & Account Actions */}
       <div className="pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between gap-2 font-sans">
         <button

@@ -268,6 +268,57 @@ export const api = {
     });
     if (!res.ok) throw new Error('Assistant chat failed');
     return res.json();
+  },
+
+  // Authentication & Security (Phase 1)
+  async register(userData) {
+    console.log('[API] Registering user with backend:', userData?.username);
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Registration failed' }));
+      throw new Error(err.detail || `Registration failed (${res.status})`);
+    }
+    return res.json();
+  },
+
+  async login(identifier, password) {
+    console.log('[API] Authenticating with backend:', identifier);
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Login failed' }));
+      throw new Error(err.detail || `Login failed (${res.status})`);
+    }
+    return res.json();
+  },
+
+  async getMe(token) {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Session invalid or expired');
+    return res.json();
+  },
+
+  async resetPassword(identifier, newPassword) {
+    const res = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, new_password: newPassword })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Password reset failed' }));
+      throw new Error(err.detail || `Password reset failed (${res.status})`);
+    }
+    return res.json();
   }
 };
+
 

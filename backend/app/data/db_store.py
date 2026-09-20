@@ -2,6 +2,8 @@ import json
 import os
 import uuid
 import base64
+import hashlib
+import secrets
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -12,12 +14,27 @@ from backend.app.pipeline.qr_generator import generate_product_qr_badge
 DB_FILE = DATA_DIR / "products_store.json"
 RFQ_FILE = DATA_DIR / "rfq_store.json"
 ORDERS_FILE = DATA_DIR / "orders_store.json"
+USERS_FILE = DATA_DIR / "users_store.json"
+
+def hash_password(password: str, salt: Optional[str] = None) -> Dict[str, str]:
+    if not salt:
+        salt = secrets.token_hex(16)
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return {
+        "hash": key.hex(),
+        "salt": salt
+    }
+
+def verify_password(password: str, stored_hash: str, salt: str) -> bool:
+    key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000)
+    return secrets.compare_digest(key.hex(), stored_hash)
 
 class DatabaseStore:
     def __init__(self):
         self.products: List[Dict[str, Any]] = []
         self.rfqs: List[Dict[str, Any]] = []
         self.orders: List[Dict[str, Any]] = []
+        self.users: List[Dict[str, Any]] = []
         self._initialize()
 
     def _initialize(self):
@@ -51,6 +68,8 @@ class DatabaseStore:
             except Exception:
                 self.orders = [dict(o) for o in SEED_ORDERS]
                 self._save_orders()
+
+        self._init_users()
 
     def _save_products(self):
         try:
@@ -90,6 +109,143 @@ class DatabaseStore:
             print(f"[BACKEND-DB] Successfully persisted {len(self.orders)} orders to disk: {ORDERS_FILE}")
         except Exception as e:
             print(f"[BACKEND-DB-ERROR] Error writing orders to disk: {e}")
+
+    def _init_users(self):
+        if not USERS_FILE.exists():
+            self._seed_default_users()
+        else:
+            try:
+                with open(USERS_FILE, "r", encoding="utf-8") as f:
+                    self.users = json.load(f)
+                if not self.users:
+                    self._seed_default_users()
+            except Exception:
+                self._seed_default_users()
+
+    def _seed_default_users(self):
+        artisan_hash = hash_password("craft123")
+        buyer_hash = hash_password("buyer123")
+        biz_hash = hash_password("b2b123")
+        
+        self.users = [
+            {
+                "id": "usr-artisan-01",
+                "username": "artisan",
+                "password_hash": artisan_hash["hash"],
+                "password_salt": artisan_hash["salt"],
+                "name": "Master Ram Das Bunkar",
+                "role": "artisan",
+                "phone": "+91 98765 43210",
+                "location": "Kotwa, Varanasi, UP",
+                "craft_type": "Handloom & Silk Weaving",
+                "scheme_id": "MoSJE-VISH-2026-UP-091",
+                "created_at": "2026-09-01T00:00:00Z"
+            },
+            {
+                "id": "usr-artisan-02",
+                "username": "bunkar_ramdas",
+                "password_hash": artisan_hash["hash"],
+                "password_salt": artisan_hash["salt"],
+                "name": "Master Ram Das Bunkar",
+                "role": "artisan",
+                "phone": "+91 98765 43210",
+                "location": "Kotwa, Varanasi, UP",
+                "craft_type": "Handloom & Silk Weaving",
+                "scheme_id": "MoSJE-VISH-2026-UP-091",
+                "created_at": "2026-09-01T00:00:00Z"
+            },
+            {
+                "id": "usr-buyer-01",
+                "username": "buyer",
+                "password_hash": buyer_hash["hash"],
+                "password_salt": buyer_hash["salt"],
+                "name": "Priya Sharma (Retail Buyer)",
+                "role": "buyer",
+                "phone": "+91 98112 34567",
+                "email": "priya.sharma@heritagecraft.in",
+                "location": "124 Connaught Place, Central Delhi, New Delhi - 110001",
+                "buyer_type": "Individual Heritage Collector",
+                "created_at": "2026-09-01T00:00:00Z"
+            },
+            {
+                "id": "usr-biz-01",
+                "username": "businessman",
+                "password_hash": biz_hash["hash"],
+                "password_salt": biz_hash["salt"],
+                "name": "Rajesh Singhal",
+                "role": "businessman",
+                "phone": "+91 98200 11223",
+                "company": "Singhal Crafts Export & Retailers Pvt Ltd",
+                "email": "procurement@singhalcrafts.com",
+                "gstin": "07AAAAA0000A1Z5",
+                "gem_org_id": "GEM-DL-2026-9912",
+                "location": "New Delhi & Global Exporter",
+                "procurement_type": "B2B Wholesale & Government GeM Tenders",
+                "created_at": "2026-09-01T00:00:00Z"
+            }
+        ]
+        self._save_users()
+
+    def _save_users(self):
+        try:
+            with open(USERS_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.users, f, ensure_ascii=False, indent=2)
+                f.flush()
+                try:
+                    os.fsync(f.fileno())
+                except Exception:
+                    pass
+            print(f"[BACKEND-DB] Successfully persisted {len(self.users)} users to disk: {USERS_FILE}")
+        except Exception as e:
+            print(f"[BACKEND-DB-ERROR] Error writing users to disk: {e}")
+
+    def get_user_by_id(self, user_id: str) -> Optional[Dict[str, Any]]:
+        for u in self.users:
+            if u.get("id") == user_id:
+                return u
+        return None
+
+    def get_user_by_identifier(self, identifier: str) -> Optional[Dict[str, Any]]:
+        if not identifier:
+            return None
+        clean_id = identifier.strip().lower().replace("@", "")
+        for u in self.users:
+            if (u.get("username", "").strip().lower() == clean_id or 
+                (u.get("email") and u.get("email").strip().lower() == clean_id) or
+                (u.get("phone") and u.get("phone").replace(" ", "").replace("-", "") == clean_id.replace(" ", "").replace("-", ""))):
+                return u
+        return None
+
+    def create_user(self, user_data: Dict[str, Any], plain_password: str) -> Dict[str, Any]:
+        user_id = user_data.get("id") or f"usr-{str(uuid.uuid4())[:8]}"
+        hashed = hash_password(plain_password)
+        new_user = dict(user_data)
+        new_user["id"] = user_id
+        new_user["username"] = user_data["username"].strip().lower().replace("@", "")
+        new_user["password_hash"] = hashed["hash"]
+        new_user["password_salt"] = hashed["salt"]
+        if not new_user.get("created_at"):
+            new_user["created_at"] = datetime.utcnow().isoformat() + "Z"
+        self.users.append(new_user)
+        self._save_users()
+        return new_user
+
+    def update_user_password(self, user_id: str, new_password: str) -> bool:
+        user = self.get_user_by_id(user_id)
+        if not user:
+            return False
+        hashed = hash_password(new_password)
+        user["password_hash"] = hashed["hash"]
+        user["password_salt"] = hashed["salt"]
+        self._save_users()
+        return True
+
+    @staticmethod
+    def sanitize_user(user: Dict[str, Any]) -> Dict[str, Any]:
+        safe = dict(user)
+        safe.pop("password_hash", None)
+        safe.pop("password_salt", None)
+        return safe
 
 
     def reset_demo_data(self) -> List[Dict[str, Any]]:

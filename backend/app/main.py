@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from backend.app.config import STATIC_DIR
-from backend.app.routes import ai, products, whatsapp, marketplace, analytics
+from backend.app.routes import ai, products, whatsapp, marketplace, analytics, auth
 
 app = FastAPI(
     title="CraftX (क्राफ्टएक्स) - AI Virtual Business Manager Backend",
@@ -35,6 +35,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Include Routers
+app.include_router(auth.router)
 app.include_router(ai.router)
 app.include_router(products.router)
 app.include_router(whatsapp.router)
