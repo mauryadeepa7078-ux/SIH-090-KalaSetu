@@ -468,12 +468,20 @@ export const PhotoStudioPage = () => {
           </p>
         </div>
 
-        {/* Status Indicator */}
+        {/* Explicit AI Verification Checks */}
         {studioResult && (
-          <div className="flex items-center justify-center sm:justify-end space-x-2">
-            <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black flex items-center space-x-1.5 shadow-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Studio Master Cutout Verified</span>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center space-x-1 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Product detected</span>
+            </span>
+            <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center space-x-1 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Background isolated</span>
+            </span>
+            <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center space-x-1 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Lighting optimized</span>
             </span>
           </div>
         )}
@@ -849,7 +857,7 @@ export const PhotoStudioPage = () => {
           </div>
 
           {/* Prominent Core Action: KEEP PRODUCT DETAILS & REMOVE BACKGROUND */}
-          {(selectedFile || rawPreview) && (
+          {(selectedFile || rawPreview) && !studioResult && (
             <button
               onClick={() => processImageWithAI(selectedFile, rawPreview)}
               disabled={isProcessing}
@@ -858,6 +866,54 @@ export const PhotoStudioPage = () => {
               <ShieldCheck className="w-5 h-5 text-amber-200" />
               <span>KEEP PRODUCT DETAILS & REMOVE BACKGROUND</span>
             </button>
+          )}
+
+          {/* Action to choose between Enhanced or Original Photo */}
+          {studioResult && (
+            <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('enhanced');
+                    showToast(lang === 'hi' ? 'संवर्धित स्टूडियो फोटो चयनित!' : 'Enhanced studio photo selected!', 'success');
+                  }}
+                  className={`py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center space-x-2 transition-all border ${
+                    viewMode === 'enhanced'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-400/30'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-300 dark:border-stone-700'
+                  }`}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Use Enhanced Photo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setViewMode('original');
+                    showToast(lang === 'hi' ? 'मूल फोटो चयनित!' : 'Original captured photo selected!', 'info');
+                  }}
+                  className={`py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center space-x-2 transition-all border ${
+                    viewMode === 'original'
+                      ? 'bg-stone-800 text-white border-stone-800 shadow-md ring-2 ring-stone-400/30'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-300 dark:border-stone-700'
+                  }`}
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Use Original Photo</span>
+                </button>
+              </div>
+
+              <button
+                onClick={() => processImageWithAI(selectedFile, rawPreview)}
+                disabled={isProcessing}
+                className="w-full py-2.5 px-3 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 font-bold text-xs flex items-center justify-center space-x-1.5 transition-all"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Re-Enhance Photo</span>
+              </button>
+            </div>
           )}
         </div>
 

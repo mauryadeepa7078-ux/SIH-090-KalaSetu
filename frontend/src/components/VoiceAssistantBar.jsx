@@ -137,6 +137,19 @@ export const VoiceAssistantBar = () => {
 
       {/* Floating Action Voice Button */}
       <div className="flex items-center space-x-2">
+        {isListening && (
+          <div className="flex items-center space-x-1.5 px-3 py-2 rounded-full bg-stone-900/95 border border-red-500/40 shadow-xl text-white text-xs font-bold backdrop-blur-md animate-fade-in">
+            <div className="flex items-center space-x-1 h-4">
+              <div className="wave-bar wave-bar-1 bg-red-400"></div>
+              <div className="wave-bar wave-bar-3 bg-red-400"></div>
+              <div className="wave-bar wave-bar-2 bg-red-400"></div>
+              <div className="wave-bar wave-bar-4 bg-red-400"></div>
+              <div className="wave-bar wave-bar-5 bg-red-400"></div>
+            </div>
+            <span className="text-[11px] text-red-200">Listening...</span>
+          </div>
+        )}
+
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="bg-stone-900/90 hover:bg-stone-800 text-stone-300 hover:text-white px-3.5 py-2 rounded-full border border-stone-700/80 shadow-lg text-xs font-semibold flex items-center space-x-1.5 backdrop-blur-md transition-all active:scale-95"

@@ -215,11 +215,14 @@ export const ArtisanOrdersPage = () => {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {filteredOrders.map((order) => {
-                const isPlaced = order.status === 'PLACED';
-                const isConfirmed = order.status === 'CONFIRMED';
-                const isPacked = order.status === 'PACKED';
-                const isShipped = order.status === 'SHIPPED';
+                const isNew = order.status === 'NEW' || order.status === 'PLACED';
+                const isAccepted = order.status === 'ACCEPTED' || order.status === 'CONFIRMED';
+                const isPreparing = order.status === 'PREPARING' || order.status === 'PACKED' || order.status === 'IN_PRODUCTION';
+                const isShipped = order.status === 'SHIPPED' || order.status === 'DISPATCHED' || order.status === 'OUT_FOR_DELIVERY';
                 const isDelivered = order.status === 'DELIVERED';
+
+                const stageIdx = isDelivered ? 4 : isShipped ? 3 : isPreparing ? 2 : isAccepted ? 1 : 0;
+                const displayStatus = isDelivered ? 'DELIVERED' : isShipped ? 'SHIPPED' : isPreparing ? 'PREPARING' : isAccepted ? 'ACCEPTED' : 'NEW';
 
                 return (
                   <div
@@ -245,12 +248,42 @@ export const ArtisanOrdersPage = () => {
                         <span className={`px-3 py-1 rounded-full text-xs font-black font-sans ${
                           isDelivered ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800' :
                           isShipped ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800' :
-                          isPacked ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800' :
-                          isConfirmed ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800' :
+                          isPreparing ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-300 dark:border-purple-800' :
+                          isAccepted ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800' :
                           'bg-orange-100 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-800 animate-pulse'
                         }`}>
-                          {order.status}
+                          {displayStatus}
                         </span>
+                      </div>
+                    </div>
+
+                    {/* 5-Stage Visual Progression Strip */}
+                    <div className="bg-stone-50 dark:bg-stone-950/70 p-3 rounded-2xl border border-stone-200/60 dark:border-stone-800">
+                      <div className="flex items-center justify-between text-[11px] font-bold">
+                        {[
+                          { label: 'New', key: 'NEW' },
+                          { label: 'Accepted', key: 'ACCEPTED' },
+                          { label: 'Preparing', key: 'PREPARING' },
+                          { label: 'Shipped', key: 'SHIPPED' },
+                          { label: 'Delivered', key: 'DELIVERED' }
+                        ].map((s, idx) => (
+                          <div key={s.key} className="flex flex-col items-center space-y-1 flex-1">
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black transition-all ${
+                              idx < stageIdx
+                                ? 'bg-emerald-600 text-white'
+                                : idx === stageIdx
+                                ? 'bg-orange-600 text-white ring-2 ring-orange-400 animate-pulse'
+                                : 'bg-stone-200 dark:bg-stone-800 text-stone-400'
+                            }`}>
+                              {idx < stageIdx ? '✓' : idx + 1}
+                            </div>
+                            <span className={`text-[10px] hidden sm:block ${
+                              idx <= stageIdx ? 'text-stone-900 dark:text-stone-100 font-bold' : 'text-stone-400'
+                            }`}>
+                              {s.label}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
@@ -280,8 +313,12 @@ export const ArtisanOrdersPage = () => {
                             Total Payout: ₹{(order.total || (order.price * (order.qty || 1))).toLocaleString('en-IN')}
                           </div>
                           <div className="flex items-center space-x-1.5 pt-0.5 font-sans">
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 font-bold">
-                              💳 {order.payment_method || 'UPI'} ({order.payment_status || 'PAID'})
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                              order.payment_method === 'COD'
+                                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+                                : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+                            }`}>
+                              {order.payment_method === 'COD' ? '💵 Cash on Delivery' : '💳 UPI Payment'} ({order.payment_status || (order.payment_method === 'COD' ? 'PENDING UPON DELIVERY' : 'PAID')})
                             </span>
                           </div>
                         </div>
@@ -322,27 +359,27 @@ export const ArtisanOrdersPage = () => {
                       </div>
 
                       <div className="flex items-center space-x-2 font-sans">
-                        {isPlaced && (
+                        {isNew && (
                           <button
-                            onClick={() => updateOrderStatus(order.id, 'CONFIRMED', 1)}
+                            onClick={() => updateOrderStatus(order.id, 'ACCEPTED', 1)}
                             className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1.5"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Confirm Order (ऑर्डर स्वीकार करें)</span>
+                            <span>Accept Order (ऑर्डर स्वीकार करें)</span>
                           </button>
                         )}
 
-                        {isConfirmed && (
+                        {isAccepted && (
                           <button
-                            onClick={() => updateOrderStatus(order.id, 'PACKED', 2)}
+                            onClick={() => updateOrderStatus(order.id, 'PREPARING', 2)}
                             className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1.5"
                           >
                             <Boxes className="w-3.5 h-3.5" />
-                            <span>Mark Packed (सामान पैक करें)</span>
+                            <span>Start Preparing / Pack (तैयारी व पैकिंग शुरू करें)</span>
                           </button>
                         )}
 
-                        {isPacked && (
+                        {isPreparing && (
                           <button
                             onClick={() => updateOrderStatus(order.id, 'SHIPPED', 3)}
                             className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1.5"
@@ -354,7 +391,7 @@ export const ArtisanOrdersPage = () => {
 
                         {isShipped && (
                           <button
-                            onClick={() => updateOrderStatus(order.id, 'DELIVERED', 5)}
+                            onClick={() => updateOrderStatus(order.id, 'DELIVERED', 4)}
                             className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center space-x-1.5"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />

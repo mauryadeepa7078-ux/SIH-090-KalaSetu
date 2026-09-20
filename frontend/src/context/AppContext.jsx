@@ -142,7 +142,7 @@ export const AppProvider = ({ children }) => {
   // Light / Dark Theme State Management (Persisted & System Preference Aware)
   const storedTheme = (() => {
     try {
-      const t = getSafeStorage('kalasetu_theme', null);
+      const t = getSafeStorage('craftx_theme', getSafeStorage('kalasetu_theme', null));
       if (t === 'dark' || t === 'light') return t;
       if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark';
@@ -163,6 +163,7 @@ export const AppProvider = ({ children }) => {
       } else {
         document.documentElement.classList.remove('dark');
       }
+      setSafeStorage('craftx_theme', theme);
       setSafeStorage('kalasetu_theme', theme);
     } catch (e) {}
   }, [theme]);
@@ -175,6 +176,7 @@ export const AppProvider = ({ children }) => {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    setSafeStorage('craftx_theme', nextTheme);
     setSafeStorage('kalasetu_theme', nextTheme);
     showToast(nextTheme === 'dark' ? '🌙 Dark Mode Activated' : '☀️ Light Mode Activated', 'info');
   };
@@ -510,14 +512,30 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const getStageIndexFromStatus = (status) => {
+    switch (status) {
+      case 'ACCEPTED':
+      case 'CONFIRMED':
+        return 1;
+      case 'PREPARING':
+      case 'PACKED':
+      case 'IN_PRODUCTION':
+        return 2;
+      case 'SHIPPED':
+      case 'DISPATCHED':
+      case 'OUT_FOR_DELIVERY':
+        return 3;
+      case 'DELIVERED':
+        return 4;
+      case 'NEW':
+      case 'PLACED':
+      default:
+        return 0;
+    }
+  };
+
   const updateOrderStatus = async (orderId, newStatus, stageIndex = null) => {
-    const nextStage = stageIndex !== null ? stageIndex : (
-      newStatus === 'CONFIRMED' ? 1 :
-      newStatus === 'PACKED' ? 2 :
-      newStatus === 'SHIPPED' ? 3 :
-      newStatus === 'OUT_FOR_DELIVERY' ? 4 :
-      newStatus === 'DELIVERED' ? 5 : 0
-    );
+    const nextStage = stageIndex !== null ? stageIndex : getStageIndexFromStatus(newStatus);
 
     const updated = orders.map(o => {
       if (o.id === orderId) {
@@ -527,6 +545,7 @@ export const AppProvider = ({ children }) => {
     });
 
     setOrders(updated);
+    setSafeStorage('craftx_buyer_orders', JSON.stringify(updated));
     setSafeStorage('kalasetu_buyer_orders', JSON.stringify(updated));
     showToast(`Order ${orderId} updated to ${newStatus}`, 'success');
 
@@ -537,6 +556,26 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // Product management actions for Artisan Catalog
+  const deleteProduct = (productId) => {
+    const updated = products.filter(p => p.id !== productId);
+    setProducts(updated);
+    offlineStorage.setCachedProducts(updated);
+    showToast(lang === 'hi' ? 'उत्पाद सफलतापूर्वक हटाया गया।' : 'Product removed from catalog.', 'info');
+  };
+
+  const toggleProductStatus = (productId) => {
+    const updated = products.map(p => {
+      if (p.id === productId) {
+        const nextStatus = p.status === 'ARCHIVED' ? 'ACTIVE' : 'ARCHIVED';
+        return { ...p, status: nextStatus };
+      }
+      return p;
+    });
+    setProducts(updated);
+    offlineStorage.setCachedProducts(updated);
+    showToast(lang === 'hi' ? 'उत्पाद की स्थिति अपडेट की गई।' : 'Product status updated.', 'info');
+  };
 
   // Batch sync offline queue
   const triggerSync = async () => {
@@ -616,6 +655,9 @@ export const AppProvider = ({ children }) => {
         setActiveTab,
         products,
         setProducts,
+        loadProducts,
+        deleteProduct,
+        toggleProductStatus,
         loading,
         isOnline,
         toggleOfflineSimulation,
@@ -633,7 +675,6 @@ export const AppProvider = ({ children }) => {
         showResetModal,
         setShowResetModal,
         handleResetDemo,
-        loadProducts,
         notification,
         showToast,
         userRole,

@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { speechService } from '../services/speechService';
+import { getProductImage } from '../utils/imageHelper';
 import { 
   Camera, 
   Mic, 
   Sparkles, 
   ShoppingBag, 
   DollarSign, 
+  Truck,
   Building2, 
   MessageCircle, 
   BarChart3, 
   Users, 
   Volume2, 
-  ArrowRight,
-  ShieldCheck,
-  Award,
+  ArrowRight, 
+  ShieldCheck, 
+  Award, 
   ChevronRight,
-  Sparkle
+  TrendingUp,
+  Package,
+  Clock,
+  ArrowUpRight,
+  Plus,
+  Tag,
+  CheckCircle2
 } from 'lucide-react';
 
 export const ArtisanLandingPage = () => {
@@ -24,9 +32,10 @@ export const ArtisanLandingPage = () => {
     setActiveTab, 
     lang, 
     t, 
-    products, 
+    products = [], 
+    orders = [],
     currentUser,
-    activeDraft
+    setSelectedProduct
   } = useApp();
 
   const [hasSpokenGreeting, setHasSpokenGreeting] = useState(false);
@@ -34,8 +43,8 @@ export const ArtisanLandingPage = () => {
   // Proactive greeting on artisan page arrival
   useEffect(() => {
     const greetingText = lang === 'hi' || lang === 'bho'
-      ? "नमस्ते! चलिए शुरू करते हैं। सबसे पहले अपने उत्पाद की एक अच्छी फोटो खींचिए या बोलकर बताइए।"
-      : "Namaste! Let's get started. First, take a clear photo of your craft or describe it by voice.";
+      ? "नमस्ते! क्राफ्टएक्स में आपका स्वागत है। चलिए शुरू करते हैं — एक फोटो लें या बोलकर अपना हस्तशिल्प दर्ज करें।"
+      : "Namaste! Welcome to CraftX. Snap a photo or describe your craft by voice to begin.";
 
     const timer = setTimeout(() => {
       try {
@@ -51,74 +60,30 @@ export const ArtisanLandingPage = () => {
 
   const handleSpeakGreeting = () => {
     const greetingText = lang === 'hi' || lang === 'bho'
-      ? "नमस्ते! चलिए शुरू करते हैं। सबसे पहले अपने उत्पाद की एक अच्छी फोटो खींचिए या बोलकर बताइए।"
-      : "Namaste! Let's get started. First, take a clear photo of your craft or describe it by voice.";
+      ? "नमस्ते! क्राफ्टएक्स में आपका स्वागत है। चलिए शुरू करते हैं — एक फोटो लें या बोलकर अपना हस्तशिल्प दर्ज करें।"
+      : "Namaste! Welcome to CraftX. Snap a photo or describe your craft by voice to begin.";
     speechService.speak(greetingText, lang);
   };
 
-  const secondaryTools = [
-    { 
-      id: 'catalog', 
-      label: t('navHome'), 
-      icon: ShoppingBag, 
-      bgLight: 'bg-amber-500/10 border-amber-500/20 text-amber-900 dark:text-amber-200', 
-      iconColor: 'bg-amber-600 text-white', 
-      count: `${products.length} Items`, 
-      desc: 'View & manage your live craft inventory' 
-    },
-    { 
-      id: 'pricing', 
-      label: t('navPricing'), 
-      icon: DollarSign, 
-      bgLight: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-900 dark:text-emerald-200', 
-      iconColor: 'bg-emerald-600 text-white', 
-      count: 'ML Engine', 
-      desc: 'Calculate fair prices with Scikit-Learn' 
-    },
-    { 
-      id: 'gem', 
-      label: t('navGeM'), 
-      icon: Building2, 
-      bgLight: 'bg-blue-500/10 border-blue-500/20 text-blue-900 dark:text-blue-200', 
-      iconColor: 'bg-blue-600 text-white', 
-      count: 'Govt RFQs', 
-      desc: 'Publish to GeM and receive bulk orders' 
-    },
-    { 
-      id: 'whatsapp', 
-      label: t('navWhatsApp'), 
-      icon: MessageCircle, 
-      bgLight: 'bg-green-500/10 border-green-500/20 text-green-900 dark:text-green-200', 
-      iconColor: 'bg-green-600 text-white', 
-      count: 'AI Bot', 
-      desc: 'Interact with your simulated WhatsApp store' 
-    },
-    { 
-      id: 'analytics', 
-      label: t('navAnalytics'), 
-      icon: BarChart3, 
-      bgLight: 'bg-purple-500/10 border-purple-500/20 text-purple-900 dark:text-purple-200', 
-      iconColor: 'bg-purple-600 text-white', 
-      count: 'Sales & Growth', 
-      desc: 'Revenue analytics and visitor charts' 
-    },
-    { 
-      id: 'community', 
-      label: t('navCommunity'), 
-      icon: Users, 
-      bgLight: 'bg-rose-500/10 border-rose-500/20 text-rose-900 dark:text-rose-200', 
-      iconColor: 'bg-rose-600 text-white', 
-      count: 'Peer Guild', 
-      desc: 'Connect with fellow artisans & craft fairs' 
-    },
-  ];
+  // Real Application Data Computations
+  const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+  const displayRevenue = totalRevenue > 0 ? totalRevenue : (products.length > 0 ? products.reduce((acc, p) => acc + (Number(p.price) || 0) * (p.sales_count || 1), 0) : 0);
+  const netEarnings = Math.round(displayRevenue * 0.82);
+  const businessExpenses = Math.round(displayRevenue * 0.18);
+
+  // Top products from actual products store
+  const bestSellers = [...products]
+    .sort((a, b) => (b.sales_count || b.views_count || 0) - (a.sales_count || a.views_count || 0))
+    .slice(0, 4);
+
+  // Recent orders
+  const recentOrders = orders.slice(0, 4);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-7 animate-fade-in pb-28">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-7 animate-fade-in pb-28 text-stone-900 dark:text-stone-100">
       
-      {/* Top Welcome Card */}
-      <div className="bg-gradient-to-r from-[#B35438] via-[#C86D51] to-[#C29B38] rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-stone-950/15 relative overflow-hidden">
-        {/* Subtle decorative glow circles */}
+      {/* 1. GREETING / IDENTITY HEADER */}
+      <div className="rounded-[28px] p-6 sm:p-8 bg-gradient-to-r from-[#B35438] via-[#C86D51] to-[#C29B38] text-white shadow-xl shadow-stone-950/15 relative overflow-hidden">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-amber-400/15 rounded-full blur-xl pointer-events-none" />
 
@@ -126,43 +91,44 @@ export const ArtisanLandingPage = () => {
           <div className="space-y-2 max-w-xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold border border-white/30">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>MoSJE Verified Artisan Portal</span>
+              <span>MoSJE Certified Artisan Portal</span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-editorial text-white">
-              {lang === 'hi' ? 'नमस्ते, शिल्पकार साथी!' : 'Namaste, Master Artisan!'}
+              {lang === 'hi' 
+                ? `नमस्ते, ${currentUser?.name || 'शिल्पकार साथी'}!` 
+                : `Namaste, ${currentUser?.name || 'Master Artisan'}!`}
             </h1>
 
             <p className="text-xs sm:text-sm text-orange-50 font-sans leading-relaxed">
-              {lang === 'hi' 
-                ? 'क्राफ्टएक्स AI आपका पर्सनल बिजनेस मैनेजर है — सिर्फ 1 फोटो या बोलकर अपना उत्पाद ऑनलाइन लाइव करें।' 
-                : 'CraftX AI is your virtual studio — snap a photo or speak to digitize and sell your handcrafted treasures.'}
+              {currentUser?.location ? `📍 ${currentUser.location} • ` : ''}
+              {currentUser?.craft_type ? `🎨 ${currentUser.craft_type}` : (lang === 'hi' ? 'भारतीय पारंपरिक हस्तकला' : 'Authentic Indian Handicrafts')}
             </p>
           </div>
 
           <div className="flex items-center space-x-3 shrink-0">
-            <div className="px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-md text-white border border-white/30 text-xs font-bold flex items-center space-x-2 shadow-sm">
+            <div className="px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-md text-white border border-white/30 text-xs font-bold flex items-center space-x-2 shadow-sm font-mono">
               <Award className="w-4 h-4 text-amber-200" />
-              <span>Pehchan ID: {currentUser?.scheme_id || 'MoSJE-UP-2026-091'}</span>
+              <span>{currentUser?.scheme_id || currentUser?.mosje_pehchan_id || 'MoSJE-UP-2026-091'}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* AI Voice Assistant Companion Card */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm flex items-center justify-between gap-4 transition-colors">
+      {/* AI Companion Voice Prompt Bar */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm flex items-center justify-between gap-4">
         <div className="flex items-center space-x-3.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-craft-terracotta flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 text-[#B35438] dark:text-[#E07A5F] flex items-center justify-center shrink-0">
             <Sparkles className="w-5 h-5 animate-pulse" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-extrabold tracking-wider text-craft-terracotta block">
-              AI Companion Guide • सहायक
+            <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#B35438] dark:text-[#E07A5F] block">
+              AI Voice Assistant • मार्गदर्शन
             </span>
             <p className="text-xs sm:text-sm font-semibold text-stone-800 dark:text-stone-200 truncate">
               {lang === 'hi'
-                ? 'शुरू करने के लिए नीचे दी गई फोटो बटन दबाएँ या आवाज से बताएं।'
-                : 'Tap the photo button below or describe your craft by voice to begin.'}
+                ? 'नया हस्तशिल्प जोड़ने के लिए फोटो खींचें या बोलकर विवरण दें।'
+                : 'Tap Photo Studio or describe by voice to list a new handcrafted product.'}
             </p>
           </div>
         </div>
@@ -170,72 +136,181 @@ export const ArtisanLandingPage = () => {
         <button
           onClick={handleSpeakGreeting}
           className="p-2.5 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-[#B35438] hover:text-white text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 transition-all shadow-sm shrink-0 flex items-center space-x-1.5"
-          title="Listen to AI voice guide"
+          title="Voice prompt"
         >
-          <Volume2 className="w-4 h-4 text-craft-terracotta group-hover:text-white" />
-          <span className="text-xs font-bold hidden sm:inline">Listen</span>
+          <Volume2 className="w-4 h-4 text-[#B35438] dark:text-[#E07A5F] group-hover:text-white" />
+          <span className="text-xs font-bold hidden sm:inline">{lang === 'hi' ? 'सुनें' : 'Listen'}</span>
         </button>
       </div>
 
-      {/* PRIMARY TWO GIANT ACTION TILES */}
-      <div className="space-y-3">
+      {/* 2. EARNINGS & KPI METRICS OVERVIEW */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        
+        {/* Total Artisan Earnings */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+              {lang === 'hi' ? 'कुल आय (Earnings)' : 'Artisan Earnings'}
+            </span>
+            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-stone-900 dark:text-white font-mono">
+            ₹{displayRevenue.toLocaleString('en-IN')}
+          </div>
+          <p className="text-[10px] text-stone-400">
+            {lang === 'hi' ? 'सकल शिल्प बिक्री' : 'Gross craft revenue'}
+          </p>
+        </div>
+
+        {/* Net Earnings */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+              {lang === 'hi' ? 'शुद्ध कमाई (Net)' : 'Net Earnings'}
+            </span>
+            <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+              <DollarSign className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono">
+            ₹{netEarnings.toLocaleString('en-IN')}
+          </div>
+          <p className="text-[10px] text-stone-400">
+            {lang === 'hi' ? 'लागत घटाकर लाभ' : 'After estimated costs'}
+          </p>
+        </div>
+
+        {/* Orders KPI */}
+        <button
+          onClick={() => setActiveTab('artisan-orders')}
+          className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 hover:border-[#B35438]/60 shadow-sm text-left transition-all space-y-2 group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider group-hover:text-[#B35438] transition-colors">
+              {lang === 'hi' ? 'सक्रिय ऑर्डर्स' : 'Active Orders'}
+            </span>
+            <div className="p-2 rounded-xl bg-orange-500/10 text-[#B35438] dark:text-[#E07A5F] group-hover:scale-110 transition-transform">
+              <Truck className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-stone-900 dark:text-white font-mono flex items-center justify-between">
+            <span>{orders.length}</span>
+            <ArrowUpRight className="w-4 h-4 text-stone-400 group-hover:text-[#B35438]" />
+          </div>
+          <p className="text-[10px] text-stone-400">
+            {lang === 'hi' ? 'DNK डिलीवरी ट्रैकिंग' : 'Fulfillment & DNK'}
+          </p>
+        </button>
+
+        {/* Products KPI */}
+        <button
+          onClick={() => setActiveTab('catalog')}
+          className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 hover:border-amber-500/60 shadow-sm text-left transition-all space-y-2 group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider group-hover:text-amber-600 transition-colors">
+              {lang === 'hi' ? 'लाइव उत्पाद' : 'Live Products'}
+            </span>
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+              <ShoppingBag className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-xl sm:text-2xl font-black text-stone-900 dark:text-white font-mono flex items-center justify-between">
+            <span>{products.length}</span>
+            <ArrowUpRight className="w-4 h-4 text-stone-400 group-hover:text-amber-600" />
+          </div>
+          <p className="text-[10px] text-stone-400">
+            {lang === 'hi' ? 'कैटलॉग में दर्ज' : 'In your catalog'}
+          </p>
+        </button>
+
+      </div>
+
+      {/* 3. AI QUICK TOOLS (Studio, Voice, Smart Pricing) */}
+      <div className="space-y-3 pt-1">
         <div className="flex items-center justify-between px-1">
           <span className="text-xs font-black uppercase tracking-wider text-stone-500 dark:text-stone-400 font-sans">
-            {lang === 'hi' ? 'मुख्य आसान कदम (Primary Actions)' : 'Fast Listing Studio'}
+            {lang === 'hi' ? 'AI त्वरित उपकरण (AI Studio Tools)' : 'AI Creator Tools'}
           </span>
-          <span className="text-xs font-bold text-craft-terracotta font-sans">
-            {lang === 'hi' ? '2 मिनट में लाइव' : 'Live in 2 mins'}
+          <span className="text-xs font-bold text-[#B35438] dark:text-[#E07A5F] font-sans">
+            {lang === 'hi' ? 'आसान व तेज़' : 'Fast 2-Min Listing'}
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
-          {/* Action 1: Photo Lo (AI Photo Studio) */}
+          {/* Tool 1: AI Photo Studio */}
           <button
             onClick={() => setActiveTab('camera')}
-            className="group relative p-6 sm:p-8 rounded-[28px] bg-gradient-to-br from-[#B35438] via-[#C86D51] to-[#C29B38] text-white text-left shadow-xl shadow-stone-950/20 hover:shadow-2xl hover:scale-[1.015] active:scale-[0.985] transition-all border border-orange-400/30 flex flex-col justify-between min-h-[200px]"
+            className="p-5 rounded-2xl bg-gradient-to-br from-[#B35438] via-[#C86D51] to-[#C29B38] text-white text-left shadow-lg hover:shadow-xl hover:scale-[1.015] active:scale-[0.985] transition-all flex flex-col justify-between min-h-[160px] group"
           >
             <div className="flex items-center justify-between w-full">
-              <div className="p-3.5 rounded-2xl bg-black/20 backdrop-blur-md group-hover:scale-110 transition-transform">
-                <Camera className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+              <div className="p-3 rounded-2xl bg-black/20 backdrop-blur-md group-hover:scale-110 transition-transform">
+                <Camera className="w-6 h-6 text-white" />
               </div>
-              <span className="px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-black tracking-wider uppercase backdrop-blur-md border border-white/20">
-                Step 1 • कदम 1
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white uppercase tracking-wider">
+                Step 1
               </span>
             </div>
-
-            <div className="mt-6 space-y-1.5">
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-editorial flex items-center justify-between">
-                <span>{t('btnPhotoLo')}</span>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            <div className="mt-4">
+              <h3 className="text-lg font-black tracking-tight font-editorial flex items-center justify-between">
+                <span>{t('btnPhotoLo') || 'AI Photo Studio'}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </h3>
-              <p className="text-xs sm:text-sm text-orange-100 font-medium leading-relaxed font-sans">
-                {t('btnPhotoLoSub')}
+              <p className="text-xs text-orange-100 mt-1 line-clamp-2">
+                {t('btnPhotoLoSub') || 'Professional background removal & studio lighting in 1 tap.'}
               </p>
             </div>
           </button>
 
-          {/* Action 2: Bolkar Batao (Voice to Catalog) */}
+          {/* Tool 2: Voice -> AI Catalog */}
           <button
             onClick={() => setActiveTab('voice')}
-            className="group relative p-6 sm:p-8 rounded-[28px] bg-white dark:bg-stone-900 text-stone-900 dark:text-white text-left shadow-md dark:shadow-xl hover:shadow-xl hover:scale-[1.015] active:scale-[0.985] transition-all border-2 border-stone-200/90 dark:border-stone-800 hover:border-[#B35438] dark:hover:border-[#C86D51] flex flex-col justify-between min-h-[200px]"
+            className="p-5 rounded-2xl bg-white dark:bg-stone-900 border-2 border-stone-200/90 dark:border-stone-800 hover:border-[#B35438] dark:hover:border-[#C86D51] text-stone-900 dark:text-white text-left shadow-sm hover:shadow-md hover:scale-[1.015] active:scale-[0.985] transition-all flex flex-col justify-between min-h-[160px] group"
           >
             <div className="flex items-center justify-between w-full">
-              <div className="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-craft-terracotta group-hover:scale-110 transition-transform">
-                <Mic className="w-7 h-7 sm:w-8 sm:h-8 animate-pulse" />
+              <div className="p-3 rounded-2xl bg-orange-500/10 text-[#B35438] dark:text-[#E07A5F] group-hover:scale-110 transition-transform">
+                <Mic className="w-6 h-6 animate-pulse" />
               </div>
-              <span className="px-3 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-[11px] font-black tracking-wider uppercase border border-stone-200 dark:border-stone-700">
-                Step 2 • कदम 2
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 uppercase tracking-wider">
+                Step 2
               </span>
             </div>
-
-            <div className="mt-6 space-y-1.5">
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight font-editorial flex items-center justify-between text-stone-900 dark:text-white group-hover:text-craft-terracotta transition-colors">
-                <span>{t('btnBolkarBatao')}</span>
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            <div className="mt-4">
+              <h3 className="text-lg font-black tracking-tight font-editorial flex items-center justify-between group-hover:text-[#B35438] dark:group-hover:text-[#E07A5F] transition-colors">
+                <span>{t('btnBolkarBatao') || 'Voice to Catalog'}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </h3>
-              <p className="text-xs sm:text-sm text-stone-600 dark:text-stone-300 font-medium leading-relaxed font-sans">
-                {t('btnBolkarBataoSub')}
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 line-clamp-2">
+                {t('btnBolkarBataoSub') || 'Describe craft in Hindi or regional language for instant AI catalog.'}
+              </p>
+            </div>
+          </button>
+
+          {/* Tool 3: Smart ML Pricing */}
+          <button
+            onClick={() => setActiveTab('pricing')}
+            className="p-5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/90 dark:border-stone-800 hover:border-emerald-500/60 text-stone-900 dark:text-white text-left shadow-sm hover:shadow-md hover:scale-[1.015] active:scale-[0.985] transition-all flex flex-col justify-between min-h-[160px] group"
+          >
+            <div className="flex items-center justify-between w-full">
+              <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                <DollarSign className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 uppercase tracking-wider">
+                Step 3
+              </span>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-lg font-black tracking-tight font-editorial flex items-center justify-between group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <span>{t('navPricing') || 'Smart Pricing'}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
+              </h3>
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 line-clamp-2">
+                {lang === 'hi' 
+                  ? 'सामग्री व समय के आधार पर निष्पक्ष पारिश्रमिक मूल्य तय करें।' 
+                  : 'Calculate fair artisan wages and market-ready price breakdown.'}
               </p>
             </div>
           </button>
@@ -243,56 +318,165 @@ export const ArtisanLandingPage = () => {
         </div>
       </div>
 
-      {/* SECONDARY DASHBOARD & MANAGEMENT TOOLS */}
-      <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-between px-1 border-t border-stone-200/80 dark:border-stone-800 pt-6">
+      {/* 4. BEST-SELLING PRODUCTS PREVIEW */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between px-1">
           <div>
-            <h4 className="text-base font-black text-stone-900 dark:text-white font-serif">
-              {t('quickTools')}
-            </h4>
-            <p className="text-xs text-stone-500 dark:text-stone-400 font-sans">
-              {lang === 'hi' ? 'कैटलॉग, GeM बाज़ार, स्मार्ट मूल्य निर्धारण व बिक्री' : 'Manage catalog, pricing, GeM orders & sales'}
+            <h3 className="text-base font-black text-stone-900 dark:text-white font-editorial">
+              {lang === 'hi' ? 'शीर्ष हस्तशिल्प (Best-Selling Crafts)' : 'Top Performing Crafts'}
+            </h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              {lang === 'hi' ? 'आपके कैटलॉग से सबसे लोकप्रिय उत्पाद' : 'Products with active buyer interest & views'}
             </p>
           </div>
           <button
             onClick={() => setActiveTab('catalog')}
-            className="text-xs font-bold text-orange-600 dark:text-orange-400 hover:text-orange-500 flex items-center space-x-1 font-sans"
+            className="text-xs font-bold text-[#B35438] dark:text-[#E07A5F] hover:underline flex items-center space-x-1"
           >
-            <span>{lang === 'hi' ? 'सभी देखें' : 'View All'}</span>
+            <span>{lang === 'hi' ? 'कैटलॉग देखें' : 'View Catalog'}</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-          {secondaryTools.map((tool) => {
-            const Icon = tool.icon;
-            return (
-              <button
-                key={tool.id}
-                onClick={() => setActiveTab(tool.id)}
-                className="p-4 rounded-2xl bg-white dark:bg-stone-900 hover:bg-stone-50 dark:hover:bg-stone-800/80 border border-stone-200/80 dark:border-stone-800 hover:border-orange-500/50 dark:hover:border-orange-500/50 text-left transition-all group flex flex-col justify-between shadow-sm hover:shadow-md min-h-[110px]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`p-2.5 rounded-xl ${tool.iconColor} shadow-sm group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+        {bestSellers.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            {bestSellers.map((p) => {
+              const img = getProductImage(p, true);
+              return (
+                <div
+                  key={p.id}
+                  onClick={() => {
+                    setSelectedProduct(p);
+                    setActiveTab('detail');
+                  }}
+                  className="rounded-2xl p-3 bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="aspect-square rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 relative mb-2.5">
+                      <img 
+                        src={img} 
+                        alt={p.title_en || p.title_hi || 'Craft'} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        loading="lazy"
+                      />
+                      {p.gi_tagged && (
+                        <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md text-[9px] font-bold text-amber-300">
+                          GI
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-xs font-bold text-stone-900 dark:text-white truncate">
+                      {lang === 'hi' && p.title_hi ? p.title_hi : p.title_en}
+                    </h4>
+                    <p className="text-[10px] text-stone-500 dark:text-stone-400 truncate">
+                      {p.category || 'Handicraft'}
+                    </p>
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
-                    {tool.count}
-                  </span>
+                  <div className="mt-2 pt-2 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                    <span className="text-xs font-black font-mono text-[#B35438] dark:text-[#E07A5F]">
+                      ₹{p.price?.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-[10px] text-stone-400 font-medium">
+                      {p.sales_count || 0} {lang === 'hi' ? 'बिके' : 'sold'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-8 rounded-2xl bg-white dark:bg-stone-900 border border-dashed border-stone-300 dark:border-stone-800 text-center space-y-3">
+            <Package className="w-8 h-8 text-stone-400 mx-auto" />
+            <div>
+              <p className="text-xs sm:text-sm font-bold text-stone-700 dark:text-stone-300">
+                {lang === 'hi' ? 'कैटलॉग में कोई उत्पाद नहीं है' : 'No products in your catalog yet'}
+              </p>
+              <p className="text-[11px] text-stone-400 mt-0.5">
+                {lang === 'hi' ? 'पहला उत्पाद जोड़ने के लिए AI Photo Studio खोलें' : 'Take a photo to digitize your first craft item.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('camera')}
+              className="px-4 py-2 rounded-xl bg-[#B35438] text-white text-xs font-bold shadow-md hover:bg-[#C86D51] transition-colors inline-flex items-center space-x-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{lang === 'hi' ? 'नया उत्पाद जोड़ें' : 'Add First Craft'}</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 5. RECENT ORDERS SECTION */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between px-1">
+          <div>
+            <h3 className="text-base font-black text-stone-900 dark:text-white font-editorial">
+              {lang === 'hi' ? 'हाल के ऑर्डर्स (Recent Orders)' : 'Recent Orders'}
+            </h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              {lang === 'hi' ? 'खरीदारों द्वारा दिए गए हालिया आदेश' : 'Customer orders with DNK shipping tracking'}
+            </p>
+          </div>
+          <button
+            onClick={() => setActiveTab('artisan-orders')}
+            className="text-xs font-bold text-[#B35438] dark:text-[#E07A5F] hover:underline flex items-center space-x-1"
+          >
+            <span>{lang === 'hi' ? 'सभी ऑर्डर्स देखें' : 'View All Orders'}</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {recentOrders.length > 0 ? (
+          <div className="space-y-2.5">
+            {recentOrders.map((order) => (
+              <div 
+                key={order.id}
+                className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 shadow-sm flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 overflow-hidden shrink-0">
+                    <img 
+                      src={order.product_image || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=80'} 
+                      alt="Order item"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs font-bold text-stone-900 dark:text-white truncate">
+                        {order.product_title || 'Handmade Craft Order'}
+                      </span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-stone-100 dark:bg-stone-800 text-stone-500">
+                        {order.id}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-stone-400 truncate mt-0.5">
+                      {order.order_date || 'Recent'} • Qty: {order.qty || 1} • {order.payment_method || 'UPI'}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="mt-3">
-                  <span className="text-xs sm:text-sm font-extrabold text-stone-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors block font-sans">
-                    {tool.label}
-                  </span>
-                  <span className="text-[10px] text-stone-500 dark:text-stone-400 line-clamp-1 block mt-0.5 font-sans">
-                    {tool.desc}
+                <div className="text-right shrink-0">
+                  <div className="text-sm font-black font-mono text-stone-900 dark:text-white">
+                    ₹{order.total?.toLocaleString('en-IN') || order.price?.toLocaleString('en-IN')}
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                    order.status === 'DELIVERED' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                    order.status === 'SHIPPED' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                    'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                  }`}>
+                    {order.status || 'ACCEPTED'}
                   </span>
                 </div>
-              </button>
-            );
-          })}
-        </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200/80 dark:border-stone-800 text-center text-xs text-stone-500">
+            {lang === 'hi' ? 'अभी तक कोई ऑर्डर नहीं आया है।' : 'No customer orders received yet.'}
+          </div>
+        )}
       </div>
 
     </div>

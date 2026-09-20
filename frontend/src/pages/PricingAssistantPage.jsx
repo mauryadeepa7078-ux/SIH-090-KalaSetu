@@ -347,9 +347,9 @@ export const PricingAssistantPage = () => {
             <div className="space-y-4 pt-2 relative z-10">
               <div className="flex items-center justify-between text-xs font-bold text-stone-300">
                 <span className="flex items-center space-x-1.5 font-editorial">
-                  <span>🧵 Interwoven Craft Value Threads:</span>
+                  <span>🧵 Interwoven Craft Value Breakdown:</span>
                 </span>
-                <span className="text-[11px] text-amber-300 font-mono">100% Fair Value</span>
+                <span className="text-[11px] text-amber-300 font-mono">100% Fair Artisan Value</span>
               </div>
 
               {/* Braided Metaphor Multi-Thread Ribbon */}
@@ -358,46 +358,60 @@ export const PricingAssistantPage = () => {
                   {/* Material Thread */}
                   <div 
                     className="craft-woven-thread bg-[#C29B38] h-full rounded-l-full transition-all duration-500 relative group cursor-pointer" 
-                    style={{ width: `${Math.max(15, Math.min(50, (pricingResult.material_cost / (pricingResult.recommended_price || 1)) * 100))}%` }}
-                    title={`Material Thread: ₹${pricingResult.material_cost}`}
+                    style={{ width: `${Math.max(15, Math.min(45, (pricingResult.material_cost / (pricingResult.recommended_price || 1)) * 100))}%` }}
+                    title={`Raw Materials: ₹${pricingResult.material_cost}`}
                   ></div>
                   {/* Labor Thread */}
                   <div 
                     className="craft-woven-thread bg-[#B35438] h-full transition-all duration-500 relative group cursor-pointer" 
-                    style={{ width: `${Math.max(25, Math.min(60, (pricingResult.labor_cost / (pricingResult.recommended_price || 1)) * 100))}%` }}
+                    style={{ width: `${Math.max(25, Math.min(50, (pricingResult.labor_cost / (pricingResult.recommended_price || 1)) * 100))}%` }}
                     title={`Artisan Labor: ₹${pricingResult.labor_cost}`}
+                  ></div>
+                  {/* Packaging Thread */}
+                  <div 
+                    className="craft-woven-thread bg-blue-500 h-full transition-all duration-500 relative group cursor-pointer" 
+                    style={{ width: '10%' }}
+                    title="Eco Heritage Packaging: ₹85"
                   ></div>
                   {/* Fair Margin Thread */}
                   <div 
                     className="craft-woven-thread bg-emerald-600 h-full flex-1 rounded-r-full transition-all duration-500 relative group cursor-pointer" 
-                    title={`Fair Margin: ₹${pricingResult.heritage_margin}`}
+                    title={`Fair Artisan Margin: ₹${pricingResult.heritage_margin}`}
                   ></div>
                 </div>
 
-                {/* Legend Chips with thread colors */}
-                <div className="grid grid-cols-3 gap-1.5 pt-1 text-[10px]">
-                  <div className="p-2 rounded-xl bg-stone-900/90 border border-[#C29B38]/40 flex flex-col">
+                {/* 4-Part Breakdown Legend Chips (Material, Artisan Labor, Packaging, Margin) */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[10px]">
+                  <div className="p-2.5 rounded-xl bg-stone-900/90 border border-[#C29B38]/40 flex flex-col">
                     <span className="text-[#D4AF37] font-bold flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-[#C29B38]"></span>
                       Material
                     </span>
-                    <span className="text-white font-mono font-bold mt-0.5">₹{pricingResult.material_cost}</span>
+                    <span className="text-white font-mono font-bold mt-0.5 text-xs">₹{pricingResult.material_cost}</span>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-stone-900/90 border border-[#B35438]/40 flex flex-col">
+                  <div className="p-2.5 rounded-xl bg-stone-900/90 border border-[#B35438]/40 flex flex-col">
                     <span className="text-orange-400 font-bold flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-[#B35438]"></span>
-                      Labor ({hoursSpent}h)
+                      Artisan Labor ({hoursSpent}h)
                     </span>
-                    <span className="text-white font-mono font-bold mt-0.5">₹{pricingResult.labor_cost}</span>
+                    <span className="text-white font-mono font-bold mt-0.5 text-xs">₹{pricingResult.labor_cost}</span>
                   </div>
 
-                  <div className="p-2 rounded-xl bg-stone-900/90 border border-emerald-500/40 flex flex-col">
+                  <div className="p-2.5 rounded-xl bg-stone-900/90 border border-blue-500/40 flex flex-col">
+                    <span className="text-blue-400 font-bold flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      Packaging
+                    </span>
+                    <span className="text-white font-mono font-bold mt-0.5 text-xs">₹85</span>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-stone-900/90 border border-emerald-500/40 flex flex-col">
                     <span className="text-emerald-400 font-bold flex items-center gap-1">
                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      Fair Margin
+                      Margin
                     </span>
-                    <span className="text-white font-mono font-bold mt-0.5">₹{pricingResult.heritage_margin}</span>
+                    <span className="text-white font-mono font-bold mt-0.5 text-xs">₹{pricingResult.heritage_margin}</span>
                   </div>
                 </div>
               </div>

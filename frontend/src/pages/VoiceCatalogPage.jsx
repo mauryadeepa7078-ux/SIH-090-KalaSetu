@@ -398,11 +398,22 @@ export const VoiceCatalogPage = () => {
               </div>
             </div>
 
-            {/* Live Visual Speech Status Indicator */}
+            {/* Animated Listening Waveform */}
             {isRecording && (
-              <div className="p-3.5 bg-red-50 dark:bg-red-950/40 rounded-2xl border border-red-200 dark:border-red-900/60 flex items-center justify-center space-x-2 text-xs font-bold text-red-700 dark:text-red-300 animate-pulse">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                <span>Web Speech API is actively listening to your dialect...</span>
+              <div className="p-4 bg-orange-50/80 dark:bg-stone-950/80 rounded-2xl border border-orange-200 dark:border-orange-900/60 flex flex-col items-center justify-center space-y-2.5 animate-fade-in">
+                <div className="flex items-center space-x-1.5 h-8">
+                  <div className="wave-bar wave-bar-1 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-2 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-3 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-4 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-5 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-2 bg-orange-600 dark:bg-orange-400"></div>
+                  <div className="wave-bar wave-bar-4 bg-orange-600 dark:bg-orange-400"></div>
+                </div>
+                <div className="flex items-center space-x-2 text-xs font-bold text-orange-700 dark:text-orange-300">
+                  <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                  <span>{lang === 'hi' ? 'आवाज़ पहचानी जा रही है... बोलते रहें' : 'Listening attentively to your craft description...'}</span>
+                </div>
               </div>
             )}
 
@@ -429,6 +440,44 @@ export const VoiceCatalogPage = () => {
               />
             </div>
 
+            {/* Structured Speech Extraction Preview (Product, Material, Craft, Price) */}
+            {transcript && (
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-left space-y-2 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                    Extracted Speech Preview
+                  </span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Ready to Generate</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800">
+                    <span className="text-[10px] text-stone-400 block font-bold">Product</span>
+                    <span className="font-bold text-stone-800 dark:text-stone-200 truncate block">
+                      {formData.title_hi || formData.title_en || 'Handmade Craft'}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800">
+                    <span className="text-[10px] text-stone-400 block font-bold">Material</span>
+                    <span className="font-bold text-stone-800 dark:text-stone-200 truncate block">
+                      {formData.material_type || 'Natural Silk / Terracotta / Brass'}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800">
+                    <span className="text-[10px] text-stone-400 block font-bold">Craft Heritage</span>
+                    <span className="font-bold text-stone-800 dark:text-stone-200 truncate block">
+                      {formData.category || 'Traditional Handloom'}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-white dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800">
+                    <span className="text-[10px] text-stone-400 block font-bold">Est. Price</span>
+                    <span className="font-bold text-stone-800 dark:text-stone-200 truncate block">
+                      {activeDraft?.suggested_price ? `₹${activeDraft.suggested_price}` : 'Smart Pricing Next'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Quick 1-Tap Voice Samples for Testing & Demo */}
             <div className="text-left space-y-2.5 pt-4 border-t border-stone-100 dark:border-stone-800">
               <span className="text-[11px] font-bold text-stone-500 dark:text-stone-400 uppercase tracking-wider block">
@@ -444,7 +493,7 @@ export const VoiceCatalogPage = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => useSampleVoice('यह बस्तर की पारंपरिक ढोकरा लॉस्ट-वैक्स ब्रास की जनजातीय संगीतकार मूर्ति है, 1 किलो वजन है।')}
+                  onClick={() => useSampleVoice('यह बस्तर की पारंपरिक ढोकरा ब्रास मूर्ति है, जिसे लॉस्ट-वैक्स तकनीक से तैयार किया गया है।')}
                   className="p-3 rounded-2xl bg-orange-50/70 dark:bg-orange-950/30 hover:bg-orange-100 dark:hover:bg-orange-950/60 border border-orange-200/80 dark:border-orange-900/50 text-left text-xs text-stone-900 dark:text-stone-200 font-medium transition-all shadow-sm min-h-[48px] flex items-center"
                 >
                   <span>🔔 <b>Dokra Brass:</b> "यह बस्तर की पारंपरिक ढोकरा ब्रास मूर्ति है..."</span>

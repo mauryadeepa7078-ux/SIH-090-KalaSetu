@@ -33,13 +33,23 @@ export const BuyerOrdersPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(orders.length > 0 ? orders[0] : null);
 
   const stages = [
-    { labelEn: 'Order Placed', labelHi: 'ऑर्डर दर्ज हुआ', descEn: 'Payment verified & order sent to artisan unit', descHi: 'भुगतान सत्यापित, ऑर्डर कारीगर इकाई को भेजा गया' },
-    { labelEn: 'Confirmed by Artisan', labelHi: 'कारीगर द्वारा स्वीकृत', descEn: 'Master artisan accepted production/dispatch', descHi: 'मास्टर कारीगर ने निर्माण व प्रेषण स्वीकार किया' },
-    { labelEn: 'Quality & GI Verified', labelHi: 'गुणवत्ता व GI जांच', descEn: 'MoSJE provenance seal & QR tag affixed', descHi: 'MoSJE प्रामाणिकता सील व डिजिटल QR संलग्न' },
-    { labelEn: 'Dispatched via India Post', labelHi: 'डाक घर से रवाना', descEn: 'Handed over to Dak Ghar Niryat Kendra (DNK)', descHi: 'डाक घर निर्यात केंद्र (DNK) द्वारा प्रेषित' },
-    { labelEn: 'Out for Delivery', labelHi: 'डिलीवरी हेतु रवाना', descEn: 'Arrived at local hub and out for door delivery', descHi: 'स्थानीय डाक हब से आपके पते के लिए रवाना' },
-    { labelEn: 'Delivered', labelHi: 'सफलतापूर्वक प्राप्त', descEn: 'Delivered to recipient with digital proof', descHi: 'डिजिटल पावती सहित सफलतापूर्वक डिलीवर' }
+    { key: 'NEW', labelEn: 'New Order Placed', labelHi: 'ऑर्डर दर्ज हुआ', descEn: 'Order confirmed & sent directly to artisan unit', descHi: 'भुगतान सत्यापित, ऑर्डर कारीगर इकाई को भेजा गया' },
+    { key: 'ACCEPTED', labelEn: 'Accepted by Artisan', labelHi: 'कारीगर द्वारा स्वीकृत', descEn: 'Master artisan accepted production and dispatch schedule', descHi: 'मास्टर कारीगर ने निर्माण व प्रेषण स्वीकार किया' },
+    { key: 'PREPARING', labelEn: 'Preparing & Quality Check', labelHi: 'तैयारी व गुणवत्ता जांच', descEn: 'Handcrafting finished, MoSJE authenticity seal affixed', descHi: 'शिल्प निर्माण संपन्न, MoSJE प्रामाणिकता सील व QR संलग्न' },
+    { key: 'SHIPPED', labelEn: 'Shipped via India Post DNK', labelHi: 'डाक घर से रवाना', descEn: 'Handed over to Dak Ghar Niryat Kendra with active tracking', descHi: 'डाक घर निर्यात केंद्र (DNK) द्वारा स्पीड पोस्ट से रवाना' },
+    { key: 'DELIVERED', labelEn: 'Delivered', labelHi: 'सफलतापूर्वक प्राप्त', descEn: 'Safely delivered to your address with digital receipt', descHi: 'डिजिटल पावती सहित सफलतापूर्वक आपके पते पर डिलीवर' }
   ];
+
+  const getStageIndex = (order) => {
+    if (!order) return 0;
+    const s = order.status;
+    if (s === 'DELIVERED') return 4;
+    if (s === 'SHIPPED' || s === 'DISPATCHED' || s === 'OUT_FOR_DELIVERY') return 3;
+    if (s === 'PREPARING' || s === 'PACKED' || s === 'IN_PRODUCTION') return 2;
+    if (s === 'ACCEPTED' || s === 'CONFIRMED') return 1;
+    if (typeof order.stage_index === 'number') return Math.min(order.stage_index, 4);
+    return 0;
+  };
 
   const handleOpenCertificate = (order) => {
     const matched = products.find(p => p.id === order.product_id) || {
@@ -257,7 +267,7 @@ export const BuyerOrdersPage = () => {
                 </div>
               </div>
 
-              {/* PROGRESS TIMELINE (6 Stages) */}
+              {/* PROGRESS TIMELINE (5 Stages) */}
               <div className="space-y-3 pt-2">
                 <h4 className="text-xs font-black uppercase tracking-wider text-stone-400 dark:text-stone-500 font-sans">
                   {lang === 'hi' ? 'ऑर्डर की प्रगति (Live Tracking Timeline)' : 'Order Milestone Timeline'}
@@ -265,8 +275,9 @@ export const BuyerOrdersPage = () => {
 
                 <div className="relative pl-6 sm:pl-8 space-y-6 before:content-[''] before:absolute before:left-3 sm:before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-stone-200 dark:before:bg-stone-800">
                   {stages.map((stage, idx) => {
-                    const isCompleted = idx <= selectedOrder.stage_index;
-                    const isCurrent = idx === selectedOrder.stage_index;
+                    const currentStageIndex = getStageIndex(selectedOrder);
+                    const isCompleted = idx <= currentStageIndex;
+                    const isCurrent = idx === currentStageIndex;
 
                     return (
                       <div key={idx} className="relative flex items-start space-x-3">

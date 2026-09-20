@@ -165,15 +165,15 @@ export const Navbar = () => {
 
   // Artisan Core vs Secondary
   const artisanPrimaryNav = [
-    { id: 'artisan-home', label: 'Studio Home', icon: Sparkles, desc: 'Photo & voice first creator hub' },
-    { id: 'camera', label: t('navPhotoStudio') || 'AI Studio', icon: Camera, highlight: true, desc: 'Lighting & background enhancement' },
-    { id: 'voice', label: t('navVoiceCatalog') || 'Voice Catalog', icon: Mic, desc: 'Bilingual AI voice descriptions' },
-    { id: 'catalog', label: 'Mera Catalog', icon: ShoppingBag, desc: 'Digitized craft inventory' },
+    { id: 'artisan-home', label: 'Home', icon: Sparkles, desc: 'Creator studio overview' },
+    { id: 'catalog', label: 'Products', icon: ShoppingBag, desc: 'Digitized craft inventory' },
+    { id: 'artisan-orders', label: 'Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Retail fulfillment & GeM bulk inquiries' },
+    { id: 'camera', label: 'AI Studio', icon: Camera, highlight: true, desc: 'Lighting & background enhancement' },
+    { id: 'voice', label: 'Voice AI', icon: Mic, desc: 'Bilingual AI voice descriptions' },
   ];
 
   const artisanSecondaryNav = [
     { id: 'pricing', label: t('navPricing') || 'Smart Pricing Assistant', icon: DollarSign, desc: 'ML fair-wage benchmark calculator' },
-    { id: 'artisan-orders', label: 'Orders & Bulk Inquiries', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: 'Retail fulfillment & GeM purchase inquiries' },
     { id: 'whatsapp', label: t('navWhatsApp') || 'WhatsApp Assistant', icon: MessageCircle, desc: 'Conversational seller bot' },
     { id: 'analytics', label: t('navAnalytics') || 'Performance Analytics', icon: BarChart3, desc: 'Sales, views, and cluster charts' },
     { id: 'community', label: t('navCommunity') || 'Artisan Community', icon: Users, desc: 'Peer artisan feed and guild network' },
@@ -183,7 +183,7 @@ export const Navbar = () => {
   // Buyer Core vs Secondary
   const buyerPrimaryNav = [
     { id: 'buyer-market', label: 'Marketplace', icon: ShoppingBag, desc: 'Authentic GI Indian crafts' },
-    { id: 'orders', label: 'My Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: '6-stage IndiaPost DNK live tracking' },
+    { id: 'orders', label: 'My Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null, desc: '5-stage IndiaPost DNK live tracking' },
     { id: 'cart', label: 'Cart', icon: ShoppingBag, badge: cart.length > 0 ? cart.length : null, desc: 'Shopping cart & instant checkout' },
     { id: 'community', label: 'Heritage Stories', icon: Users, desc: 'Artisan lineage & craft fair calendar' },
   ];
@@ -194,9 +194,10 @@ export const Navbar = () => {
 
   // Businessman Core vs Secondary
   const businessmanPrimaryNav = [
-    { id: 'businessman-home', label: 'B2B Procurement', icon: Briefcase, desc: 'Direct artisan cluster sourcing' },
-    { id: 'businessman-orders', label: 'B2B & RFQ Tracker', icon: PackageCheck, desc: '6-stage live milestone tracker' },
-    { id: 'gem', label: 'GeM & ONDC Tenders', icon: Building2, desc: 'Government & corporate bulk tenders' },
+    { id: 'businessman-home', label: 'B2B Hub', icon: Briefcase, desc: 'Direct artisan cluster sourcing' },
+    { id: 'gem', label: 'GeM & Tenders', icon: Building2, desc: 'Government & corporate bulk tenders' },
+    { id: 'businessman-orders', label: 'Orders & RFQs', icon: PackageCheck, desc: 'Bulk milestone tracker' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, desc: 'Procurement metrics & trade volume' },
   ];
 
   const businessmanSecondaryNav = [
@@ -220,21 +221,21 @@ export const Navbar = () => {
   const allNavItems = [...primaryNavItems, ...secondaryNavItems];
   const isSecondaryActive = secondaryNavItems.some(item => item.id === activeTab);
 
-  // Mobile Bottom Navigation Tabs (4 distinct items per role)
+  // Mobile Bottom Navigation Tabs (clean 4-5 items per role)
   const bottomTabs = userRole === 'artisan'
     ? [
-        { id: 'artisan-home', label: 'Studio', icon: Sparkles },
+        { id: 'artisan-home', label: 'Home', icon: Sparkles },
+        { id: 'catalog', label: 'Products', icon: ShoppingBag },
+        { id: 'camera', label: 'AI Studio', icon: Camera, isFab: true },
         { id: 'artisan-orders', label: 'Orders', icon: Truck, badge: orders.length > 0 ? orders.length : null },
-        { id: 'camera', label: 'Photo Studio', icon: Camera, isFab: true },
         { id: 'voice', label: 'Voice', icon: Mic },
-        { id: 'catalog', label: 'Catalog', icon: ShoppingBag },
       ]
     : userRole === 'businessman'
     ? [
         { id: 'businessman-home', label: 'B2B Hub', icon: Briefcase },
-        { id: 'businessman-orders', label: 'Orders', icon: PackageCheck, badge: 1 },
         { id: 'gem', label: 'GeM Board', icon: Building2, isFab: true },
-        { id: 'whatsapp', label: 'Inquiries', icon: MessageCircle },
+        { id: 'businessman-orders', label: 'Orders', icon: PackageCheck, badge: 1 },
+        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       ]
     : [
         { id: 'buyer-market', label: 'Market', icon: ShoppingBag },
